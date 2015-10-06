@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.6.3
+// @version        3.6.4
 // @description    Auto submit to get link
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -24,6 +24,7 @@
 // @include        /^https?://(|www\.)yadi.sk/*/
 // @include        /^https?://(|www\.)datafilehost.com/d/*/
 // @include        /^https?://(|www\.)userscloud.com/*/
+// @include        /^https?://(|www\.)hulkload.com/*/
 // @include        /^https?://app.box.com/s/*/
 //
 // ==/UserScript==
@@ -673,6 +674,43 @@
         }, 100);
       }
     },
+    hulkload: {
+      rule: /hulkload\.com/,
+      run: function(){
+        var that = this, FORM, el;
+
+        that.clog('inside hulkload, '+that.get_href());
+        setTimeout(function(){ 
+          that.killframes();
+
+          var el_, els = xp('//*[contains(@id,"onsor")]', null);
+          that.clog("els="+els.snapshotLength);
+          if( els.snapshotLength ){
+            for(var i=0, iL=els.snapshotLength; i<iL; i++){
+              el_ = els.snapshotItem(i);
+              el_.parentNode.removeChild(el_);
+            }
+          }
+        }, 123);
+
+        this.waitforit(function(){
+          return xp('//*[contains(@id, "ownlo") and not(contains(@disabled,"disabled"))]', null, true);
+        }, function(){
+          if( FORM = xp('//form[@name="F1"]', null, true) ){
+            if( el = xp('//input[@name="code"]', null, FORM) )
+              el.focus();
+            else
+              setTimeout(function(){ FORM.submit() }, 345);
+          }else
+          if( el = xp('//a[contains(@href,"kloa'+'d.co'+'m/fi'+'les/")]', null, true) ){
+            setTimeout(function(){
+              SimulateMouse(el, "click", true)
+            }, 125);
+          }
+        }, 100);
+      }
+    },
+
   };
   // end of patterns
 
