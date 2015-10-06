@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.6.5
+// @version        3.6.6
 // @description    Auto submit to get link
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -307,7 +307,7 @@
         else{
           for(var i=0, iL=btns.length; i<iL; i++){
             style = window.getComputedStyle(btns[i]);
-            if( this.isVisible(btns[i]) ){
+            if( this.isVisible(btns[i]) || isUndefined(btns[i].getAttribute("class")) ){
               dlBtn = btns[i];
               break;
             }
