@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.6.4
+// @version        3.6.5
 // @description    Auto submit to get link
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -604,11 +604,13 @@
         that = this;
 
         that.clog('inside solidfiles, '+that.get_href());
-        setTimeout(function(){ that.killframes() }, 123);
+        setTimeout(function(){
+          that.killframes();
+          that.disableWindowOpen();
+        }, 123);
 
         // pick selector dat relevant and exist on several browsers
-        //if( btnDownload = g('a[class*=direct-download]') )
-        if( btnDownload = g('[id=ddl-btn]') )
+        if( btnDownload = g('.btns>a') )
           setTimeout(function(){
             SimulateMouse(btnDownload, "click", true)
           }, 125);
@@ -649,7 +651,8 @@
         that.clog('inside datafilehost, '+that.get_href());
         setTimeout(function(){ that.killframes() }, 123);
 
-        if( btnDownload = g('a[href*="/get.php?"]') )
+        // pick selector dat relevant and exist on several browsers
+        if( btnDownload = xp('//a[contains(@href,"/get.php?") or contains(@class,"ownloa")]', null, true) )
           setTimeout(function(){
             SimulateMouse(btnDownload, "click", true)
           }, 125);
@@ -730,13 +733,16 @@
       href = (elem && elem.getAttribute ? elem.getAttribute("href") : null);
 
     // make sure it's link, not some sumthin like: "javascript:;"
-    if( href && /^((?:(?:ht|f)tp(?:s?)\:\/\/){1}\S+)/.test(href) ){
+    if( href && /^((?:(?:ht|f)tps?\:\/\/){1}\S+)/.test(href) ){
       try{
-        MNy.action.clog("SimulateMouse trying href");
+        MNy.action.clog("SimulateMouse trying href loaded to iFrame");
         MNy.action.frameload(href);
 
         is_error = false;
       }catch(e){ is_error = true }
+    }
+    else{
+      MNy.action.clog("Element is either not link or invalid format. href="+href);
     }
     
 
