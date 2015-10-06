@@ -10,7 +10,6 @@
 // @include        /^https?://(|www\.)fileswap.com/*/
 // @include        /^https?://(|www\.)mediafire.com/*/
 // @include        /^https?://(|www\.)sendspace.com/file/*/
-// @include        /^https?://(|www\.)firedrive.com/*/
 // @include        /^https?://(|www\.)uptobox.com/*/
 // @include        /^https?://(|www\.)howfile.com/file/*/
 // @include        /^https?://(|www\.)uppit.com/*/
@@ -318,45 +317,6 @@
         dlBtn &&
           this.frameload(dlBtn.getAttribute('href'));
       }
-    },
-
-    firedrive: { // defect
-      rule: /firedrive\.com/,
-      run: function(){
-
-        var sTryWait, that = this;
-        var is_login = g('#profile_top_btn');
-        var btnDownload = ( is_login ? g('.external_download_button') : g('#prepare_continue_btn') );
-        var wait_for_it = function(btn){
-          if( btn.className.indexOf('prepare_btn_done') !== -1 ){
-            sTryWait && clearInterval( sTryWait );
-            SimulateMouse(btn, "click", true);
-          }
-          else
-            return false;
-        };
-        if( btnDownload ){
-          if( !is_login )
-            sTryWait = setInterval(function(){
-              wait_for_it(btnDownload);
-            }, 100);
-          else
-            SimulateMouse(btnDownload, "click", true);
-        }
-        else{
-          if( !is_login ){
-            setTimeout(function(){
-              btnDownload = g('a[href*="dl.firedrive.com"]');
-              that.frameload( btnDownload.getAttribute("href") );
-            }, 567)
-          }
-          else{
-              // step-1
-              if(btnDownload = g('#archive_download_button'))
-                SimulateMouse(btnDownload, "click", true);
-          }
-        }
-      } 
     },
 
     uptobox: {
