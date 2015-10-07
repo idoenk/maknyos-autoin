@@ -32,7 +32,7 @@
 
 (function() {
   var gvar=function(){};
-  gvar.__DEBUG__ = !1;
+  gvar.__DEBUG__ = 1;
 
   function MaknyosHelper(baseURI){
     this.baseURI=baseURI;
@@ -218,8 +218,11 @@
     },
 
     isVisible: function (ele) {
-      return  ele.clientWidth !== 0 &&
-        ele.clientHeight !== 0 &&
+      // this.clog("visibility-test; clientWidth="+ele.clientWidth+'; clientHeight='+ele.clientHeight+'; opacity='+ele.style.opacity+'; visibility='+ele.style.visibility+'; offsetParent='+ele.offsetParent);
+      return true &&
+        // ele.clientWidth !== 0 &&
+        // ele.clientHeight !== 0 &&
+        ele.offsetParent !== null &&
         ele.style.opacity !== 0 &&
         ele.style.visibility !== 'hidden';
     },
@@ -230,8 +233,11 @@
       }else {
         arguments.callee.counter = 1
       }
-      if("function" == typeof GM_log)
-        GM_log("(" + arguments.callee.counter + ") " + msg);
+      if("function" == typeof GM_log){
+        GM_log("(" + arguments.callee.counter + ") " + (typeof msg == "object" ? ">>" : msg));
+        if( typeof msg == "object" )
+          GM_log(msg);
+      }
       else
         console && console.log && console.log(msg);
       if( force == 0 )
@@ -240,7 +246,7 @@
     clog: function(x){
       if( !gvar.__DEBUG__ )
         return
-      x && this.show_alert(["string","number"].indexOf(typeof x) != -1 ? x : JSON.stringify(x))
+      this.show_alert(x);
     }
   };
   Actions.prototype.patterns = {
@@ -315,24 +321,35 @@
       run: function(){
         this.clog('inside 2shared;');
 
-        var style, dlBtn=null,
-          btns = gAll('#dlBtn')
-        ;
+        var gotit = false, dlBtn=null, btns, that;
 
-        if( btns.length === 1 ) 
-          dlBtn = btns[0];
-        else{
-          for(var i=0, iL=btns.length; i<iL; i++){
-            style = window.getComputedStyle(btns[i]);
-            if( this.isVisible(btns[i]) || isUndefined(btns[i].getAttribute("class")) ){
-              dlBtn = btns[i];
-              break;
+        that = this;
+        setTimeout(function(){
+          btns = xp('//*[contains(@id,"dlBtn") and not(contains(@style,"display:"))]', null);
+
+          if( btns.snapshotLength ){
+            if( btns.snapshotLength == 1 ){
+              gotit = true;
+              dlBtn = btns.snapshotItem(0);
             }
+            else
+              for(var i=0, iL=btns.snapshotLength; i<iL; i++){
+                dlBtn = btns.snapshotItem(i);
+                that.clog(dlBtn);
+                if( that.isVisible(dlBtn) ){
+                  gotit = true;
+                  break;
+                }
+              }
           }
-        }
 
-        dlBtn &&
-          this.frameload(dlBtn.getAttribute('href'));
+          if( gotit && dlBtn ){
+            // this.frameload(dlBtn.getAttribute('href'));
+            that.set_href(dlBtn.getAttribute('href'));
+          }
+          else
+            that.clog("unable finding download-button");
+        }, 345);
       }
     },
 
