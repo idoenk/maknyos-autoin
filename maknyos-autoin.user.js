@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.6.6
+// @version        3.6.7
 // @description    Auto submit to get link
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
-// @include        /^https?://(.+\.)2shared.com/*/
+// @include        /^https?://(.+\.)2shared.com/file/*/
 // @include        /^https?://(.+\.)zippyshare.com/v/*/
 // @include        /^https?://(|www\.)fileswap.com/*/
 // @include        /^https?://(|www\.)mediafire.com/*/
@@ -88,6 +88,23 @@
     },
     set_href: function(x){
       location.href = x;
+    },
+
+    parse_handle_href: function(x){
+      var cucok, href;
+      if( "string" == typeof x )
+        href = x;
+      else if( "object" == typeof x )
+        href = x.getAttribute("href");
+
+      if( href && /\/handle\?/.test(href) ){
+        href = href.replace('&amp;', '&');
+        if( cucok = /\&?fl=((?:f|ht)tps?[^\&]+)/i.exec(href) )
+          href = decodeURIComponent(cucok[1]);
+        else
+          this.clog("parsing fail on href, missing param `fl=`");
+      }
+      return href;
     },
 
     // do waitwhat -> thenwhat
@@ -572,6 +589,10 @@
         // pick selector dat relevant and exist on several browsers
         if( btnDownload = g('.btns>a') )
           setTimeout(function(){
+            
+            if( href = that.parse_handle_href( btnDownload.getAttribute("href") ) )
+              btnDownload.setAttribute("href", href);
+
             SimulateMouse(btnDownload, "click", true)
           }, 125);
         else
@@ -614,6 +635,10 @@
         // pick selector dat relevant and exist on several browsers
         if( btnDownload = xp('//a[contains(@href,"/get.php?") or contains(@class,"ownloa")]', null, true) )
           setTimeout(function(){
+
+            if( href = that.parse_handle_href( btnDownload.getAttribute("href") ) )
+              btnDownload.setAttribute("href", href);
+
             SimulateMouse(btnDownload, "click", true)
           }, 125);
         else
