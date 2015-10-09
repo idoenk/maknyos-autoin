@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.7.0
+// @version        3.7.1
 // @description    Auto submit to get link
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -33,7 +33,7 @@
 
 (function() {
   var gvar=function(){};
-  gvar.__DEBUG__ = 1;
+  gvar.__DEBUG__ = !1;
 
   function MaknyosHelper(baseURI){
     this.baseURI=baseURI;
