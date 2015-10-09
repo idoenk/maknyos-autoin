@@ -33,7 +33,7 @@
 
 (function() {
   var gvar=function(){};
-  gvar.__DEBUG__ = !1;
+  gvar.__DEBUG__ = 1;
 
   function MaknyosHelper(baseURI){
     this.baseURI=baseURI;
@@ -183,6 +183,34 @@
       }
     },
 
+    // get codes of simple capcay code
+    scrap_simplecapcay: function(el_code){
+      var $code = $(el_code);
+      var codes=[], thecodes = [];
+      var $trycode = $code.closest("td").prev();
+      if( $trycode.length ){
+        $trycode.find(">div > span").each(function(){
+          var $me = $(this);
+          var pl = $me.css("paddingLeft").replace('px','');
+          thecodes.push({
+            'id': pl,
+            'val': $me.text()
+          })
+        });
+
+        thecodes.sort(function(a,b) {
+          return a.id - b.id;
+        });
+        for(var i=0, iL=thecodes.length; i<iL; i++)
+          codes.push( thecodes[i].val );
+
+        if( codes.length )
+          $code.val( codes.join("") );
+      }
+
+      return codes;
+    },
+
     // basic cleanup document from anoying things
     // eg. iframe, onclick body, etc
     baseCleanUp: function(){
@@ -257,7 +285,7 @@
         this.clog('inside indowebster');
 
         var that = this;
-        var waitFor, count, counter, countdown = g('#countdown');
+        var waitFor, code, count, counter, countdown = g('#countdown');
         var btn_free, f1form = g('form[name="F1"]');
 
         if( f1form ){
@@ -268,32 +296,14 @@
           }
           else{
             if( count = g('*', counter) ){
-
               
               setTimeout(function(){
-                var code = g('[name="code"]', f1form);
-                var codes=[], thecodes = [];
-                var $trycode = $(code).closest("td").prev();
-                if( $trycode.length ){
-                  $trycode.find(">div > span").each(function(){
-                    var $me = $(this);
-                    var pl = $me.css("paddingLeft").replace('px','');
-                    thecodes.push({
-                      'id': pl,
-                      'val': $me.text()
-                    })
-                  });
-                  thecodes.sort(function(a,b) {
-                    return a.id - b.id;
-                  });
-                  for(var i=0, iL=thecodes.length; i<iL; i++)
-                    codes.push( thecodes[i].val );
-
-                  if( codes.length )
-                    $(code).val( codes.join("") );
+                
+                if( code = g('[name="code"]', f1form) ){
+                  that.scrap_simplecapcay( code );
+                  code.focus();
                 }
 
-                code.focus();
               }, 123);
 
               if( waitFor = parseInt( $(count).text() ) ){
@@ -768,8 +778,34 @@
           return xp('//*[contains(@id, "ownlo") and not(contains(@disabled,"disabled"))]', null, true);
         }, function(){
           if( FORM = xp('//form[@name="F1"]', null, true) ){
-            if( el = xp('//input[@name="code"]', null, FORM) )
+            if( el = xp('//input[@name="code"]', null, FORM) ){
+
+              that.scrap_simplecapcay( el );
               el.focus();
+
+              var counter, count, btn_download;
+
+              btn_download = g('#btn_download');
+              if( counter = g('[id*="ountdow"]') ){
+                if( !that.isVisible(counter) ){
+
+                  SimulateMouse(btn_download, "click", true);
+                }
+                else{
+                  if( count = g('*', counter) )
+                  if( waitFor = parseInt( $(count).text() ) ){
+                    that.clog("waiting for "+waitFor+' seconds');
+                    that.waitforit(function(){
+
+                      return !that.isVisible( counter );
+                    }, function(){
+                      SimulateMouse(btn_download, "click", true);
+                    }, waitFor * 1000);
+                  }
+                }
+              }
+
+            }
             else
               setTimeout(function(){ FORM.submit() }, 345);
           }else
