@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.6.8
+// @version        3.7.0
 // @description    Auto submit to get link
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
+// @include        /^https?://maknyos.indowebster.com/*/
 // @include        /^https?://(.+\.)2shared.com/file/*/
 // @include        /^https?://(.+\.)zippyshare.com/v/*/
 // @include        /^https?://(|www\.)fileswap.com/*/
@@ -32,7 +33,7 @@
 
 (function() {
   var gvar=function(){};
-  gvar.__DEBUG__ = !1;
+  gvar.__DEBUG__ = 1;
 
   function MaknyosHelper(baseURI){
     this.baseURI=baseURI;
@@ -250,6 +251,46 @@
     }
   };
   Actions.prototype.patterns = {
+    indowebster: {
+      rule: /maknyos\.indowebster\.com/,
+      run: function(){
+        this.clog('inside indowebster');
+
+        var that = this;
+        var waitFor, count, counter, countdown = g('#countdown');
+        var btn_free, f1form = g('form[name="F1"]');
+
+        if( f1form ){
+          counter = g('[id*="ountdow"]');
+          if( !this.isVisible(counter) ){
+
+            SimulateMouse(g('#btn_download'), "click", true);
+          }
+          else{
+            if( count = g('*', counter) ){
+              
+              this.clog("waiting for "+waitFor+' seconds');
+              setTimeout(function(){
+                g('[name="code"]', f1form).focus();
+              }, 123);
+              if( waitFor = parseInt( $(count).text() ) )
+                this.waitforit(function(){
+
+                  return !that.isVisible( counter );
+                }, function(){
+                  SimulateMouse(g('#btn_download'), "click", true);
+                }, waitFor * 1000);
+            }
+          }
+        }
+        else if( btn_free = g('[name="method_free"]') ){
+          this.clog("commencing btn_free ");
+          SimulateMouse(btn_free, "click", true);
+        }
+      }
+    },
+
+
     sendspace: {
       rule: /sendspace\.com/,
       run: function(){
@@ -715,7 +756,6 @@
         }, 100);
       }
     },
-
   };
   // end of patterns
 
