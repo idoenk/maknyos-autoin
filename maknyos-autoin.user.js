@@ -33,7 +33,7 @@
 
 (function() {
   var gvar=function(){};
-  gvar.__DEBUG__ = 1;
+  gvar.__DEBUG__ = !1;
 
   function MaknyosHelper(baseURI){
     this.baseURI=baseURI;
@@ -268,18 +268,43 @@
           }
           else{
             if( count = g('*', counter) ){
+
               
-              this.clog("waiting for "+waitFor+' seconds');
               setTimeout(function(){
-                g('[name="code"]', f1form).focus();
+                var code = g('[name="code"]', f1form);
+                var codes=[], thecodes = [];
+                var $trycode = $(code).closest("td").prev();
+                if( $trycode.length ){
+                  $trycode.find(">div > span").each(function(){
+                    var $me = $(this);
+                    var pl = $me.css("paddingLeft").replace('px','');
+                    thecodes.push({
+                      'id': pl,
+                      'val': $me.text()
+                    })
+                  });
+                  thecodes.sort(function(a,b) {
+                    return a.id - b.id;
+                  });
+                  for(var i=0, iL=thecodes.length; i<iL; i++)
+                    codes.push( thecodes[i].val );
+
+                  if( codes.length )
+                    $(code).val( codes.join("") );
+                }
+
+                code.focus();
               }, 123);
-              if( waitFor = parseInt( $(count).text() ) )
+
+              if( waitFor = parseInt( $(count).text() ) ){
+                this.clog("waiting for "+waitFor+' seconds');
                 this.waitforit(function(){
 
                   return !that.isVisible( counter );
                 }, function(){
                   SimulateMouse(g('#btn_download'), "click", true);
                 }, waitFor * 1000);
+              }
             }
           }
         }
