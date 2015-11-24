@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.7.1
+// @version        3.7.2
 // @description    Auto submit to get link
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -33,7 +33,7 @@
 
 (function() {
   var gvar=function(){};
-  gvar.__DEBUG__ = !1;
+  gvar.__DEBUG__ = 1;
 
   function MaknyosHelper(baseURI){
     this.baseURI=baseURI;
@@ -338,10 +338,21 @@
       rule: /zippyshare\.com/,
       run: function(){
         this.clog('inside zippyshare');
-        var btn = g("[alt*=Download]");
-        if( btn ) {
-          btn = btn.parentNode;
+        var btn = btn = g("[id=dlbutton]");
 
+        // failover, just incase
+        if( !btn ) {
+          btn = g("[alt*=Download]");
+          if( btn )
+            btn = btn.parentNode;
+          else
+            btn = g("[class=download]");
+
+          if( btn )
+            btn = btn.parentNode;
+        }
+
+        if( btn ) {
           this.waitforit(function(){
 
             return /(?:\.zippyshare\.com)?\/d\/.+/.test( btn.getAttribute("href") );
@@ -349,6 +360,10 @@
 
             btn && SimulateMouse(btn, "click", true);
           });
+        }
+        else{
+
+          this.clog('missing: download button');
         }
       }
     },
@@ -434,9 +449,23 @@
       run: function(){
 
         this.clog('inside uptobox');
+        var that = this;
+
+        // force download link with https based on its parent protocol
+        var prefilter_uptobox_https = function(href_){
+          var prot = location.protocol;
+          if( location.protocol == 'https:' && !/https:/i.test(href_) ){
+            href_ = href_.replace(/^http\:/i, 'https:');
+            
+            that.clog('https download-link='+href_);
+          }
+          return href_;
+        };
         var btnDownload = g('[type=submit][value*="ownload"]');
+
         if( btnDownload ){
-          SimulateMouse(btnDownload, "click", true);
+          
+          SimulateMouse(btnDownload, "click", true, prefilter_uptobox_https);
         }
         else{
           btnDownload = g('#countdown_str');
@@ -455,7 +484,7 @@
                 this.waitforit(function(){
                   return g('#btn_download');
                 }, function(){
-                  SimulateMouse(g('#btn_download'), "click", true);
+                  SimulateMouse(g('#btn_download'), "click", true, prefilter_uptobox_https);
                 }, parseInt(cucok[1] * 1000));
 
               }
@@ -474,7 +503,7 @@
               }
               else{
                 // last-resort, key may changed.
-                SimulateMouse(link, "click", true);
+                SimulateMouse(link, "click", true, prefilter_uptobox_https);
               }
             }
 
@@ -827,7 +856,7 @@
   // lil-helpers
   function isDefined(x) { return!(x == null && x !== null) }
   function isUndefined(x) { return x == null && x !== null }
-  function SimulateMouse(elem, event, preventDef) {
+  function SimulateMouse(elem, event, preventDef, prefilter) {
     if(typeof elem != "object") 
       return;
 
@@ -838,6 +867,8 @@
     // make sure it's link, not some sumthin like: "javascript:;"
     if( href && /^((?:(?:ht|f)tps?\:\/\/){1}\S+)/.test(href) ){
       try{
+        if('function' == typeof prefilter)
+          href = prefilter( href );
         MNy.action.clog("SimulateMouse trying href loaded to iFrame");
         MNy.action.frameload(href);
 
