@@ -512,6 +512,7 @@
             this.clog('tpl-changed, mismatch element');
           }
         }
+
       }
     },
 
