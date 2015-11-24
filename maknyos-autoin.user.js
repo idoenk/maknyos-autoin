@@ -219,6 +219,7 @@
 
       this.clog("killing click events.");
       this.killevents(null, 'click');
+      this.killevents(null, 'mousedown');
     },
 
     // brutaly kill frames
@@ -787,7 +788,7 @@
     hulkload: {
       rule: /hulkload\.com/,
       run: function(){
-        var that = this, FORM, el;
+        var that = this, FORM, el, adcopy;
 
         that.clog('inside hulkload, '+that.get_href());
         setTimeout(function(){ 
@@ -803,47 +804,53 @@
           }
         }, 123);
 
-        this.waitforit(function(){
-          return xp('//*[contains(@id, "ownlo") and not(contains(@disabled,"disabled"))]', null, true);
-        }, function(){
-          if( FORM = xp('//form[@name="F1"]', null, true) ){
-            if( el = xp('//input[@name="code"]', null, FORM) ){
+        if( adcopy = g("[name=adcopy_response]") ){
 
-              that.scrap_simplecapcay( el );
-              el.focus();
+          adcopy.focus();
+        }
+        else{
+          this.waitforit(function(){
+            return xp('//*[contains(@id, "ownlo") and not(contains(@disabled,"disabled"))]', null, true);
+          }, function(){
+            if( FORM = xp('//form[@name="F1"]', null, true) ){
+              if( el = xp('//input[@name="code"]', null, FORM) ){
 
-              var counter, count, btn_download;
+                that.scrap_simplecapcay( el );
+                el.focus();
 
-              btn_download = g('#btn_download');
-              if( counter = g('[id*="ountdow"]') ){
-                if( !that.isVisible(counter) ){
+                var counter, count, btn_download;
 
-                  SimulateMouse(btn_download, "click", true);
-                }
-                else{
-                  if( count = g('*', counter) )
-                  if( waitFor = parseInt( $(count).text() ) ){
-                    that.clog("waiting for "+waitFor+' seconds');
-                    that.waitforit(function(){
+                btn_download = g('#btn_download');
+                if( counter = g('[id*="ountdow"]') ){
+                  if( !that.isVisible(counter) ){
 
-                      return !that.isVisible( counter );
-                    }, function(){
-                      SimulateMouse(btn_download, "click", true);
-                    }, waitFor * 1000);
+                    SimulateMouse(btn_download, "click", true);
+                  }
+                  else{
+                    if( count = g('*', counter) )
+                    if( waitFor = parseInt( $(count).text() ) ){
+                      that.clog("waiting for "+waitFor+' seconds');
+                      that.waitforit(function(){
+
+                        return !that.isVisible( counter );
+                      }, function(){
+                        SimulateMouse(btn_download, "click", true);
+                      }, waitFor * 1000);
+                    }
                   }
                 }
-              }
 
+              }
+              else
+                setTimeout(function(){ FORM.submit() }, 345);
+            }else
+            if( el = xp('//a[contains(@href,"kloa'+'d.co'+'m/fi'+'les/")]', null, true) ){
+              setTimeout(function(){
+                SimulateMouse(el, "click", true)
+              }, 125);
             }
-            else
-              setTimeout(function(){ FORM.submit() }, 345);
-          }else
-          if( el = xp('//a[contains(@href,"kloa'+'d.co'+'m/fi'+'les/")]', null, true) ){
-            setTimeout(function(){
-              SimulateMouse(el, "click", true)
-            }, 125);
-          }
-        }, 100);
+          }, 100);
+        }
       }
     },
   };
