@@ -27,6 +27,7 @@
 // @include        /^https?://(|www\.)hulkload.com/*/
 // @include        /^https?://app.box.com/s/*/
 // @include        /^https?://(|www\.)dailyuploads.net/*/
+// @include        /^https?://(|www\.)kumpulbagi.com/*/
 //
 // ==/UserScript==
 
@@ -34,7 +35,7 @@
 
 (function() {
   var gvar=function(){};
-  gvar.__DEBUG__ = !1;
+  gvar.__DEBUG__ = 1;
 
   function MaknyosHelper(baseURI){
     this.baseURI=baseURI;
@@ -868,6 +869,25 @@
             el.removeAttribute('checked');
 
           setTimeout(function(){ FORM.submit() }, 345);
+        }
+      }
+    },
+  
+    kumpulbagi: {
+      rule: /kumpulbagi\.com/,
+      run: function(){
+        var that = this, el, FORM, parent;
+        if( !g('#fileDetails') ){
+          that.clog('wrong page broh, GTFO..');
+          return;
+        }
+
+        if( FORM = xp('//form[contains(@action,"DownloadFile")]', null, true) ){
+          
+          el = g('.download', FORM);
+          setTimeout(function(){ 
+            SimulateMouse(el, "click", true)
+          }, 345);
         }
       }
     },
