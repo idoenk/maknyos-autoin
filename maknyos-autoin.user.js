@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.7.2
+// @version        3.7.3
 // @description    Auto submit to get link
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -26,6 +26,7 @@
 // @include        /^https?://(|www\.)userscloud.com/*/
 // @include        /^https?://(|www\.)hulkload.com/*/
 // @include        /^https?://app.box.com/s/*/
+// @include        /^https?://(|www\.)dailyuploads.net/*/
 //
 // ==/UserScript==
 
@@ -851,6 +852,22 @@
               }, 125);
             }
           }, 100);
+        }
+      }
+    },
+
+    dailyuploads: {
+      rule: /dailyuploads\.net/,
+      run: function(){
+        var that = this, el, FORM;
+
+        if( FORM = xp('//form[@name="F1"]', null, true) ){
+          // uncheck download-manager
+          el = g('[name="chkIsAdd"]');
+          if( el )
+            el.removeAttribute('checked');
+
+          setTimeout(function(){ FORM.submit() }, 345);
         }
       }
     },
