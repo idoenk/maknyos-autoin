@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.7.3
+// @version        3.7.4
 // @description    Auto submit to get link
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -28,6 +28,7 @@
 // @include        /^https?://app.box.com/s/*/
 // @include        /^https?://(|www\.)dailyuploads.net/*/
 // @include        /^https?://(|www\.)kumpulbagi.com/*/
+// @include        /^https?://(|www\.)kb.simple-aja.info/*/
 //
 // ==/UserScript==
 
@@ -889,6 +890,17 @@
             SimulateMouse(el, "click", true)
           }, 345);
         }
+      }
+    },
+    "simple-aja": {
+      rule: /simple-aja\.info/,
+      run: function(){
+        var newbaseURI = document.baseURI
+          .replace('kb.simple-aja.info','kumpulbagi.com')
+          .replace('https:','http:')
+        ;
+        MNy = new MaknyosHelper(newbaseURI);
+        MNy.matchDomain().matchAction().invokeAction();
       }
     },
   };
