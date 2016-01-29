@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.7.4
+// @version        3.7.5
 // @description    Auto submit to get link
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -27,7 +27,7 @@
 // @include        /^https?://(|www\.)hulkload.com/*/
 // @include        /^https?://app.box.com/s/*/
 // @include        /^https?://(|www\.)dailyuploads.net/*/
-// @include        /^https?://(|www\.)kumpulbagi.com/*/
+// @include        /^https?://(|www\.)kumpulbagi.id/*/
 // @include        /^https?://(|www\.)kb.simple-aja.info/*/
 //
 // ==/UserScript==
@@ -875,7 +875,7 @@
     },
   
     kumpulbagi: {
-      rule: /kumpulbagi\.com/,
+      rule: /kumpulbagi\.id/,
       run: function(){
         var that = this, el, FORM, parent;
         if( !g('#fileDetails') ){
