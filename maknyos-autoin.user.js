@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.7.5
+// @version        3.7.6
 // @description    Auto submit to get link
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -775,16 +775,22 @@
     userscloud: {
       rule: /userscloud\.com/,
       run: function(){
-        var that=this, FORM;
+        var FORM,
+            that = this,
+            btn_selector = '//button[contains(@id, "ownlo") and not(contains(@disabled,"disabled"))]';
 
         that.clog('inside userscloud, '+that.get_href());
         setTimeout(function(){ that.killframes() }, 123);
 
         this.waitforit(function(){
-          return xp('//button[contains(@id, "ownlo") and not(contains(@disabled,"disabled"))]', null, true);
+          return xp(btn_selector, null, true);
         }, function(){
-          if( FORM = xp('//form[@name="F1"]', null, true) )
-            setTimeout(function(){ FORM.submit() }, 345);
+          if( xp('//form[@name="F1"]', null, true) )
+            setTimeout(function(){
+                var btn_download = xp(btn_selector, null, true);
+                SimulateMouse(btn_download, "click", true);
+
+            }, 345);
             
         }, 100);
       }
