@@ -11,7 +11,7 @@
 // @include        /^https?://(|www\.)fileswap.com/*/
 // @include        /^https?://(|www\.)mediafire.com/*/
 // @include        /^https?://(|www\.)sendspace.com/file/*/
-// @include        /^https?://(|www\.)uptobox.com/*/
+// @include        /^https?://(|www\.)uptobox.com\/\w/
 // @include        /^https?://(|www\.)howfile.com/file/*/
 // @include        /^https?://(|www\.)uppit.com/*/
 // @include        /^https?://(|\w+\.)idup.in/*/
@@ -74,8 +74,8 @@
     find: function(domain){
       this.clog('Actions:find, domain='+domain);
 
-      var isMatch;
-      var pattern;
+      var isMatch, pattern;
+      
       for(var key in this.patterns){
         pattern = this.patterns[key];
         this.clog('pattern-check: '+pattern.rule+' vs '+domain);
@@ -523,17 +523,12 @@
       rule: /howfile\.com/,
       run: function(){
         this.clog('inside howfile');
-        var selector = '//a[contains(.,"Download")]';
         this.waitforit(function(){
 
-          return xp(selector, null, true);
+          return xp('//a[contains(.,"Download")]', null, true);
         }, function(){
-          btnDownload = xp(selector, null, true);
-          btnDownload && SimulateMouse(btnDownload, "click", true);
 
-          var dtable = g("#downloadtable");
-
-          btnDownload = xp('//a[contains(@href, "/downfile/")]', dtable, true);
+          btnDownload = xp('//a[contains(@href, "/downfile/")]', g("#downloadtable"), true);
           btnDownload && SimulateMouse(btnDownload, "click", true);
         }, 234);
       }
@@ -738,12 +733,16 @@
           document.addEventListener('DOMContentLoaded', function() {
             if( !triggered )
               setTimeout(function(){
+                that.clog('Simulating Click.. #2');
                 SimulateMouse(btnDownload, "click", true)
               }, 125);
           }, false);
 
-          SimulateMouse(btnDownload, "click", true);
-          triggered = 1;
+          setTimeout(function(){
+            that.clog('Simulating Click.. #1');
+            SimulateMouse(btnDownload, "click", true);
+            triggered = 1;
+          }, 100);
         }
         else
           this.clog('yadi: missing download button, page may changed');
