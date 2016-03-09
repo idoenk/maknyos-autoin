@@ -14,7 +14,6 @@
 // @include        /^https?://(|www\.)uptobox.com\/\w/
 // @include        /^https?://(|www\.)howfile.com/file/*/
 // @include        /^https?://(|www\.)uppit.com/*/
-// @include        /^https?://(|\w+\.)idup.in/*/
 // @include        /^https?://(|www\.)imzupload.com/*/
 // @include        /^https?://(|www\.)jumbofiles.com/*/
 // @include        /^https?://(|www\.)sendmyway.com/*/
@@ -560,23 +559,6 @@
         }
         else{
           SimulateMouse(g('.m-btn'), "click", true);
-        }
-      }
-    },
-
-    idup: {
-      rule: /idup\.in|download\.idup\.in/,
-      run: function(){
-        this.clog('inside idup');
-        var btnDownload = xp('//form//button/*[contains(.,"e download")]', null, true);
-
-        if( btnDownload ){
-          btnDownload = btnDownload.parentNode;
-          btnDownload && SimulateMouse(btnDownload, "click", true);
-        }
-        else{
-          btnDownload = xp('//a[contains(.,"Download:")]',null,true)
-          btnDownload && SimulateMouse(btnDownload, "click", true);
         }
       }
     },
