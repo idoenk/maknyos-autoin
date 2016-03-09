@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.7.7
+// @version        3.7.8
 // @description    Auto submit to get link
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
