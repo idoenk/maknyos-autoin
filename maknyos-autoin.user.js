@@ -859,6 +859,9 @@
         else if( g(".inner") ){
           
           btnDownload = xp('//a[contains(@href,"dailyuploads.net") and contains(@href,"/d/")]', g(".inner"), true);
+
+          // since loading this href to iframe is not gonna work,
+          // bypass load it in `top.location` instead.
           btnDownload && SimulateMouse(btnDownload, "click", true, function(href){
             href = encodeURI( href );
             top.location.href = href;
