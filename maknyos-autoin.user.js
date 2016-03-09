@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.7.6
+// @version        3.7.7
 // @description    Auto submit to get link
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -713,8 +713,7 @@
           that.disableWindowOpen();
         }, 123);
 
-        // pick selector dat relevant and exist on several browsers
-        if( btnDownload = g('.btns>a') )
+        if( btnDownload = xp('//a[contains(.,"ownloa") and not(contains(@href,"remiu"))]', g('.dl .buttons'), true) )
           setTimeout(function(){
             
             if( href = that.parse_handle_href( btnDownload.getAttribute("href") ) )
