@@ -150,7 +150,7 @@
         g('#'+idfrm).removeChild()
       iframe.setAttribute('id', idfrm);
       iframe.setAttribute('title', "iFrame of "+idfrm+"; src="+url);
-      iframe.setAttribute('style', 'position:absolute; z-index:999999; '+(gvar.__DEBUG__ ? 'border:1px solid #000; width:100%;' : 'border:0; height:0; width:0; left:-9999; bottom:9999'));
+      iframe.setAttribute('style', 'position:absolute; z-index:999999; '+(gvar.__DEBUG__ ? 'border:1px solid #000; left:0; top:0; width:100%;' : 'border:0; height:0; width:0; left:-9999; bottom:9999'));
       iframe.setAttribute('src', url);
 
       body = g('body');
@@ -452,7 +452,7 @@
       run: function(){
 
         this.clog('inside uptobox');
-        var that = this;
+        var btnDownload, btnDownloadthat = this;
 
         // force download link with https based on its parent protocol
         var prefilter_uptobox_https = function(href_){
@@ -464,7 +464,7 @@
           }
           return href_;
         };
-        var btnDownload = g('[type=submit][value*="ownload"]');
+        btnDownload = g('[type=submit][value*="ownload"]');
 
         if( btnDownload ){
 
@@ -514,7 +514,6 @@
             this.clog('tpl-changed, mismatch element');
           }
         }
-
       }
     },
 
@@ -527,7 +526,7 @@
           return xp('//a[contains(.,"Download")]', null, true);
         }, function(){
 
-          btnDownload = xp('//a[contains(@href, "/downfile/")]', g("#downloadtable"), true);
+          var btnDownload = xp('//a[contains(@href, "/downfile/")]', g("#downloadtable"), true);
           btnDownload && SimulateMouse(btnDownload, "click", true);
         }, 234);
       }
@@ -568,7 +567,7 @@
       run: function(){
         this.clog('inside imzupload');
 
-        var btnDownload = g('[type="submit"][name="method_free"]',null,true);
+        var main, btnDownload = g('[type="submit"][name="method_free"]',null,true);
         this.clog('method_free='+btnDownload);
         if( btnDownload ){
           SimulateMouse(btnDownload, "click", true);
@@ -585,8 +584,8 @@
             g('[type=text]',tbcacay).focus();
           }
           else{
-            var main = g('[role=main]');
-            var btnDownload = xp('//a[contains(@href,"imzupload.com/files")]',main,true);
+            main = g('[role=main]');
+            btnDownload = xp('//a[contains(@href,"imzupload.com/files")]',main,true);
             btnDownload && this.frameload(btnDownload.getAttribute('href'))
           }
         }
@@ -635,8 +634,8 @@
       rule: /sendmyway\.com/,
       run: function(){
         this.clog('inside sendmyway');
-        var adcopy = g('#adcopy_response');
-        var btnDownload = g('#download_link');
+        var dd, adcopy = g('#adcopy_response'),
+            btnDownload = g('#download_link');
         if( !adcopy && !btnDownload ){
           this.clog('adad adcopy');
           g(".down-link") && SimulateMouse(g(".down-link"), "click", true);
@@ -646,7 +645,7 @@
             adcopy.focus();
           }
           else{
-            var dd = g('#direct_download');
+            dd = g('#direct_download');
             btnDownload = g('#download_link', dd);
             this.frameload(btnDownload.getAttribute('href'))
           }
@@ -657,7 +656,7 @@
     box: {
       rule: /app\.box\.com/,
       run: function(){
-        var that = this;
+        var btnDownload, that = this;
         this.waitforit(function(){
           return xp('//button[contains(@data-type, "download-btn")]', null, true);
         }, function(){
@@ -847,7 +846,7 @@
     dailyuploads: {
       rule: /dailyuploads\.net/,
       run: function(){
-        var that = this, el, FORM;
+        var that = this, el, FORM, btnDownload;
 
         if( FORM = xp('//form[@name="F1"]', null, true) ){
           // uncheck download-manager
@@ -856,6 +855,17 @@
             el.removeAttribute('checked');
 
           setTimeout(function(){ FORM.submit() }, 345);
+        }
+        else if( g(".inner") ){
+          
+          btnDownload = xp('//a[contains(@href,"dailyuploads.net") and contains(@href,"/d/")]', g(".inner"), true);
+          btnDownload && SimulateMouse(btnDownload, "click", true, function(href){
+            href = encodeURI( href );
+            top.location.href = href;
+
+            // dont let simulate continue with click events
+            return true;
+          });
         }
       }
     },
@@ -912,10 +922,20 @@
       try{
         if('function' == typeof prefilter)
           href = prefilter( href );
-        MNy.action.clog("SimulateMouse trying href loaded to iFrame");
-        MNy.action.frameload(href);
 
-        is_error = false;
+        if( typeof href === "string" && href ){
+
+          MNy.action.clog("SimulateMouse trying href loaded to iFrame");
+          MNy.action.frameload(href);
+          is_error = false;
+        }
+        else{
+
+          if( href )
+            is_error = false;
+          else
+            is_error = true;
+        }
       }catch(e){ is_error = true }
     }
     else{
