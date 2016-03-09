@@ -452,7 +452,7 @@
       run: function(){
 
         this.clog('inside uptobox');
-        var btnDownload, btnDownloadthat = this;
+        var btnDownload, that = this;
 
         // force download link with https based on its parent protocol
         var prefilter_uptobox_https = function(href_){
