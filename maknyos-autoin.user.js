@@ -8,7 +8,6 @@
 // @include        /^https?://maknyos.indowebster.com/*/
 // @include        /^https?://(.+\.)2shared.com/file/*/
 // @include        /^https?://(.+\.)zippyshare.com/v/*/
-// @include        /^https?://(|www\.)fileswap.com/*/
 // @include        /^https?://(|www\.)mediafire.com/*/
 // @include        /^https?://(|www\.)sendspace.com/file/*/
 // @include        /^https?://(|www\.)uptobox.com\/\w/
@@ -398,18 +397,6 @@
             SimulateMouse(g('.download_link a'), "click", true);
           }, 100);
         }
-      }
-    },
-
-    fileswap: {
-      rule: /\.fileswap\.com/,
-      run: function(){
-        this.clog('inside fileswap');
-        var tgtBtn = g('[id*="share_index_"][href*="/download/"]');
-        if( !tgtBtn )
-          tgtBtn = g('[value="DOWNLOAD ALL"]');
-        
-        tgtBtn && SimulateMouse(tgtBtn, "click", true);
       }
     },
 
