@@ -625,10 +625,12 @@
       run: function(){
         this.clog('inside sendmyway');
         var dd, adcopy = g('#adcopy_response'),
-            btnDownload = g('#download_link');
+            btnDownload = g('#download_link'),
+            btnFreeDownload = g('.btn-free.dl_btn')
+        ;
         if( !adcopy && !btnDownload ){
           this.clog('adad adcopy');
-          g(".down-link") && SimulateMouse(g(".down-link"), "click", true);
+          btnFreeDownload && SimulateMouse(btnFreeDownload, "click", true);
         }
         else{
           if( !btnDownload ){
