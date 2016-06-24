@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.7.8
+// @version        3.7.9
 // @description    Auto submit to get link
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -28,6 +28,9 @@
 // @include        /^https?://(|www\.)dailyuploads.net/*/
 // @include        /^https?://(|www\.)kumpulbagi.id/*/
 // @include        /^https?://(|www\.)kb.simple-aja.info/*/
+// @include        /^https?://(|www\.)moesubs.com/url/*/
+// @include        /^https?://kirino.uguu.at/*/
+// @include        /^https?://(|www\.)seiba.ga/*/
 //
 // ==/UserScript==
 
@@ -902,6 +905,38 @@
         MNy.matchDomain().matchAction().invokeAction();
       }
     },
+
+    moesubs: {
+      rule: /(?:www\.)?moesubs\.com/,
+      run: function(){
+        var btnDownload = null,
+            btn_selector = '//a[contains(@href, "kirino.uguu.at/uh/")]'
+        ;
+        // pick selector dat relevant and exist on several browsers
+        if( btnDownload = xp(btn_selector, null, true) )
+          setTimeout(function(){
+
+            location.href = btnDownload.getAttribute('href');
+          }, 125);
+        else
+          this.clog('moesubs\: missing download button, page may changed');
+      }
+    },
+
+    "kirino-uguu-seiba": {
+      rule: /kirino\.uguu\.at|seiba\.ga/,
+      run: function(){
+        var btnDownload = null;
+
+        if( btnDownload = g('a', g(".btns"), true) )
+          setTimeout(function(){
+
+            SimulateMouse(btnDownload, "click", true)
+          }, 125);
+        else
+          this.clog('kirino-uguu|seiba: missing download button, page may changed');
+      }
+    }
   };
   // end of patterns
 
