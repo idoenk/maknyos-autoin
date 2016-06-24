@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.7.9
+// @version        3.7.10
 // @description    Auto submit to get link
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -19,7 +19,7 @@
 // @include        /^https?://(|www\.)sendmyway.com/*/
 // @include        /^https?://(|www\.)tusfiles.net/*/
 // @include        /^https?://(|www\.)dropbox.com/s/*/
-// @include        /^https?://(|www\.)solidfiles.com/d/*/
+// @include        /^https?://(|www\.)solidfiles.com/*/
 // @include        /^https?://(|www\.)yadi.sk/*/
 // @include        /^https?://(|www\.)datafilehost.com/d/*/
 // @include        /^https?://(|www\.)userscloud.com/*/
@@ -38,7 +38,7 @@
 
 (function() {
   var gvar=function(){};
-  gvar.__DEBUG__ = !1;
+  gvar.__DEBUG__ = 1;
 
   function MaknyosHelper(baseURI){
     this.baseURI=baseURI;
@@ -910,10 +910,10 @@
       rule: /(?:www\.)?moesubs\.com/,
       run: function(){
         var btnDownload = null,
-            btn_selector = '//a[contains(@href, "kirino.uguu.at/uh/")]'
+            img_click = xp('//img[contains(@src, "click.")]', null, true)
         ;
-        // pick selector dat relevant and exist on several browsers
-        if( btnDownload = xp(btn_selector, null, true) )
+        btnDownload = (img_click ? img_click.parentNode : null);
+        if( btnDownload && btnDownload.nodeName === 'A' )
           setTimeout(function(){
 
             location.href = btnDownload.getAttribute('href');
