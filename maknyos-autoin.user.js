@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.7.10
+// @version        3.7.11
 // @description    Auto submit to get link
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -30,6 +30,7 @@
 // @include        /^https?://(|www\.)moesubs.com/url/*/
 // @include        /^https?://kirino.uguu.at/*/
 // @include        /^https?://(|www\.)seiba.ga/*/
+// @include        /^https?://(|www\.)mylinkgen.com/*/
 //
 // ==/UserScript==
 
@@ -37,7 +38,7 @@
 
 (function() {
   var gvar=function(){};
-  gvar.__DEBUG__ = !1;
+  gvar.__DEBUG__ = 1;
 
   function MaknyosHelper(baseURI){
     this.baseURI=baseURI;
@@ -924,6 +925,19 @@
           }, 125);
         else
           this.clog('kirino-uguu|seiba: missing download button, page may changed');
+      }
+    },
+
+    mylinkgen: {
+      rule: /mylinkgen\.com/,
+      run: function(){
+        var wrapBox = g('#main-content'),
+            btnContinue = null
+        ;
+        if( wrapBox ){
+          btnContinue = g('.btn', wrapBox);
+          btnContinue && this.set_href(btnContinue);
+        }
       }
     }
   };
