@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.7.11
+// @version        3.7.12
 // @description    Auto submit to get link
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
-// @include        /^https?://maknyos.indowebster.com/*/
+// @include        /^https?://(files|maknyos).indowebster.com/*/
 // @include        /^https?://(.+\.)2shared.com/file/*/
 // @include        /^https?://(.+\.)zippyshare.com/v/*/
 // @include        /^https?://(|www\.)mediafire.com/*/
@@ -31,6 +31,7 @@
 // @include        /^https?://kirino.uguu.at/*/
 // @include        /^https?://(|www\.)seiba.ga/*/
 // @include        /^https?://(|www\.)mylinkgen.com/*/
+// @include        /^https?://(|www\.)openload.co/*/
 //
 // ==/UserScript==
 
@@ -38,7 +39,7 @@
 
 (function() {
   var gvar=function(){};
-  gvar.__DEBUG__ = !1;
+  gvar.__DEBUG__ = 1;
 
   function MaknyosHelper(baseURI){
     this.baseURI=baseURI;
@@ -142,6 +143,12 @@
       }
       else
         thenwhatwrap();
+    },
+
+    injectBodyScript: function(scriptFunc){
+      var script = document.createElement("script");
+      script.textContent = "(" + scriptFunc.toString() + ")();";
+      document.body.appendChild(script);
     },
 
     // load url to an iframe
@@ -286,7 +293,7 @@
   };
   Actions.prototype.patterns = {
     indowebster: {
-      rule: /maknyos\.indowebster\.com/,
+      rule: /files|maknyos\.indowebster\.com/,
       run: function(){
         this.clog('inside indowebster');
 
@@ -937,6 +944,32 @@
         if( wrapBox ){
           btnContinue = g('.btn', wrapBox);
           btnContinue && this.set_href(btnContinue);
+        }
+      }
+    },
+
+    openload: {
+      rule: /openload.co/,
+      run: function(){
+        var wrapBox = g('#realdl'),
+            wrapTimer = g('#downloadTimer')
+        ;
+        if( wrapBox ){
+          var scriptHandler = function(){
+            return (function(win, $){
+              
+              setTimeout(function(){
+                console.log("Second..")
+                console.log(win.realdllink)
+              }, 1500)
+            })(window, jQuery);
+          };
+
+          this.injectBodyScript(scriptHandler);
+          // this.clog(scriptHandler.toString());
+        }
+        else{
+          // other location..
         }
       }
     }
