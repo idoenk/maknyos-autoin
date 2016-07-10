@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.7.12
+// @version        3.7.13
 // @description    Auto submit to get link
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -160,7 +160,8 @@
       var iframe = document.createElement('iframe');
       
       if( g('#'+idfrm) )
-        g('#'+idfrm).removeChild()
+        g('#'+idfrm).removeChild();
+
       iframe.setAttribute('id', idfrm);
       iframe.setAttribute('title', "iFrame of "+idfrm+"; src="+url);
       iframe.setAttribute('style', 'position:absolute; z-index:999999; '+(gvar.__DEBUG__ ? 'border:1px solid #000; left:0; top:0; width:100%;' : 'border:0; height:0; width:0; left:-9999; bottom:9999'));
@@ -169,13 +170,16 @@
       body = g('body');
       if( gvar.__DEBUG__ )
         body.insertBefore(iframe, body.firstChild);
-        else
-        g('body').appendChild(iframe);
-
-      if( g('#'+idfrm) )
-        this.clog("iframe created, src="+url);
       else
-        this.clog("error while creating iframe");
+      g('body').appendChild(iframe);
+
+
+      if( gvar.__DEBUG__ ){
+        if( g('#'+idfrm) )
+          this.clog("iframe created, src="+url);
+        else
+          this.clog("error while creating iframe");
+      }
     },
     // resize capcay
     rezCapcay: function(target, dims){
@@ -298,15 +302,98 @@
     indowebster: {
       rule: /files|maknyos\.indowebster\.com/,
       run: function(){
-        this.clog('inside indowebster');
 
-        var that = this;
-        var waitFor, code, count, counter, countdown = g('#countdown');
-        var btn_free, dlBtn = g('#downloadBtn');
+        var that = this,
+            dlBtn = g('#downloadBtn'),
+            delayTime = 0,
+            btn_free, scripts, innerScript,
+            cucok, cokcok, fnName,
+            el, mainWrap
+        ;
 
         if( dlBtn ){
 
-          this.clog('coba inside downloadBtn..');
+          scripts = document.getElementsByTagName( 'script' );
+          for( var i = 0; i < scripts.length; ++i ) {
+            innerScript = scripts[i].innerHTML;
+            innerScript = innerScript.trim();
+            
+            if( innerScript ){
+              if( cucok = /(\$\.post\b.+)/m.exec(innerScript)) {
+
+                if( cokcok = /var\s+s\s+=\s(\d+)/.exec(innerScript) )
+                  delayTime = parseInt(cokcok[1]);
+
+                innerScript = cucok[1];
+
+                // getting fn-name
+                if( cucok = /function\([^\)]+.\s*\{\s*(\w+)/.exec(innerScript) )
+                  fnName = cucok[1];
+
+                // required: [fnName, delayTime]
+                var scriptHandler = function(){
+                  return (function(win, $){
+                    var gvar = gvar||{};
+                    gvar.__DEBUG__ = !1;
+
+                    win["__dlhit__"] = null;
+                    win["___function___"] = function(ret){
+                      console.log('AHOYY, .......')
+                      console.log(ret);
+
+                      var $tgt = $("#filename");
+                      $tgt.prepend('<div>DOWNLOAD</div>');
+                      $("#filename").wrap("<a href='"+ret+"' class='button color_blue'></a>");
+                      $tgt.parent().css('display', 'block');
+
+                      setTimeout(function(){
+                        win["iframe_preloader"](ret)
+                      }, 100);
+                      $('#downloadBtn').remove();
+                      win["__dlhit__"] = true;
+                    };
+
+                    win["iframe_preloader"] = __iframe_preloader__;
+                    win["g"] = __function_g__;
+
+                    setTimeout(function(){
+                      if( win["__dlhit__"] === null ){
+                        
+                        console.log('requesting XHR die to __dlhit__='+win["__dlhit__"]);
+                        ___innerScript___;
+                      }
+                    }, (___delaytime___+1)*1000);
+                  })(window, jQuery);
+                };
+                scriptHandler = scriptHandler.toString();
+                scriptHandler = scriptHandler.replace(/___function___/i, fnName);
+                scriptHandler = scriptHandler.replace(/___innerScript___/i, innerScript);
+                scriptHandler = scriptHandler.replace(/___delaytime___/i, delayTime);
+                scriptHandler = scriptHandler.replace(/__iframe_preloader__/i, this.frameload.toString());
+                scriptHandler = scriptHandler.replace(/__function_g__/i, g.toString());
+
+                this.injectBodyScript(scriptHandler);
+
+                // end-it
+                break;
+              }
+            }
+          }
+          // end:for
+
+          // remove css idb: #idb
+          scripts = document.getElementsByTagName( 'style' );
+          for( var i = 0; i < scripts.length; ++i ){
+            innerScript = scripts[i].innerHTML;
+            if( innerScript ){
+              if( cucok = /\#idb/.exec(innerScript)) {
+
+                scripts[i].parentNode.removeChild(scripts[i]);
+                break;
+              }
+            }
+          }
+          // end:for
         }
         else if( btn_free = g('.block.al_c a.downloadBtn') ){
           btn_free.setAttribute('data-target', btn_free.getAttribute('href'));
