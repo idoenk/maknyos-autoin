@@ -62,7 +62,8 @@
 
     invokeAction: function(){
       if(this.action.invoked){
-        this.action.baseCleanUp();
+        if(!this.action.noBaseClean)
+          this.action.baseCleanUp();
         this.action.invoked();
       }
       return this;
@@ -72,6 +73,7 @@
 
   function Actions(){
     this.invoked=null;
+    this.noBaseClean=null;
   }
   Actions.prototype = {
     find: function(domain){
@@ -85,6 +87,7 @@
         isMatch = typeof pattern.rule === 'string' ? pattern.rule == domain : pattern.rule.test(domain);
         if(isMatch){
           this.invoked = pattern.run;
+          this.noBaseClean = !isUndefined(pattern.noBaseClean) && pattern.noBaseClean;
           return;
         }
       }
@@ -299,39 +302,20 @@
 
         var that = this;
         var waitFor, code, count, counter, countdown = g('#countdown');
-        var btn_free, f1form = g('form[name="F1"]');
+        var btn_free, dlBtn = g('#downloadBtn');
 
-        if( f1form ){
-          counter = g('[id*="ountdow"]');
-          if( !this.isVisible(counter) ){
+        if( dlBtn ){
 
-            SimulateMouse(g('#btn_download'), "click", true);
-          }
-          else{
-            if( count = g('*', counter) ){
-              
-              setTimeout(function(){
-                
-                if( code = g('[name="code"]', f1form) ){
-                  that.scrap_simplecapcay( code );
-                  code.focus();
-                }
-
-              }, 123);
-
-              if( waitFor = parseInt( $(count).text() ) ){
-                this.clog("waiting for "+waitFor+' seconds');
-                this.waitforit(function(){
-
-                  return !that.isVisible( counter );
-                }, function(){
-                  SimulateMouse(g('#btn_download'), "click", true);
-                }, waitFor * 1000);
-              }
-            }
-          }
+          this.clog('coba inside downloadBtn..');
         }
-        else if( btn_free = g('[name="method_free"]') ){
+        else if( btn_free = g('.block.al_c a.downloadBtn') ){
+          btn_free.setAttribute('data-target', btn_free.getAttribute('href'));
+          btn_free.setAttribute('href', 'javascript:;');
+          btn_free.onclick = function(e){
+            top.location.href = this.getAttribute('data-target');
+            e.preventDefault();
+            return !1;
+          }
           this.clog("commencing btn_free ");
           SimulateMouse(btn_free, "click", true);
         }
@@ -383,6 +367,7 @@
 
     mediafire: {
       rule: /mediafire\.com/,
+      noBaseClean: true,
       run: function(){
 
         var dcg, selector, that, is_match_path = /mediafire\.com\/(view|download)\b/;
