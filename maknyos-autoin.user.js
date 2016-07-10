@@ -376,8 +376,6 @@
         if( !is_match_path.test(that.get_href()) ) return;
         that.clog('inside mediafire, '+that.get_href());
 
-        setTimeout(function(){ that.killframes() }, 123);
-
         if( dcg = g("#docControlGroup") ){
           selector = './/a[contains(@target,"_blank")]';
           selector = xp(selector, dcg, true);
