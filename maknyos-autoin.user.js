@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.7.13
+// @version        3.7.14
 // @description    Auto submit to get link
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -308,8 +308,17 @@
             delayTime = 0,
             btn_free, scripts, innerScript,
             cucok, cokcok, fnName,
-            el, mainWrap
+            el, mainWrap, aabp
         ;
+        // anti-(antiabp) :: injectBodyStyle-ish
+        aabp = function(){
+          var style = document.createElement("style"),
+              css = '*[id*="idb"] ~ #bodyAndFooter{display: initial!important;}';
+
+          style.textContent = css;
+          document.body.appendChild(style);
+        };
+        aabp();
 
         if( dlBtn ){
 
