@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.7.14
+// @version        3.7.15
 // @description    Auto submit to get link
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -783,29 +783,72 @@
     yadi: {
       rule: /yadi\.sk/,
       run: function(){
-        var btnDownload, that = this;
+        var that = this,
+            btnSelector = '.button_download'
+        ;
 
         that.clog('inside yadi, '+that.get_href());
-        if( btnDownload = g('*[data-click-action="resource.download"]') ){
-          var triggered = !1;
 
-          // proper content ready is required, since button used some ajax on it.
-          document.addEventListener('DOMContentLoaded', function() {
-            if( !triggered )
-              setTimeout(function(){
-                that.clog('Simulating Click.. #2');
-                SimulateMouse(btnDownload, "click", true)
-              }, 125);
-          }, false);
+        this.waitforit(function(){
 
-          setTimeout(function(){
-            that.clog('Simulating Click.. #1');
-            SimulateMouse(btnDownload, "click", true);
-            triggered = 1;
-          }, 100);
-        }
-        else
-          this.clog('yadi: missing download button, page may changed');
+          return g(btnSelector);
+        }, function(){
+          var btnDownload = g('.button_download');
+          if( btnDownload ){
+
+            // models-client json
+            var json = g('#models-client').innerHTML,
+                pdata = {};
+
+            if( json ){
+              try{
+                json = JSON.parse(json)
+              }catch(e){ json = null; }
+            }
+
+            if( json ){
+              var data, url;
+
+              for(var i=0, iL=json.length; i<iL; i++){
+                if( isUndefined(json[i]['data']) )
+                  continue;
+                data = json[i]['data'];
+
+                if(json[i].model == 'resource'){
+                  if( isDefined(data['id']) )
+                    pdata['id.0'] = data['id'];
+                }
+                else if(json[i].model == 'config'){
+                  if( isDefined(data['sk']) )
+                    pdata['sk'] = data['sk'];
+                }
+              }
+
+              pdata['_model.0'] = 'do-get-resource-url';
+              // that.clog(pdata);
+
+              // xhr
+              url = 'https://www.yadi.sk/models/?_m=do-get-resource-url';
+              $.post(url, pdata, function(ret){
+                that.clog(ret);
+                if(ret && ret.models && ret.models.length){
+                  var md = ret.models[0];
+                  if( md.data && md.data.file ){
+                    that.frameload( md.data.file );
+                  }
+                }
+              });
+            }
+            else{
+
+              that.clog('yadi: missing models-clients');
+            }
+          }
+          else{
+            that.clog('yadi: missing download button, page may changed');
+          }
+            
+        }, 100);
       }
     },
     datafilehost: {
