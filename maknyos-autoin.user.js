@@ -39,7 +39,7 @@
 
 (function() {
   var gvar=function(){};
-  gvar.__DEBUG__ = !1;
+  gvar.__DEBUG__ = 1;
 
   function MaknyosHelper(baseURI){
     this.baseURI=baseURI;
@@ -411,12 +411,13 @@
         else if( btn_free = g('.block.al_c a.downloadBtn') ){
           btn_free.setAttribute('data-target', btn_free.getAttribute('href'));
           btn_free.setAttribute('href', 'javascript:;');
+          btn_free.setAttribute('_target', 'self');
           btn_free.onclick = function(e){
-            top.location.href = this.getAttribute('data-target');
-            e.preventDefault();
-            return !1;
+            var href = this.getAttribute('data-target');;
+            this.setAttribute('href', href);
+            location.href = href;
+            return true;
           }
-          this.clog("commencing btn_free ");
           SimulateMouse(btn_free, "click", true);
         }
       }
