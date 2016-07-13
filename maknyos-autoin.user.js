@@ -313,10 +313,14 @@
         // anti-(antiabp) :: injectBodyStyle-ish
         aabp = function(){
           var style = document.createElement("style"),
-              css = '*[id*="idb"] ~ #bodyAndFooter{display: initial!important;}';
+              css = ''
+                +'*[id*="idb"] ~ #bodyAndFooter{display: initial!important;}'
+                +'*[id*="idb"]{display:none!important;}'
+              ;
 
           style.textContent = css;
-          document.body.appendChild(style);
+          document.body.insertBefore(style, document.body.firstChild);
+          that.clog('injecting anti-(antiabp)..');
         };
         aabp();
 
