@@ -300,7 +300,7 @@
   };
   Actions.prototype.patterns = {
     indowebster: {
-      rule: /files|maknyos\.indowebster\.com/,
+      rule: /(files|maknyos)\.indowebster\.com/,
       run: function(){
 
         var that = this,
