@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.7.15
+// @version        3.7.16
 // @description    Auto submit to get link
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -32,6 +32,8 @@
 // @include        /^https?://(|www\.)seiba.ga/*/
 // @include        /^https?://(|www\.)mylinkgen.com/*/
 // @include        /^https?://(|www\.)openload.co/*/
+// @include        /^https?://(|www\.)rgho.st/*/
+// @include        /^https?://(|www\.)upload.ee/files/*/
 //
 // ==/UserScript==
 
@@ -39,7 +41,7 @@
 
 (function() {
   var gvar=function(){};
-  gvar.__DEBUG__ = 1;
+  gvar.__DEBUG__ = !1;
 
   function MaknyosHelper(baseURI){
     this.baseURI=baseURI;
@@ -1070,7 +1072,14 @@
         ;
         if( wrapBox ){
           btnContinue = g('.btn', wrapBox);
-          btnContinue && this.set_href(btnContinue);
+          if( btnContinue )
+            this.set_href(btnContinue);
+          else
+            this.clog('mylinkgen: missing download button, page may changed');
+        }
+        else{
+
+          this.clog('mylinkgen: missing wrapper button, page may changed');
         }
       }
     },
@@ -1097,6 +1106,46 @@
         }
         else{
           // other location..
+        }
+      }
+    },
+
+    rgho: {
+      rule: /rgho.st/,
+      run: function(){
+        var wrapBox = g('#actions'),
+            btnDl = null
+        ;
+        if( wrapBox ){
+          btnDl = g('.btn', wrapBox);
+          if( btnDl )
+            SimulateMouse(btnDl, "click", true);
+          else
+            this.clog('rgho: missing download button, page may changed');
+        }
+        else{
+
+          this.clog('rgho: missing wrapper button, page may changed');
+        }
+      }
+    },
+
+    uploadee: {
+      rule: /upload.ee/,
+      run: function(){
+        var wrapBox = g('.textbody:last-child'),
+            btnDl = null
+        ;
+        if( wrapBox ){
+          btnDl = g('a[href*="/download/"]', wrapBox);
+          if( btnDl )
+            SimulateMouse(btnDl, "click", true);
+          else
+            this.clog('uploadee: missing download button, page may changed');
+        }
+        else{
+
+          this.clog('uploadee: missing wrapper button, page may changed');
         }
       }
     }
