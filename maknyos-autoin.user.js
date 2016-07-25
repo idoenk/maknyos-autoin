@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.7.16
+// @version        3.7.17
 // @description    Auto submit to get link
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -1069,12 +1069,31 @@
       rule: /mylinkgen\.com/,
       run: function(){
         var wrapBox = g('#main-content'),
-            btnContinue = null
+            btnContinue = null,
+            href, cucok, el
         ;
         if( wrapBox ){
           btnContinue = g('.btn', wrapBox);
-          if( btnContinue )
-            this.set_href(btnContinue);
+          if( btnContinue ){
+            href = btnContinue.getAttribute('href');
+            this.clog(href);
+
+            if( href && /^https?\:\/\//.test(href) )
+              this.set_href(btnContinue);
+            else{
+              if( cucok = /\shref=[\'\"](https?\:\/\/[^\'\"]+)./.exec(wrapBox.innerHTML) ){
+                el = document.createElement('a');
+                el.setAttribute('href', cucok[1]);
+                el.setAttribute('target', '_blank');
+                el.textContent = cucok[1];
+
+                wrapBox.insertBefore(el, wrapBox.firstChild);
+                this.set_href(cucok[1]);
+              }
+              else
+                this.clog('mylinkgen: missing hidden download link, page may changed');
+            }
+          }
           else
             this.clog('mylinkgen: missing download button, page may changed');
         }
