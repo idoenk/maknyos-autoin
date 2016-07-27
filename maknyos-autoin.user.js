@@ -494,6 +494,7 @@
             btn = g('.download_link a');
             nbtn = document.createElement('a');
             nbtn.setAttribute('href', btn.getAttribute('href'));
+            nbtn.setAttribute('onclick', 'location.href=this.href; return !1');
             nbtn.innerHTML = btn.innerHTML;
             btn.parentNode.replaceChild(nbtn, btn);
 
