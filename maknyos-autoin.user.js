@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.7.17
+// @version        3.7.18
 // @description    Auto submit to get link
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -474,8 +474,10 @@
       noBaseClean: true,
       run: function(){
 
-        var dcg, selector, that, is_match_path = /mediafire\.com\/(view|download)\b/;
-        that = this;
+        var dcg, selector, btn, nbtn,
+            that = this,
+            is_match_path = /mediafire\.com\/(view|download)\b/
+        ;
 
         if( !is_match_path.test(that.get_href()) ) return;
         that.clog('inside mediafire, '+that.get_href());
@@ -489,7 +491,13 @@
           that.waitforit(function(){
             return g('.download_link a');
           }, function(){
-            SimulateMouse(g('.download_link a'), "click", true);
+            btn = g('.download_link a');
+            nbtn = document.createElement('a');
+            nbtn.setAttribute('href', btn.getAttribute('href'));
+            nbtn.innerHTML = btn.innerHTML;
+            btn.parentNode.replaceChild(nbtn, btn);
+
+            SimulateMouse(nbtn, "click", true);
           }, 100);
         }
       }
