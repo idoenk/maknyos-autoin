@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.7.18
+// @version        3.7.19
 // @description    Auto submit to get link
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -35,6 +35,8 @@
 // @include        /^https?://(|www\.)openload.co/*/
 // @include        /^https?://(|www\.)rgho.st/*/
 // @include        /^https?://(|www\.)upload.ee/files/*/
+// @include        /^https?://bc.vc/([\w]+)(\#\w+?)?$/
+// @include        /^https?://sh.st/([\w]+)(\#\w+?)?$/
 //
 // ==/UserScript==
 
@@ -142,7 +144,7 @@
           }
           else{
             if( itry < maxtry )
-              waitwrap()
+              stoWait = setTimeout(waitwrap, delay+1000);
           }
         },
         stoWait = setTimeout(waitwrap, delay+1000);
@@ -1175,6 +1177,53 @@
         else{
 
           this.clog('uploadee: missing wrapper button, page may changed');
+        }
+      }
+    },
+
+    bcvc: {
+      rule: /bc.vc/,
+      noBaseClean: true,
+      run: function(){
+        var loc = location.href,
+            btnSel = '.skip_btn'
+        ;
+
+        if( loc.indexOf('#') == -1 ){
+          top.location.href = loc+'#maknyos';
+          location.reload( !1 );
+          return !1;
+        }
+        else{
+          if('function' === typeof window['IFrameLoaded'])
+            window['IFrameLoaded']();
+
+          this.waitforit(function(){
+
+            return g(btnSel);
+          }, function(){
+
+            SimulateMouse(g(btnSel), "click", true);
+          }, 567);
+        }
+      }
+    },
+
+    shst: {
+      rule: /sh.st/,
+      run: function(){
+        var elAd = g('#intermediate-ad'),
+            dataAd = elAd.getAttribute('data-advertisement'),
+            cucok = null
+        ;
+        if( dataAd && (cucok = /cp\.dest_domain=([^\&]+)/.exec(dataAd)) ){
+          
+          top.location.href = 'http://'+cucok[1];
+          return !1;
+        }
+        else{
+
+          this.clog('missing element: #intermediate-ad');
         }
       }
     }
