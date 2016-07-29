@@ -44,7 +44,7 @@
 
 (function() {
   var gvar=function(){};
-  gvar.__DEBUG__ = !1;
+  gvar.__DEBUG__ = 1;
 
   function MaknyosHelper(baseURI){
     this.baseURI=baseURI;
@@ -1185,26 +1185,86 @@
       rule: /bc.vc/,
       noBaseClean: true,
       run: function(){
-        var loc = location.href,
+        var that = this,
+            loc = location.href,
             btnSel = '.skip_btn'
         ;
 
         if( loc.indexOf('#') == -1 ){
-          top.location.href = loc+'#maknyos';
-          location.reload( !1 );
+          top.location.href = loc+'#';
+          location.reload();
           return !1;
         }
         else{
           if('function' === typeof window['IFrameLoaded'])
             window['IFrameLoaded']();
 
-          this.waitforit(function(){
+          var failoverClick = function(){
 
-            return g(btnSel);
-          }, function(){
+            that.waitforit(function(){
 
-            SimulateMouse(g(btnSel), "click", true);
-          }, 567);
+              return g(btnSel);
+            }, function(){
+
+              // do that later
+              SimulateMouse(g(btnSel), "click", true);
+            }, 567);
+          };
+
+
+          if( 'function' == typeof $ ){
+            try{
+              var scripts = document.getElementsByTagName('script'),
+                  dataopt = null,
+                  cucok, params
+              ;
+              for(var i=0, iL=scripts.length; i<iL; i++){
+
+                that.clog(scripts[i].innerHTML);
+                if( (cucok = /\{opt\:[^,]+.(args[^}]+.)/i.exec(scripts[i].innerHTML)) && cucok.length ){
+
+                  dataopt = eval("({"+cucok[1]+"})");
+                  that.clog(dataopt);
+                  break;
+                }
+              }
+              
+              params = {
+                opt: 'make_log',
+                args: {}
+              };
+              if( dataopt && dataopt.args ){
+                dataopt.args.nok = 'no';
+                dataopt.args.mob = 'no';
+                params.args = dataopt.args;
+
+                $.post('/fly/ajax.fly.php?_1', params, function(ret){
+                  if( ret )
+                    ret = eval('('+ret+')');
+
+                  if( ret.message && ret.message.url ){
+
+                    top.location.href = ret.message.url;
+                  }
+                  else{
+
+                    failoverClick();
+                  }
+                });
+              }
+              else{
+
+                failoverClick();
+              }
+            }catch(e){
+
+              failoverClick();
+            }
+          }
+          else{
+
+            failoverClick();
+          }
         }
       }
     },
