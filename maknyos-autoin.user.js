@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.7.19
+// @version        3.7.20
 // @description    Auto submit to get link
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -9,7 +9,7 @@
 // @include        /^https?://(files|maknyos).indowebster.com/*/
 // @include        /^https?://(.+\.)2shared.com/file/*/
 // @include        /^https?://(.+\.)zippyshare.com/v/*/
-// @include        /^https?://(|www\.)mediafire.com/*/
+// @include        /^https?://(|www\.)mediafire.com/(download|view)/*/
 // @include        /^https?://(|www\.)sendspace.com/file/*/
 // @include        /^https?://(|www\.)uptobox.com\/\w/
 // @include        /^https?://(|www\.)howfile.com/file/*/
@@ -153,6 +153,11 @@
         thenwhatwrap();
     },
 
+    injectBodyStyle: function(stylesString){
+      var style = document.createElement("style");
+      style.appendChild( document.createTextNode(stylesString) );
+      document.body.appendChild(style);
+    },
     injectBodyScript: function(scriptFunc){
       var script = document.createElement("script");
       script.textContent = "(" + scriptFunc.toString() + ")();";
@@ -476,20 +481,53 @@
       noBaseClean: true,
       run: function(){
 
-        var dcg, selector, btn, nbtn,
-            that = this,
-            is_match_path = /mediafire\.com\/(view|download)\b/
+        var that = this,
+            dcg, selector, btn, nbtn
         ;
-
-        if( !is_match_path.test(that.get_href()) ) return;
-        that.clog('inside mediafire, '+that.get_href());
 
         if( dcg = g("#docControlGroup") ){
           selector = './/a[contains(@target,"_blank")]';
           selector = xp(selector, dcg, true);
           selector && that.set_href(selector.getAttribute('href'))
         }
-        else {
+        else if( dcg = g('#recaptcha_widget_div') ){
+          var recapcay = g('.g-recaptcha', dcg),
+              site_key = recapcay.getAttribute('data-sitekey')
+          ;
+
+          if('function' === typeof $ && site_key){
+
+            $('.g-recaptcha', dcg)
+              .replaceWith($('<div id="maknyos-recaptcha" data-bijikuda="1" data-sitekey="'+site_key+'"></div>'));
+
+            // recaptcha-rebuilder
+            var scriptHandler = function(_site_key){
+              return (function(win, $){
+
+                if("undefined" !== typeof grecaptcha){
+                  grecaptcha.render("maknyos-recaptcha", {
+                    sitekey: "___SITEKEY___",
+                    callback: function(){ $(".dl_startlink > a").trigger("click") }
+                  });
+                }
+                else{
+
+                  console.log('grecaptcha undefined');
+                }
+              })(window, $);
+            };
+            scriptHandler = scriptHandler.toString();
+            scriptHandler = scriptHandler.replace(/___SITEKEY___/, site_key);
+            that.injectBodyScript(scriptHandler);
+
+            var cssString = ''
+              +'#form_captcha .captchaPromo:before { content: "Click to download"; font-size: 1.2em; color: #ccc; position: absolute; top: 6px; left: -20px; margin-top: -30px;}'
+              +'.nonpro_adslayout #form_captcha .captchaPromo, .freeAccount .pro #form_captcha .captchaPromo{ background-size: 275%; background-position-y: -110px; }'
+            ;
+            that.injectBodyStyle(cssString);
+          }
+        } else {
+
           that.waitforit(function(){
             return g('.download_link a');
           }, function(){
