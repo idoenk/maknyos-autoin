@@ -1263,16 +1263,16 @@
         var that = this,
             scripts = document.getElementsByTagName( 'script' ),
             cbu = null, si = null,
-            cucok, urlAsk, cbName
+            cucok, cbName
         ;
         for( var i = 0; i < scripts.length; ++i ) {
           innerScript = scripts[i].innerHTML;
           if( !innerScript ) continue;
 
-          if( (cucok = /callbackUrl\s*:\s*[\'\"]([^\'\"]+)/i.exec(innerScript)) )
+          if( null === cbu && (cucok = /callbackUrl\s*:\s*[\'\"]([^\'\"]+)/i.exec(innerScript)) )
             cbu = cucok[1];
 
-          if( (cucok = /sessionId\s*:\s*[\'\"]([^\'\"]+)/i.exec(innerScript)) )
+          if( null === si && (cucok = /sessionId\s*:\s*[\'\"]([^\'\"]+)/i.exec(innerScript)) )
             si = cucok[1];
 
           if( cbu != null && si != null)
