@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.7.20
+// @version        3.8
 // @description    Auto submit to get link
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -284,6 +284,12 @@
         ele.offsetParent !== null &&
         ele.style.opacity !== 0 &&
         ele.style.visibility !== 'hidden';
+    },
+
+    hasClass: function(cName, ele){
+      if(!cName || !ele) return;
+      var clss = (ele.getAttribute('class')||'').split(' ');
+      return (clss.indexOf(cName) != -1);
     },
 
     show_alert: function(msg, force) {
@@ -1254,18 +1260,74 @@
     shst: {
       rule: /sh.st/,
       run: function(){
-        var elAd = g('#intermediate-ad'),
-            dataAd = elAd.getAttribute('data-advertisement'),
-            cucok = null
+        var that = this,
+            scripts = document.getElementsByTagName( 'script' ),
+            cbu = null, si = null,
+            cucok, urlAsk, cbName
         ;
-        if( dataAd && (cucok = /cp\.dest_domain=([^\&]+)/.exec(dataAd)) ){
-          
-          top.location.href = 'http://'+cucok[1];
-          return !1;
+        for( var i = 0; i < scripts.length; ++i ) {
+          innerScript = scripts[i].innerHTML;
+          if( !innerScript ) continue;
+
+          if( (cucok = /callbackUrl\s*:\s*[\'\"]([^\'\"]+)/i.exec(innerScript)) )
+            cbu = cucok[1];
+
+          if( (cucok = /sessionId\s*:\s*[\'\"]([^\'\"]+)/i.exec(innerScript)) )
+            si = cucok[1];
+
+          if( cbu != null && si != null)
+            break;
+        }
+
+        if( cbu && si && 'function' == typeof reqwest ){
+          cbName = 'mkycb_'+String(Math.random()).replace(/0\./,'');
+
+          that.waitforit(function(){
+            var btn = g("#skip_button");
+            return that.isVisible(btn) && that.hasClass('show', btn);
+          }, function(){
+
+            reqwest({
+              url: cbu+'?',
+              method: 'get',
+              data: {
+                adSessionId: si,
+                adbd: 1,
+                callback: cbName,
+              },
+              type: 'jsonp',
+              success: function(ret){
+                if( ret && ret.destinationUrl )
+                  location.href = ret.destinationUrl;
+              },
+              timeout: 1e4,
+              error: function(e){ that.clog( e ) }
+            });
+
+            var scriptHandler = function(){
+              return (function(win){
+                win["__cbName__"] = function(ret){
+                  var btn = document.getElementById("skip_button");
+                  btn.textContent = 'Redirecting...';
+
+                  if(ret && ret.destinationUrl)
+                    location.href = ret.destinationUrl;
+
+                  setTimeout(function(){
+                    btn.setAttribute('disabled', 'disabled');
+                  }, 200)
+                };
+              })(window);
+            };
+            scriptHandler = scriptHandler.toString();
+            scriptHandler = scriptHandler.replace(/__cbName__/i, cbName);
+
+            that.injectBodyScript(scriptHandler);
+          }, 345);
         }
         else{
 
-          this.clog('missing element: #intermediate-ad');
+          that.clog('Missing callbackUrl | sessionId'+('undefined' == typeof reqwest ? ' | reqwest is Undefined' : ''));
         }
       }
     }
