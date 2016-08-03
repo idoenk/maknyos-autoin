@@ -2,7 +2,7 @@
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
 // @version        3.8.1
-// @description    Auto click / submit to get link, iframes killer, load direct-link with iframe. Supported host: indowebster, 2shared, zippyshare, mediafire, sendspace, uptobox, howfile, uppit, imzupload, jumbofiles, sendmyway, tusfiles, dropbox, yadi.sk, datafilehost, userscloud, hulkload, app.box.com, dailyuploads, kumpulbagi, kb.simple-aja, moesubs, kirino.uguu.at, seiba.ga, mylinkgen, rgho.st, upload.ee, bc.vc, sh.st, adf.ly
+// @description    Auto click / submit to get link, iframes killer, load direct-link with iframe. Supported host: indowebster, 2shared, zippyshare, mediafire, sendspace, uptobox, howfile, uppit, imzupload, jumbofiles, sendmyway, tusfiles, dropbox, yadi.sk, datafilehost, userscloud, hulkload, app.box.com, dailyuploads, kumpulbagi, kb.simple-aja, moesubs, kirino.uguu.at, seiba.ga, mylinkgen, rgho.st, upload.ee, bc.vc, sh.st, adf.ly, adfoc.us
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
 // @grant          GM_log
@@ -1339,7 +1339,7 @@
       noBaseClean: true,
       run: function(){
         var that = this,
-            elck = g('#cookie_notice')
+            elck = g('#cookie_notice'),
             id = '#home',
             skipSel = '#top span img[src*=sk'+'ip_'+'ad]'
         ;
@@ -1415,7 +1415,7 @@
   function isDefined(x) { return!(x == null && x !== null) }
   function isUndefined(x) { return x == null && x !== null }
   function SimulateMouse(elem, event, preventDef, prefilter) {
-    if(typeof elem != "object") 
+    if(typeof elem != "object")
       return;
 
     // is it an a element? try with iframe loader
