@@ -38,6 +38,7 @@
 // @include        /^https?://bc.vc/([\w]+)(\#\w+?)?$/
 // @include        /^https?://sh.st/([\w]+)(\#\w+?)?$/
 // @include        /^https?://adf.ly/*/
+// @include        /^https?://adfoc.us/*/
 //
 // ==/UserScript==
 
@@ -1365,6 +1366,36 @@
         }, function(){
           var btn = g(skipSel).parentNode,
               href = btn.getAttribute('href')
+          ;
+          if( href )
+            location.href = href;
+          else
+            that.clog('Unable get redirect link');
+        }, 345);
+      }
+    },
+
+    adfocus: {
+      rule: /adfoc.us/,
+      run: function(){
+        var that = this,
+            id = '#interstitial',
+            skipSel = '#showSkip >a'
+        ;
+        if( !g(id) ){
+          that.clog('['+location.href+']:: Not a redirecter page..');
+          return !1;
+        }
+
+        that.waitforit(function(){
+          var btn = g(skipSel), href = null;
+          if( btn )
+            href = btn.getAttribute('href');
+
+          return href && /^((?:(?:ht|f)tps?\:\/\/){1}\S+)/.test(href);
+        }, function(){
+          var btn = g(skipSel),
+              href = (btn ? btn.getAttribute('href') : null)
           ;
           if( href )
             location.href = href;
