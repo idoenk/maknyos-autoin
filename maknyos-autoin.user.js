@@ -1344,7 +1344,7 @@
         ;
         if( !g(id) || !/\/\w+$/.test(location.pathname) ) {
           
-          that.clog('['+location.href']:: Not a redirecter page..');
+          that.clog('['+location.href+']:: Not a redirecter page..');
           return !1;
         }
 
