@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.8
-// @description    Auto click / submit to get link, iframes killer, load direct-link with iframe. Supported host: indowebster, 2shared, zippyshare, mediafire, sendspace, uptobox, howfile, uppit, imzupload, jumbofiles, sendmyway, tusfiles, dropbox, yadi.sk, datafilehost, userscloud, hulkload, app.box.com, dailyuploads, kumpulbagi, kb.simple-aja, moesubs, kirino.uguu.at, seiba.ga, mylinkgen, rgho.st, upload.ee, bc.vc, sh.st
+// @version        3.8.1
+// @description    Auto click / submit to get link, iframes killer, load direct-link with iframe. Supported host: indowebster, 2shared, zippyshare, mediafire, sendspace, uptobox, howfile, uppit, imzupload, jumbofiles, sendmyway, tusfiles, dropbox, yadi.sk, datafilehost, userscloud, hulkload, app.box.com, dailyuploads, kumpulbagi, kb.simple-aja, moesubs, kirino.uguu.at, seiba.ga, mylinkgen, rgho.st, upload.ee, bc.vc, sh.st, adf.ly
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
 // @grant          GM_log
@@ -37,6 +37,7 @@
 // @include        /^https?://(|www\.)upload.ee/files/*/
 // @include        /^https?://bc.vc/([\w]+)(\#\w+?)?$/
 // @include        /^https?://sh.st/([\w]+)(\#\w+?)?$/
+// @include        /^https?://adf.ly/*/
 //
 // ==/UserScript==
 
@@ -1329,6 +1330,47 @@
 
           that.clog('Missing callbackUrl | sessionId'+('undefined' == typeof reqwest ? ' | reqwest is Undefined' : ''));
         }
+      }
+    },
+
+    adfly: {
+      rule: /adf.ly/,
+      noBaseClean: true,
+      run: function(){
+        var that = this,
+            elck = g('#cookie_notice')
+            id = '#home',
+            skipSel = '#top span img[src*=sk'+'ip_'+'ad]'
+        ;
+        if( !g(id) || !/\/\w+$/.test(location.pathname) ) {
+          
+          that.clog('['+location.href']:: Not a redirecter page..');
+          return !1;
+        }
+
+        if( elck )
+          elck.parentNode.removeChild( elck );
+
+        that.killevents(null, 'click');
+        that.killevents(null, 'mousedown');
+        that.injectBodyStyle('iframe{visibility:hidden!important;}');
+
+        that.waitforit(function(){
+          var btn = g(skipSel), href;
+          if( btn ){
+            btn = btn.parentNode;
+            href = btn.getAttribute('href');
+          }
+          return href && /^((?:(?:ht|f)tps?\:\/\/){1}\S+)/.test(href);
+        }, function(){
+          var btn = g(skipSel).parentNode,
+              href = btn.getAttribute('href')
+          ;
+          if( href )
+            location.href = href;
+          else
+            that.clog('Unable get redirect link');
+        }, 345);
       }
     }
   };
