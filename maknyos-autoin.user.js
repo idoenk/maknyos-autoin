@@ -39,7 +39,6 @@
 // @include        /^https?://sh.st/([\w]+)(\#\w+?)?$/
 // @include        /^https?://adf.ly/*/
 // @include        /^https?://adfoc.us/*/
-// @include        /^https?://www.indostreamings.com/*/
 // ==/UserScript==
 
 
@@ -1404,34 +1403,6 @@
         }, 345);
       }
     },
-
-    indostreamings:{
-      rule: /indostreamings.com/,
-      noBaseClean: true,
-      run: function(){
-        var that = this;
-        var scriptHandler = function(){
-          return (function(win){
-            function isDef(x) { return!(x == null && x !== null) }
-            function g(x, par) {
-              !par && (par = document);
-              return ('string' == typeof x ? par.querySelector(x) : x);
-            }
-            var dN = eval(atob('Vnd'+'EZ'+'XpMQ3'+''+'p0bGlz')),
-                f = "film"
-            ;
-            if( isDef(dN) && dN ){
-              if( isDef(win[dN]) )
-                win[dN] = {bab:function(){}};
-            }
-            g('#'+f).style.display = 'block';
-            g('#'+f+'oncereklam').style.display = 'none';
-          })(window);
-        };
-        scriptHandler = scriptHandler.toString();
-        that.injectBodyScript(scriptHandler);
-      }
-    }
   };
   // end of patterns
 
