@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.8.2
-// @description    Auto click / submit to get link, iframes killer, anti-(antiabp) load direct-link with iframe. Supported host: indowebster, 2shared, zippyshare, mediafire, sendspace, uptobox, howfile, uppit, imzupload, jumbofiles, sendmyway, tusfiles, dropbox, yadi.sk, datafilehost, userscloud, hulkload, app.box.com, dailyuploads, kumpulbagi, kb.simple-aja, moesubs, kirino.uguu.at, seiba.ga, mylinkgen, rgho.st, upload.ee, bc.vc, sh.st, adf.ly, adfoc.us
+// @version        3.8.3
+// @description    Auto click / submit to get link, iframes killer, load direct-link with iframe. Supported host: indowebster, 2shared, zippyshare, mediafire, sendspace, uptobox, howfile, uppit, imzupload, jumbofiles, sendmyway, tusfiles, dropbox, yadi.sk, datafilehost, userscloud, hulkload, app.box.com, dailyuploads, kumpulbagi, kb.simple-aja, moesubs, my.pcloud.com, kirino.ga, seiba.ga, mylinkgen, rgho.st, upload.ee, bc.vc, sh.st, adf.ly, adfoc.us
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
 // @grant          GM_log
@@ -29,7 +29,7 @@
 // @include        /^https?://(|www\.)kumpulbagi.id/*/
 // @include        /^https?://(|www\.)kb.simple-aja.info/*/
 // @include        /^https?://(|www\.)moesubs.com/url/*/
-// @include        /^https?://kirino.uguu.at/*/
+// @include        /^https?://kirino.ga/lak/*/
 // @include        /^https?://(|www\.)seiba.ga/*/
 // @include        /^https?://(|www\.)mylinkgen.com/*/
 // @include        /^https?://(|www\.)openload.co/*/
@@ -39,6 +39,7 @@
 // @include        /^https?://sh.st/([\w]+)(\#\w+?)?$/
 // @include        /^https?://adf.ly/*/
 // @include        /^https?://adfoc.us/*/
+// @include        /^https?://my.pcloud.com/*/
 // ==/UserScript==
 
 
@@ -1107,7 +1108,7 @@
     },
 
     "kirino-uguu-seiba": {
-      rule: /kirino\.uguu\.at|seiba\.ga/,
+      rule: /kirino\.ga|seiba\.ga/,
       run: function(){
         var btnDownload = null;
 
@@ -1401,6 +1402,29 @@
           else
             that.clog('Unable get redirect link');
         }, 345);
+      }
+    },
+
+    mypcloudcom: {
+      rule: /my.pcloud.com/,
+      run: function(){
+        var that = this,
+            btn_selector = '//div[contains(@class,"button") and contains(text(),"ownload")]',
+            el = null
+        ;
+        if( publinkData && publinkData.downloadlink ){
+
+          that.set_href(publinkData.downloadlink);
+        }else if( el = xp(btn_selector, g('.button-area'), true) ){
+
+          setTimeout(function(){
+
+            SimulateMouse(el, "click", true)
+          }, 125);
+        }
+        else{
+          that.clog('mypcloudcom: missing button element, page may changed');
+        }
       }
     },
   };
