@@ -1409,19 +1409,38 @@
       rule: /my.pcloud.com/,
       run: function(){
         var that = this,
-            btn_selector = '//div[contains(@class,"button") and contains(text(),"ownload")]',
-            el = null
+            btn_selector = '//div[contains(@class,"button") and contains(text(),"ownload")]'
         ;
-        if( 'undefined' != typeof publinkData && publinkData.downloadlink ){
 
-          that.frameload( publinkData.downloadlink );
+        if( xp(btn_selector, g('.button-area'), true) ){
+          var scriptHandler = function(_site_key){
+            return (function(win, $){
 
-        }else if( el = xp(btn_selector, g('.button-area'), true) ){
+              var gvar          = gvar||{},
+                  btn_selector  = '.button-area > .button.greenbut',
+                  g             = ___func_g___,
+                  frameload     = ___func_frameload___,
+                  SimulateMouse = ___func_simulatemouse___
+              ;
 
-          setTimeout(function(){
 
-            SimulateMouse(el, "click", true)
-          }, 125);
+              if('undefined' != typeof publinkData && publinkData.downloadlink){
+                
+                frameload( publinkData.downloadlink );
+              }
+              else{
+                console.log('publinkData undefined');
+
+                SimulateMouse( $(btn_selector).first().get(0), "click", true );
+              }
+            })(window, $);
+          };
+          scriptHandler = scriptHandler.toString();
+          scriptHandler = scriptHandler.replace(/___func_simulatemouse___/, SimulateMouse.toString());
+          scriptHandler = scriptHandler.replace(/___func_g___/, g.toString());
+          scriptHandler = scriptHandler.replace(/___func_frameload___/, that.frameload.toString());
+          
+          that.injectBodyScript(scriptHandler);
         }
         else{
           that.clog('mypcloudcom: missing button element, page may changed');
