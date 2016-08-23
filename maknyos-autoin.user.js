@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.8.3
+// @version        3.8.4
 // @description    Auto click / submit to get link, iframes killer, load direct-link with iframe. Supported host: indowebster, 2shared, zippyshare, mediafire, sendspace, uptobox, howfile, uppit, imzupload, jumbofiles, sendmyway, tusfiles, dropbox, yadi.sk, datafilehost, userscloud, hulkload, app.box.com, dailyuploads, kumpulbagi, kb.simple-aja, moesubs, my.pcloud.com, kirino.ga, seiba.ga, mylinkgen, rgho.st, upload.ee, bc.vc, sh.st, adf.ly, adfoc.us
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -39,7 +39,7 @@
 // @include        /^https?://sh.st/([\w]+)(\#\w+?)?$/
 // @include        /^https?://adf.ly/*/
 // @include        /^https?://adfoc.us/*/
-// @include        /^https?://my.pcloud.com/*/
+// @include        /^https?://my.pcloud.com/publink/*/
 // ==/UserScript==
 
 
@@ -1412,9 +1412,10 @@
             btn_selector = '//div[contains(@class,"button") and contains(text(),"ownload")]',
             el = null
         ;
-        if( publinkData && publinkData.downloadlink ){
+        if( 'undefined' != typeof publinkData && publinkData.downloadlink ){
 
-          that.set_href(publinkData.downloadlink);
+          that.frameload( publinkData.downloadlink );
+
         }else if( el = xp(btn_selector, g('.button-area'), true) ){
 
           setTimeout(function(){
