@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.8.4
+// @version        3.8.5
 // @description    Auto click / submit to get link, iframes killer, load direct-link with iframe. Supported host: indowebster, 2shared, zippyshare, mediafire, sendspace, uptobox, howfile, uppit, imzupload, jumbofiles, sendmyway, tusfiles, dropbox, yadi.sk, datafilehost, userscloud, hulkload, app.box.com, dailyuploads, kumpulbagi, kb.simple-aja, moesubs, my.pcloud.com, kirino.ga, seiba.ga, mylinkgen, rgho.st, upload.ee, bc.vc, sh.st, adf.ly, adfoc.us
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -27,6 +27,7 @@
 // @include        /^https?://app.box.com/s/*/
 // @include        /^https?://(|www\.)dailyuploads.net/*/
 // @include        /^https?://(|www\.)kumpulbagi.id/*/
+// @include        /^https?://(|www\.)kbagi.com/*/
 // @include        /^https?://(|www\.)kb.simple-aja.info/*/
 // @include        /^https?://(|www\.)moesubs.com/url/*/
 // @include        /^https?://kirino.ga/lak/*/
@@ -824,25 +825,26 @@
     solidfiles: {
       rule: /solidfiles\.com/,
       run: function(){
-        var href, that, btnDownload;
-        that = this;
-
+        var that  = this,
+            $bc   = g('.box-content:first-child'),
+            btnDownload
+        ;
         that.clog('inside solidfiles, '+that.get_href());
+
         setTimeout(function(){
           that.killframes();
           that.disableWindowOpen();
         }, 123);
 
-        if( btnDownload = xp('//a[contains(.,"ownloa") and not(contains(@href,"remiu"))]', g('.dl .buttons'), true) )
+        if( btnDownload = g('[type=submit]', g('form.ng-pristine')) ){
           setTimeout(function(){
-            
-            if( href = that.parse_handle_href( btnDownload.getAttribute("href") ) )
-              btnDownload.setAttribute("href", href);
-
             SimulateMouse(btnDownload, "click", true)
           }, 125);
-        else
-          this.clog('solidfiles: missing download button, page may changed');
+        }
+        else {
+          if( $bc.textContent.indexOf('downloading') == -1 )
+            this.clog('solidfiles: missing download button, page may changed');
+        }
       }
     },
     yadi: {
@@ -1061,7 +1063,7 @@
     },
   
     kumpulbagi: {
-      rule: /kumpulbagi\.id/,
+      rule: /kumpulbagi\.id|kbagi\.com/,
       run: function(){
         var that = this, el, FORM, parent;
         if( !g('#fileDetails') ){
