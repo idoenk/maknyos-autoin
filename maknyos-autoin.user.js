@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.8.6
+// @version        3.8.7
 // @description    Auto click / submit to get link, iframes killer, load direct-link with iframe. Supported host: indowebster, 2shared, zippyshare, mediafire, sendspace, uptobox, howfile, uppit, imzupload, jumbofiles, sendmyway, tusfiles, dropbox, yadi.sk, datafilehost, userscloud, hulkload, app.box.com, dailyuploads, kumpulbagi, kb.simple-aja, moesubs, uploadrocket, my.pcloud.com, kirino.ga, seiba.ga, mylinkgen, rgho.st, upload.ee, bc.vc, sh.st, adf.ly, adfoc.us
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -49,7 +49,7 @@
 
 (function() {
   var gvar=function(){};
-  gvar.__DEBUG__ = !1;
+  gvar.__DEBUG__ = 1;
 
   function MaknyosHelper(baseURI){
     this.baseURI=baseURI;
@@ -895,13 +895,20 @@
               pdata['_model.0'] = 'do-get-resource-url';
 
               // xhr
-              url = 'https://www.yadi.sk/models/?_m=do-get-resource-url';
+              url = location.protocol+'//'+location.host+'/models/?_m=do-get-resource-url';
               $.post(url, pdata, function(ret){
                 that.clog(ret);
                 if(ret && ret.models && ret.models.length){
                   var md = ret.models[0];
-                  if( md.data && md.data.file ){
-                    that.frameload( md.data.file );
+                  if( md.data ){
+                    if( md.data.file )
+                      that.frameload( md.data.file );
+                    else if( md.data.folder )
+                      that.frameload( md.data.folder );
+                  }
+                  else{
+
+                    that.clog('yadi: missing xhr data models');
                   }
                 }
               });
