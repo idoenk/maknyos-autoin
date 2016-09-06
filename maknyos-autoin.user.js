@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.8.5
-// @description    Auto click / submit to get link, iframes killer, load direct-link with iframe. Supported host: indowebster, 2shared, zippyshare, mediafire, sendspace, uptobox, howfile, uppit, imzupload, jumbofiles, sendmyway, tusfiles, dropbox, yadi.sk, datafilehost, userscloud, hulkload, app.box.com, dailyuploads, kumpulbagi, kb.simple-aja, moesubs, my.pcloud.com, kirino.ga, seiba.ga, mylinkgen, rgho.st, upload.ee, bc.vc, sh.st, adf.ly, adfoc.us
+// @version        3.8.6
+// @description    Auto click / submit to get link, iframes killer, load direct-link with iframe. Supported host: indowebster, 2shared, zippyshare, mediafire, sendspace, uptobox, howfile, uppit, imzupload, jumbofiles, sendmyway, tusfiles, dropbox, yadi.sk, datafilehost, userscloud, hulkload, app.box.com, dailyuploads, kumpulbagi, kb.simple-aja, moesubs, uploadrocket, my.pcloud.com, kirino.ga, seiba.ga, mylinkgen, rgho.st, upload.ee, bc.vc, sh.st, adf.ly, adfoc.us
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
 // @grant          GM_log
+// @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js
 // @include        /^https?://(files|maknyos).indowebster.com/*/
 // @include        /^https?://(.+\.)2shared.com/file/*/
 // @include        /^https?://(.+\.)zippyshare.com/v/*/
@@ -35,6 +36,7 @@
 // @include        /^https?://(|www\.)mylinkgen.com/*/
 // @include        /^https?://(|www\.)openload.co/*/
 // @include        /^https?://(|www\.)rgho.st/*/
+// @include        /^https?://(|www\.)uploadrocket.net/*/
 // @include        /^https?://(|www\.)upload.ee/files/*/
 // @include        /^https?://bc.vc/([\w]+)(\#\w+?)?$/
 // @include        /^https?://sh.st/([\w]+)(\#\w+?)?$/
@@ -890,9 +892,7 @@
                     pdata['sk'] = data['sk'];
                 }
               }
-
               pdata['_model.0'] = 'do-get-resource-url';
-              // that.clog(pdata);
 
               // xhr
               url = 'https://www.yadi.sk/models/?_m=do-get-resource-url';
@@ -943,8 +943,7 @@
     userscloud: {
       rule: /userscloud\.com/,
       run: function(){
-        var FORM,
-            that = this,
+        var that = this,
             btn_selector = '//button[contains(@id, "ownlo") and not(contains(@disabled,"disabled"))]';
 
         that.clog('inside userscloud, '+that.get_href());
@@ -955,11 +954,9 @@
         }, function(){
           if( xp('//form[@name="F1"]', null, true) )
             setTimeout(function(){
-                var btn_download = xp(btn_selector, null, true);
-                SimulateMouse(btn_download, "click", true);
-
+              var btn_download = xp(btn_selector, null, true);
+              SimulateMouse(btn_download, "click", true);
             }, 345);
-            
         }, 100);
       }
     },
@@ -980,6 +977,16 @@
               el_.parentNode.removeChild(el_);
             }
           }
+
+          var selector = '//a[contains(@href, "data:text/html;")]';
+          that.waitforit(function(){
+            return xp(selector, null, true);
+          }, function(){
+            var layer = xp(selector, null, true);
+
+            layer.parentNode.removeChild( layer );
+          });
+
         }, 123);
 
         if( adcopy = g("[name=adcopy_response]") ){
@@ -1192,17 +1199,18 @@
     rgho: {
       rule: /rgho.st/,
       run: function(){
-        var wrapBox = g('#actions'),
-            btnDl = null
-        ;
-        if( wrapBox ){
-          btnDl = g('.btn', wrapBox);
-          if( btnDl )
-            SimulateMouse(btnDl, "click", true);
+        var that = this,
+            href = '',
+            btn_selector = '//a[contains(@href,"/download/") and contains(text(),"ownload")]';
+
+        if( btnDl = xp(btn_selector, null, true) ){
+          href = btnDl.getAttribute('href');
+
+          if( href )
+            that.set_href( href );
           else
-            this.clog('rgho: missing download button, page may changed');
-        }
-        else{
+            SimulateMouse(btnDl, "click", true);
+        }else{
 
           this.clog('rgho: missing wrapper button, page may changed');
         }
@@ -1446,6 +1454,37 @@
         }
         else{
           that.clog('mypcloudcom: missing button element, page may changed');
+        }
+      }
+    },
+
+    uploadrocket: {
+      rule: /uploadrocket.net/,
+      run: function(){
+        var that = this,
+            form = g('[name=freeorpremium]'),
+            btnDl = null, href
+        ;
+        if( form )
+          btnDl = g('[name=method_isfree]', form);
+
+        if( form && btnDl ){
+
+          SimulateMouse(btnDl, "click", true);
+        }
+        else if( g('#btn_download') ){
+
+          that.clog('insert captcha...');
+        }
+        else{
+          btnDl = xp('//a[contains(.,"rect Downlo")]', null, true);
+          if( btnDl ){
+            href = btnDl.getAttribute('href');
+            if( href )
+              that.set_href( href );
+            else
+              SimulateMouse(btnDl, "click", true);
+          }
         }
       }
     },
