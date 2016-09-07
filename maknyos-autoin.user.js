@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.8.7
-// @description    Auto click / submit to get link, iframes killer, load direct-link with iframe. Supported host: indowebster, 2shared, zippyshare, mediafire, sendspace, uptobox, howfile, uppit, imzupload, jumbofiles, sendmyway, tusfiles, dropbox, yadi.sk, datafilehost, userscloud, hulkload, app.box.com, dailyuploads, kumpulbagi, kb.simple-aja, moesubs, uploadrocket, my.pcloud.com, kirino.ga, seiba.ga, mylinkgen, rgho.st, upload.ee, bc.vc, sh.st, adf.ly, adfoc.us
+// @version        3.9
+// @description    Auto click / submit to get link, iframes killer, load direct-link with iframe. Supported host: indowebster, 2shared, zippyshare, mediafire, sendspace, uptobox, howfile, uppit, imzupload, jumbofiles, sendmyway, tusfiles, dropbox, yadi.sk, datafilehost, userscloud, hulkload, app.box.com, dailyuploads, kumpulbagi, kb.simple-aja, moesubs, uploadrocket, my.pcloud.com, kirino.ga, seiba.ga, mylinkgen, rgho.st, upload.ee, upload.so, bc.vc, sh.st, adf.ly, adfoc.us
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
 // @grant          GM_log
@@ -37,6 +37,7 @@
 // @include        /^https?://(|www\.)openload.co/*/
 // @include        /^https?://(|www\.)rgho.st/*/
 // @include        /^https?://(|www\.)uploadrocket.net/*/
+// @include        /^https?://(|www\.)upload.so/*/
 // @include        /^https?://(|www\.)upload.ee/files/*/
 // @include        /^https?://bc.vc/([\w]+)(\#\w+?)?$/
 // @include        /^https?://sh.st/([\w]+)(\#\w+?)?$/
@@ -1491,6 +1492,45 @@
               that.set_href( href );
             else
               SimulateMouse(btnDl, "click", true);
+          }
+          else{
+            
+            that.clog('uploadrocket: missing download button, page may changed');
+          }
+        }
+      }
+    },
+
+    uploadso: {
+      rule: /upload.so/,
+      run: function(){
+        var that    = this,
+            blah    = null,
+            btnChk  = null,
+            btnDl   = null, href
+        ;
+        if( blah = g('a[href*="apploading.mobi"]') )
+          blah.parentNode.removeChild( blah );
+
+        if( btnChk = g('#chkIsAdd') )
+          btnChk.checked = false;
+        
+        if( btnDl = g('#downloadBtnClickOrignal') ){
+
+          SimulateMouse(btnDl, "click", true);
+        }
+        else{
+          // stage-2 ?
+          if( btnDl = xp('//a[contains(.,"ownloa")]', g('.downloadbtn'), true) ){
+            href = btnDl.getAttribute('href');
+            if( href )
+              that.set_href( href );
+            else
+              SimulateMouse(btnDl, "click", true);
+          }
+          else{
+
+            that.clog('uploadso: missing download button, page may changed');
           }
         }
       }
