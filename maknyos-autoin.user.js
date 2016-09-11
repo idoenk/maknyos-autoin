@@ -1544,9 +1544,14 @@
 
           SimulateMouse(btnDl, "click", true);
         }
-        else if( g('#btn_download') ){
+        else if( btnDl = g('#btn_download') ){
+          var blah = g('#glasstop');
+          blah.parentNode.removeChild( blah );
 
           that.clog('insert captcha...');
+          g('[name=adcopy_response]').focus();
+
+          btnDl.removeAttribute('disabled');
         }
         else{
           btnDl = xp('//a[contains(.,"rect Downlo")]', null, true);
