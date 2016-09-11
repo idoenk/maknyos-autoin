@@ -40,6 +40,8 @@
 // @include        /^https?://(|www\.)upload.so/*/
 // @include        /^https?://(|www\.)upload.ee/files/*/
 // @include        /^https?://cloud.mail.ru/public/*/
+// @include        /^https?://drive.google.com/file/d/*/
+// @include        /^https?://docs.google.com/uc\?*/
 // @include        /^https?://bc.vc/([\w]+)(\#\w+?)?$/
 // @include        /^https?://sh.st/([\w]+)(\#\w+?)?$/
 // @include        /^https?://adf.ly/*/
@@ -1631,6 +1633,79 @@
           that.observe(layers, param_observe);
           SimulateMouse(btn, "click", true);
         }, 345);
+      }
+    },
+
+    gdrive: {
+      rule: /drive.google.com|docs.google.com/,
+      run: function(){
+        var that  = this,
+            loc   = that.get_href()
+        ;
+
+        if( /drive.google.com/.test( loc ) ){
+          gvar.stoRedirectGDrive = null;
+
+          var $wrapper    = $('.drive-viewer'),
+              id_timer    = 'maknyos-gd-timer',
+              countdown   = 4,
+              $btn_cancel = $('<a href="javascript:;" class="drive-viewer-dark-button goog-inline-block drive-viewer-button drive-viewer-button-clear-border btn-cancelredirect">cancel</a>');
+          ;
+          $btn_cancel.click(function(e){
+            if( gvar.stoRedirectGDrive )
+              clearInterval( gvar.stoRedirectGDrive );
+
+            $('#'+id_timer).parent().remove();
+            e.preventDefault();
+            that.clog('Redirect plan canceled..');
+          });
+          $wrapper.prepend(''
+            +'<div class="drive-viewer-toolstrip-name timer-autodownload" style="position:absolute; z-index: 10; top:9px; right: 260px; width: auto;">'
+            + 'Redirecting <span id="'+id_timer+'">in (X) </span>...'
+            +'</div>'
+          );
+          $wrapper.find(".timer-autodownload").append( $btn_cancel );
+
+          // stInterval
+          gvar.stoRedirectGDrive = setInterval(function(){
+            var $tgt = $('#'+id_timer),
+                count = $tgt.data('count')
+            ;
+            if( !(count && !isNaN(count)) && count != 0 )
+              $tgt.data('count', countdown);
+            
+            count = parseInt( $tgt.data('count') );
+            if( count > 0 ){
+              count = (count - 1);
+              $tgt.text( 'in ('+count+') ' );
+              $tgt.data('count', count);
+            }
+            else{
+              clearInterval( gvar.stoRedirectGDrive );
+              $tgt.text('');
+
+              var id = (function(url){
+                    var ret = null, cucok;
+                    if( cucok = /\/file\/d\/([^\/]+)/i.exec(url) )
+                      ret = cucok[1];
+
+                    return ret;
+                  })( loc ),
+                  href = location.protocol+'//docs.google.com/uc?id='+id+'&export=download'
+              ;
+              if( id ){
+
+                that.clog('opening href:'+href);
+                that.set_href( href );
+              }
+            }
+          }, 1000);
+        }
+        else{
+
+          that.clog('Force Downloading ....');
+          SimulateMouse(g('#uc-download-link'), "click", true);
+        }
       }
     }
   };
