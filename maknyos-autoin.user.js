@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.9
-// @description    Auto click / submit to get link, iframes killer, load direct-link with iframe. Supported host: indowebster, 2shared, zippyshare, mediafire, sendspace, uptobox, howfile, uppit, imzupload, jumbofiles, sendmyway, tusfiles, dropbox, yadi.sk, datafilehost, userscloud, hulkload, app.box.com, dailyuploads, kumpulbagi, kb.simple-aja, moesubs, uploadrocket, my.pcloud.com, kirino.ga, seiba.ga, mylinkgen, rgho.st, upload.ee, upload.so, bc.vc, sh.st, adf.ly, adfoc.us
+// @version        3.9.1
+// @description    Auto click / submit to get link, iframes killer, load direct-link with iframe. Supported host: indowebster, 2shared, zippyshare, mediafire, sendspace, uptobox, howfile, uppit, imzupload, jumbofiles, sendmyway, tusfiles, dropbox, yadi.sk, datafilehost, userscloud, hulkload, app.box.com, dailyuploads, kumpulbagi, kb.simple-aja, moesubs, uploadrocket, my.pcloud.com, kirino.ga, seiba.ga, mylinkgen, rgho.st, upload.ee, upload.so, cloud.mail.ru, bc.vc, sh.st, adf.ly, adfoc.us
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
 // @grant          GM_log
@@ -39,6 +39,7 @@
 // @include        /^https?://(|www\.)uploadrocket.net/*/
 // @include        /^https?://(|www\.)upload.so/*/
 // @include        /^https?://(|www\.)upload.ee/files/*/
+// @include        /^https?://cloud.mail.ru/public/*/
 // @include        /^https?://bc.vc/([\w]+)(\#\w+?)?$/
 // @include        /^https?://sh.st/([\w]+)(\#\w+?)?$/
 // @include        /^https?://adf.ly/*/
@@ -130,13 +131,14 @@
 
     // do waitwhat -> thenwhat
     waitforit: function(waitwhat, thenwhat, delay){
-      var stoWait,
-        itry = 0,
-        maxtry = 100,
-        thenwhatwrap = function(){
-          ('function' == typeof thenwhat ) &&
-            thenwhat();
-        };
+      var ME = this,
+          stoWait,
+          itry    = 0,
+          maxtry  = 100,
+          thenwhatwrap = function(r){
+            ('function' == typeof thenwhat ) &&
+              thenwhat(r);
+          };
       
       if( !delay )
         delay = 0;
@@ -144,19 +146,79 @@
       if('function' == typeof waitwhat){
         var waitwrap = function(){
           itry++;
-          if( waitwhat() ){
+          var r_ = null;
+          if( r_ = waitwhat() ){
             stoWait && clearTimeout( stoWait )
-            thenwhatwrap();
+            thenwhatwrap( r_ );
           }
           else{
             if( itry < maxtry )
               stoWait = setTimeout(waitwrap, delay+1000);
+            else{
+
+              ME.clog('waitforit failed...');
+            }
           }
         },
         stoWait = setTimeout(waitwrap, delay+1000);
       }
       else
         thenwhatwrap();
+    },
+
+    observer_init_: function(ev){
+      var ME = this,
+          params = ME.param_observe
+      ;
+      ME.clog('inside observer_init_..');
+      ME.clog(ME.param_observe);
+      
+      if( ev.type == params.event ){
+        
+        ME.clog('ahoy this match event...'+ev.type)
+      }
+    },
+    observe: function(element, params){
+      var ME = this,
+          config = {}
+      ;
+      if( !(params && params.callback) ){
+        ME.clog('missing required params');
+        return !1;
+      }
+
+      // create an observer instance
+      var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
+      var observer = new MutationObserver(function(mutations) {
+        var BreakException = {};
+        try{
+          mutations.forEach(function(mutation) {
+            // var $el = $(mutation.target);
+            // if( is_observed ) throw BreakException;
+
+            if( 'function' == typeof params.callback )
+              params.callback( mutation.target );
+          });
+        }catch(e){
+
+          if(e!==BreakException) throw e;
+        }
+      });
+       
+      // configuration of the observer:
+      config = $.extend({
+        attributes: true,
+        childList: true,
+        characterData: true
+      }, params.config);
+      ME.clog(config);
+      
+      // pass in the target node, as well as the observer options
+      observer.observe(element, config);
+       
+      // later, you can stop observing
+      // observer.disconnect();
+      gvar.observer = observer;
     },
 
     injectBodyStyle: function(stylesString){
@@ -1535,6 +1597,42 @@
         }
       }
     },
+
+    cloudmailru: {
+      rule: /cloud.mail.ru/,
+      run: function(){
+        var that    = this;
+
+        that.waitforit(function(){
+
+          return g('.btn_main');
+        }, function(btn){
+
+          var layers = g('.layers'),
+              param_observe = {
+                config: {
+                  attributes: false,
+                  childList: true,
+                  subtree: true,
+                  characterData: false
+                },
+                callback: function(e){
+                  var $dialog = $(e);
+                  if( $dialog && $dialog.length )
+                  setTimeout(function(){
+                    $dialog.find(".b-checkbox").trigger('click');
+                    $dialog.find(".btn.btn_main").trigger('click');
+                    if( gvar.observer )
+                      gvar.observer.disconnect();
+                  }, 123)
+                }
+              }
+          ;
+          that.observe(layers, param_observe);
+          SimulateMouse(btn, "click", true);
+        }, 345);
+      }
+    }
   };
   // end of patterns
 
@@ -1635,6 +1733,6 @@
       }
     }
     return root.getElementsByTagName(q)
-  };  
+  };
 })();
 /* eof. */
