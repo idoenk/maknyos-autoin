@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.9.1
+// @version        3.9.2
 // @description    Auto click / submit to get link, iframes killer, load direct-link with iframe. Supported host: indowebster, 2shared, zippyshare, mediafire, sendspace, uptobox, howfile, uppit, imzupload, jumbofiles, sendmyway, tusfiles, dropbox, yadi.sk, datafilehost, userscloud, hulkload, app.box.com, dailyuploads, kumpulbagi, kb.simple-aja, moesubs, uploadrocket, my.pcloud.com, kirino.ga, seiba.ga, mylinkgen, rgho.st, upload.ee, upload.so, cloud.mail.ru, bc.vc, sh.st, adf.ly, adfoc.us
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -47,6 +47,11 @@
 // @include        /^https?://adf.ly/*/
 // @include        /^https?://adfoc.us/*/
 // @include        /^https?://my.pcloud.com/publink/*/
+// @include        /^https?://gen.lib.rus.ec/*/
+// @include        /^https?://libgen.io/*/
+// @include        /^https?://golibgen.io/*/
+// @include        /^https?://bookzz.org/*/
+// @include        /^https?://(|\w+.)bookfi.net/*/
 // ==/UserScript==
 
 
@@ -1712,6 +1717,95 @@
           SimulateMouse(g('#uc-download-link'), "click", true);
         }
       }
+    },
+
+    "e-book:genlib": {
+      rule: /gen.lib.rus.ec|libgen.io|golibgen.io|bookzz.org|(|\w+\.)bookfi.net/,
+      run: function(){
+        var that      = this,
+            pathname  = location.pathname,
+            matchLoc  = ['foreignfiction','search.php','book'],
+            imgdl, btnDl, form, rows
+        ;
+        that.clog('location.hostname='+location.hostname);
+
+        switch(location.hostname){
+          case "libgen.io":
+            btnDl = g('[href*="md5"]');
+            if( btnDl )
+              SimulateMouse(btnDl, "click", true);
+            else
+              that.clog('Missing download button')
+          break;
+
+          case "bookzz.org":
+          case "en.bookfi.net":
+
+            that.clog('pathname='+pathname);
+
+            rows = gAll('.resItemBox');
+            if( rows && rows.length == 1 ){
+
+              if( btnDl = g('.ddownload', rows[0]) )
+                SimulateMouse(btnDl, "click", true);
+              else
+                that.clog('Missing download button');
+            }
+            else if(/\/book\/\w+/i.test(pathname) ){
+              if( btnDl = xp('//a[contains(.,"ownloa") and contains(@href,"/dl/")]', null, true) )
+                SimulateMouse(btnDl, "click", true);
+              else
+                that.clog('Missing download button');
+            }
+          break;
+
+          case "golibgen.io":
+
+            if( form = g('form[action*="noleech1.php"]') ){
+              
+              if( btnDl = g('[type=submit]', form) )
+                SimulateMouse(btnDl, "click", true);
+              else
+                that.clog('Missing download button')
+            }
+          break;
+
+          // gen.lib.rus.ec
+          default:
+            var unsupported = true;
+            for(var i=0, iL=matchLoc.length; i<iL; i++){
+              if( pathname.indexOf('/'+matchLoc[i]) !== -1 ){
+                unsupported = false;
+                break;
+              }
+            }
+
+            if( unsupported ){
+              that.clog('Exiting, location not supported, '+pathname);
+              return !1
+            }
+
+            $('a[href*="md5"]').each(function(){
+              var $me = $(this),
+                  href = $me.attr('href')
+              ;
+              if( /ads\.php/.test(href) ){
+                $me.html(''
+                  +'<strong>'+$me.text()+'</strong>'
+                );
+                href = href.replace('ads.php', 'get.php');
+                $me.attr('href', href);
+                $me.on('click', function(e){
+                  e.preventDefault();
+                  var win = window.open(href, href.replace(/\W/g,''));
+                  win.focus();
+                  return !1;
+                });
+              }
+            });
+          break;
+        };
+      },
     }
   };
   // end of patterns
