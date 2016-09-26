@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.9.2
+// @version        3.9.3
 // @description    Auto click / submit to get link, iframes killer, load direct-link with iframe. Supported host: indowebster, 2shared, zippyshare, mediafire, sendspace, uptobox, howfile, uppit, imzupload, jumbofiles, sendmyway, tusfiles, dropbox, yadi.sk, datafilehost, userscloud, hulkload, app.box.com, dailyuploads, kumpulbagi, kb.simple-aja, moesubs, uploadrocket, my.pcloud.com, kirino.ga, seiba.ga, mylinkgen, rgho.st, upload.ee, upload.so, cloud.mail.ru, bc.vc, sh.st, adf.ly, adfoc.us
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -1725,24 +1725,57 @@
         var that      = this,
             pathname  = location.pathname,
             matchLoc  = ['foreignfiction','search.php','book'],
-            imgdl, btnDl, form, rows
+            imgdl, btnDl, form, rows, healLinks
         ;
         that.clog('location.hostname='+location.hostname);
 
+        healLinks = function(){
+          $('a[href*="md5"]').each(function(){
+            var $me = $(this),
+            href = $me.attr('href')
+            ;
+            if( /ads\.php/.test(href) ){
+              $me.html(''
+                +'<strong>'+$me.text()+'</strong>'
+                );
+              href = href.replace('ads.php', 'get.php');
+              $me.attr('href', href);
+              $me.on('click', function(e){
+                e.preventDefault();
+                $(this).addClass('opened');
+                window.open(this, href.replace(/\W/g,''));
+                return !1;
+              });
+            }
+          });
+        };
+        var cssString = ''
+          +'a#mlink:link{color: #1a0dab;text-decoration:none;}'
+          +'a#mlink:link>strong{font-weight:normal;}'
+          +'a#mlink:hover{text-decoration:underline;}'
+          +'a#mlink:visited,a#mlink.opened{color: #609;}'
+          +'a#mlink:visited>strong,a#mlink.opened>strong{font-weight:bold;}'
+        ;
+
         switch(location.hostname){
           case "libgen.io":
-            btnDl = g('[href*="md5"]');
-            if( btnDl )
-              SimulateMouse(btnDl, "click", true);
-            else
-              that.clog('Missing download button')
+            that.clog('pathname='+pathname);
+            if( /\/ads\.php/.test(pathname) ){
+              btnDl = g('[href*="get.php?md5"]');
+              if( btnDl )
+                SimulateMouse(btnDl, "click", true);
+              else
+                that.clog('Missing download button')
+            }
+            else{
+
+              that.injectBodyStyle(cssString);
+              healLinks();
+            }
           break;
 
           case "bookzz.org":
           case "en.bookfi.net":
-
-            that.clog('pathname='+pathname);
-
             rows = gAll('.resItemBox');
             if( rows && rows.length == 1 ){
 
@@ -1760,9 +1793,8 @@
           break;
 
           case "golibgen.io":
-
             if( form = g('form[action*="noleech1.php"]') ){
-              
+
               if( btnDl = g('[type=submit]', form) )
                 SimulateMouse(btnDl, "click", true);
               else
@@ -1784,29 +1816,12 @@
               that.clog('Exiting, location not supported, '+pathname);
               return !1
             }
-
-            $('a[href*="md5"]').each(function(){
-              var $me = $(this),
-                  href = $me.attr('href')
-              ;
-              if( /ads\.php/.test(href) ){
-                $me.html(''
-                  +'<strong>'+$me.text()+'</strong>'
-                );
-                href = href.replace('ads.php', 'get.php');
-                $me.attr('href', href);
-                $me.on('click', function(e){
-                  e.preventDefault();
-                  var win = window.open(href, href.replace(/\W/g,''));
-                  win.focus();
-                  return !1;
-                });
-              }
-            });
+            that.injectBodyStyle(cssString);
+            healLinks();
           break;
         };
-      },
-    }
+      }
+    },
   };
   // end of patterns
 
