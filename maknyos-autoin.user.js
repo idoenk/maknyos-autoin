@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.9.3
-// @description    Auto click / submit to get link, iframes killer, load direct-link with iframe. Supported host: indowebster, 2shared, zippyshare, mediafire, sendspace, uptobox, howfile, uppit, imzupload, jumbofiles, sendmyway, tusfiles, dropbox, yadi.sk, datafilehost, userscloud, hulkload, app.box.com, dailyuploads, kumpulbagi, kb.simple-aja, moesubs, uploadrocket, my.pcloud.com, kirino.ga, seiba.ga, mylinkgen, rgho.st, upload.ee, upload.so, cloud.mail.ru, bc.vc, sh.st, adf.ly, adfoc.us
+// @version        3.9.4
+// @description    Auto click / submit to get link, iframes killer, load direct-link with iframe. Supported host: indowebster, 2shared, zippyshare, mediafire, sendspace, uptobox, howfile, uppit, imzupload, jumbofiles, sendmyway, tusfiles, dropbox, yadi.sk, datafilehost, userscloud, hulkload, app.box.com, dailyuploads, kumpulbagi, kb.simple-aja, moesubs, uploadrocket, my.pcloud.com, kirino.ga, seiba.ga, mylinkgen, rgho.st, upload.ee, upload.so, cloud.mail.ru, bc.vc, sh.st, adf.ly, adfoc.us, gen.lib.rus.ec, libgen.io, golibgen.io, bookzz.org, bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
 // @grant          GM_log
@@ -47,6 +47,7 @@
 // @include        /^https?://adf.ly/*/
 // @include        /^https?://adfoc.us/*/
 // @include        /^https?://my.pcloud.com/publink/*/
+// @include        /^https?://filescdn.com/*/
 // @include        /^https?://gen.lib.rus.ec/*/
 // @include        /^https?://libgen.io/*/
 // @include        /^https?://golibgen.io/*/
@@ -139,19 +140,23 @@
     // do waitwhat -> thenwhat
     waitforit: function(waitwhat, thenwhat, delay){
       var ME = this,
-          stoWait,
+          stoWait = null,
           itry    = 0,
-          maxtry  = 100,
+          maxtry  = 10,
           thenwhatwrap = function(r){
+            ME.clog('callback waiting element, doing thenwhatwrap..');
             ('function' == typeof thenwhat ) &&
               thenwhat(r);
           };
       
       if( !delay )
         delay = 0;
+      delay = parseInt( delay );
 
+      ME.clog('waiting for element..');
       if('function' == typeof waitwhat){
         var waitwrap = function(){
+          ME.clog('['+itry+']: inside waitwrap..');
           itry++;
           var r_ = null;
           if( r_ = waitwhat() ){
@@ -166,7 +171,7 @@
               ME.clog('waitforit failed...');
             }
           }
-        },
+        };
         stoWait = setTimeout(waitwrap, delay+1000);
       }
       else
@@ -1021,19 +1026,18 @@
       rule: /userscloud\.com/,
       run: function(){
         var that = this,
-            btn_selector = '//button[contains(@id, "ownlo") and not(contains(@disabled,"disabled"))]';
+            btn_selector = '//*[contains(@href,"usercdn.com") and contains(@href,"/d/")]'
+        ;
 
         that.clog('inside userscloud, '+that.get_href());
-        setTimeout(function(){ that.killframes() }, 123);
+        setTimeout(function(){ that.killframes() }, 456);
 
         this.waitforit(function(){
+
           return xp(btn_selector, null, true);
-        }, function(){
-          if( xp('//form[@name="F1"]', null, true) )
-            setTimeout(function(){
-              var btn_download = xp(btn_selector, null, true);
-              SimulateMouse(btn_download, "click", true);
-            }, 345);
+        }, function(btn){
+
+          SimulateMouse(btn, "click", true);
         }, 100);
       }
     },
@@ -1822,6 +1826,17 @@
         };
       }
     },
+
+    filescdn: {
+      rule: /filescdn.com/,
+      run: function(){
+        var that  = this,
+            btnDl = null
+        ;
+        if( btnDl = g('#btn_download') )
+          SimulateMouse( btnDl, "click", true );
+      }
+    }
   };
   // end of patterns
 
