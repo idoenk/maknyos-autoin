@@ -10,7 +10,7 @@
 // @include        /^https?://(files|maknyos).indowebster.com/*/
 // @include        /^https?://(.+\.)2shared.com/file/*/
 // @include        /^https?://(.+\.)zippyshare.com/v/*/
-// @include        /^https?://(|www\.)mediafire.com/(download|view)/*/
+// @include        /^https?://(|www\.)mediafire.com/(download|view|file)/*/
 // @include        /^https?://(|www\.)sendspace.com/file/*/
 // @include        /^https?://(|www\.)uptobox.com\/\w/
 // @include        /^https?://(|www\.)howfile.com/file/*/
