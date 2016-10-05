@@ -1026,19 +1026,28 @@
       rule: /userscloud\.com/,
       run: function(){
         var that = this,
-            btn_selector = '//*[contains(@href,"usercdn.com") and contains(@href,"/d/")]'
+            btnDl = null,
+            btn_selector = '//button[contains(@id, "ownlo") and not(contains(@disabled,"disabled"))]'
         ;
 
         that.clog('inside userscloud, '+that.get_href());
         setTimeout(function(){ that.killframes() }, 456);
 
-        this.waitforit(function(){
+        if( btnDl = xp(btn_selector, null, true) ){
+          setTimeout(function(){
+            SimulateMouse(btnDl, "click", true);
+          }, 345);
+        }
+        else{
+          btn_selector = '//*[contains(@href,"usercdn.com") and contains(@href,"/d/")]';
+          this.waitforit(function(){
 
-          return xp(btn_selector, null, true);
-        }, function(btn){
+            return xp(btn_selector, null, true);
+          }, function(btn){
 
-          SimulateMouse(btn, "click", true);
-        }, 100);
+            SimulateMouse(btn, "click", true);
+          }, 100);
+        }
       }
     },
     hulkload: {
