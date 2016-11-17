@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.9.4
+// @version        3.9.5
 // @description    Auto click / submit to get link, iframes killer, load direct-link with iframe. Supported host: indowebster, 2shared, zippyshare, mediafire, sendspace, uptobox, howfile, uppit, imzupload, jumbofiles, sendmyway, tusfiles, dropbox, yadi.sk, datafilehost, userscloud, hulkload, app.box.com, dailyuploads, kumpulbagi, kb.simple-aja, moesubs, uploadrocket, my.pcloud.com, kirino.ga, seiba.ga, mylinkgen, rgho.st, upload.ee, upload.so, cloud.mail.ru, bc.vc, sh.st, adf.ly, adfoc.us, gen.lib.rus.ec, libgen.io, golibgen.io, bookzz.org, bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -59,7 +59,7 @@
 
 (function() {
   var gvar=function(){};
-  gvar.__DEBUG__ = !1;
+  gvar.__DEBUG__ = 1;
 
   function MaknyosHelper(baseURI){
     this.baseURI=baseURI;
@@ -1263,25 +1263,38 @@
     openload: {
       rule: /openload.co/,
       run: function(){
-        var wrapBox = g('#realdl'),
-            wrapTimer = g('#downloadTimer')
+        var that        = this,
+            streamsel   = '#streamurl',
+            streamurl   = g(streamsel),
+            secondsleft = null,
+            btnDl       = null,
+            btn_selector = '.main-button.dlbutton'
         ;
-        if( wrapBox ){
-          var scriptHandler = function(){
-            return (function(win, $){
-              
-              setTimeout(function(){
-                console.log("Second..")
-                console.log(win.realdllink)
-              }, 1500)
-            })(window, jQuery);
-          };
 
-          this.injectBodyScript(scriptHandler);
-          // this.clog(scriptHandler.toString());
+        if( streamurl ){
+
+          that.set_href('/stream/'+streamurl.innerText);
         }
         else{
-          // other location..
+          that.clog('Error: Download failed missing '+streamsel);
+          btnDl = g(btn_selector);
+          secondsleft = g('#secondsleft');
+
+          // second chance
+          if( secondsleft && btnDl ){
+            setTimeout(function(){
+              SimulateMouse(btnDl, "click", true);
+
+              // second-layer btn
+              setTimeout(function(){
+                if( btnDl = g('#realdl '+btn_selector) )
+                  SimulateMouse(btnDl, "click", true);
+              }, 100);
+            }, parseInt(secondsleft.innerText) * 1000);
+          }
+          else{
+            that.clog('Error: Missing download button, exiting');
+          }
         }
       }
     },
