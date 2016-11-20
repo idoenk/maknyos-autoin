@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.9.5
-// @description    Auto click/submit get link, kill iframes.Supported host: indowebster, 2shared, zippyshare, mediafire, sendspace, uptobox, howfile, uppit, imzupload, jumbofiles, sendmyway, tusfiles, dropbox, yadi.sk, datafilehost, userscloud, hulkload, app.box.com, dailyuploads, kumpulbagi, kb.simple-aja, moesubs, uploadrocket, my.pcloud.com, kirino.ga, seiba.ga, mylinkgen, rgho.st, upload.ee, upload.so, cloud.mail.ru, bc.vc, sh.st, adf.ly, adfoc.us, gen.lib.rus.ec, libgen.io, golibgen.io, bookzz.org, bookfi.net
+// @version        3.9.6
+// @description    Auto click get link, iframe killer. Hosts: indowebster,2shared,zippyshare,mediafire,sendspace,uptobox,howfile,uppit,imzupload,jumbofiles,sendmyway,tusfiles,dropbox,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,kumpulbagi,moesubs,uploadrocket,my.pcloud.com,kirino.ga,seiba.ga,mylinkgen,rgho.st,uploads.to,upload.ee,upload.so,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen.io,golibgen.io,bookzz.org,bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
 // @grant          GM_log
@@ -39,6 +39,7 @@
 // @include        /^https?://(|www\.)uploadrocket.net/*/
 // @include        /^https?://(|www\.)upload.so/*/
 // @include        /^https?://(|www\.)upload.ee/files/*/
+// @include        /^https?://(|www\.)uploads.to/*/
 // @include        /^https?://cloud.mail.ru/public/*/
 // @include        /^https?://drive.google.com/file/d/*/
 // @include        /^https?://docs.google.com/uc\?*/
@@ -1632,6 +1633,46 @@
 
             that.clog('uploadso: missing download button, page may changed');
           }
+        }
+      }
+    },
+
+    //uploads.to
+    uploadso: {
+      rule: /uploads.to/,
+      run: function(){
+        var that    = this,
+            btnChk  = null,
+            btnDl   = null
+        ;
+        $(function(){
+          setTimeout(function(){
+            $('body>div').each(function(){
+              var $me   = $(this);
+              if( !/\bnavbar-fixed\b/.test($me.attr('class')) && ['absolute','fixed'].indexOf($me.css('position')) !== -1 ){
+                $me.remove();
+              }
+            });
+          }, 100);
+        });
+
+        if( btnChk = g('#chkIsAdd') )
+          btnChk.checked = false;
+
+        if( btnDl = g('#btn_download') ){
+
+          $('[name=down_script]').val(0);
+          return $(btnDl).closest('form').get(0).submit();
+        }
+        else{
+          $(function(){
+            setTimeout(function(){
+              if( btnDl = xp('//a[contains(@href,"/d/")]', null, true) )
+                SimulateMouse(btnDl, "click", true);
+              else
+                that.clog('Download link not found, page may changed');
+            }, 100);
+          });
         }
       }
     },
