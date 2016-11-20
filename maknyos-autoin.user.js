@@ -37,7 +37,7 @@
 // @include        /^https?://(|www\.)openload.co/*/
 // @include        /^https?://(|www\.)rgho.st/*/
 // @include        /^https?://(|www\.)uploadrocket.net/*/
-// @include        /^https?://(|www\.)upload.so/*/
+// @include        /^https?://(|www\.)(upload.so|uplod.ws)/*/
 // @include        /^https?://(|www\.)upload.ee/files/*/
 // @include        /^https?://(|www\.)uploads.to/*/
 // @include        /^https?://cloud.mail.ru/public/*/
@@ -1602,8 +1602,8 @@
       }
     },
 
-    uploadso: {
-      rule: /upload.so/,
+    uploadsows: {
+      rule: /(upload.so)|(uplod.ws)/,
       run: function(){
         var that    = this,
             blah    = null,
