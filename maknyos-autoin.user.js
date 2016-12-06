@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.9.7
+// @version        3.9.8
 // @description    Auto click get link, iframe killer. Hosts: indowebster,2shared,zippyshare,mediafire,sendspace,uptobox,howfile,uppit,imzupload,jumbofiles,sendmyway,tusfiles,dropbox,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,kumpulbagi,moesubs,uploadrocket,my.pcloud.com,kirino.ga,seiba.ga,mylinkgen,rgho.st,uploads.to,upload.ee,upload.so,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen.io,golibgen.io,bookzz.org,bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -60,7 +60,7 @@
 
 (function() {
   var gvar=function(){};
-  gvar.__DEBUG__ = !1;
+  gvar.__DEBUG__ = 1;
 
   function MaknyosHelper(baseURI){
     this.baseURI=baseURI;
@@ -330,6 +330,10 @@
       this.clog("killing click events.");
       this.killevents(null, 'click');
       this.killevents(null, 'mousedown');
+
+      this.clog("killing onbeforeunload events.");
+      window.onbeforeunload = null;
+      unsafeWindow.onbeforeunload = null;
     },
 
     // brutaly kill frames
@@ -1462,18 +1466,64 @@
       noBaseClean: true,
       run: function(){
         var that = this,
-            elck = g('#cookie_notice'),
-            id = '#home',
-            skipSel = '#top span img[src*=sk'+'ip_'+'ad]'
+            lpath = location.pathname,
+            id   = '#home',
+            neededVar = !1
         ;
-        if( !g(id) || !/\/\w+$/.test(location.pathname) ) {
-          
+        if( /\/ad\/locked/.test(lpath) ){
+          return that.waitforit(function(){
+            var el = g('#continue');
+            return (that.isVisible(el) ? el : !1);
+          }, function(cnt){
+            that.clog(cnt);
+            return setTimeout(function(){
+              SimulateMouse(g('a', cnt), "click", true);
+            });
+          });
+        }
+        else if( !g(id) || !/\/\w+$/.test(lpath) ) {
+
           that.clog('['+location.href+']:: Not a redirecter page..');
           return !1;
         }
+        else{
+          neededVar = (isDefined(ysmm) ? ysmm : null);
+          if( !neededVar && 'undefined' != typeof unsafeWindow['ysmm'] )
+            neededVar = unsafeWindow['ysmm'];
+          if( !neededVar && 'undefined' != typeof window['ysmm'] )
+            neededVar = window['ysmm'];
+        }
 
+        // stage-1
+        if( 'undefined' != neededVar && neededVar && 'function' == typeof atob ){
+          // snippet-code src:
+          // greasyfork.org/en/scripts/2669-adf-ly-lienscash-com-adfoc-us-bc-vc-sh-st-bypasser
+          var f = "", z = "", result = null;
+          for (var l = 0; l < neededVar.length; l++) {
+            if (l % 2 == 0)
+              f += neededVar.charAt (l);
+            else
+              z  = neededVar.charAt (l) + z;
+          }
+          if( result = f + z ){
+            window.onbeforeunload = null;
+            unsafeWindow.onbeforeunload = null;
+            result = atob(result).substring(2);
+            that.set_href( result );
+            
+            return !1;
+          }
+        }
+
+
+        // stage-2 (failover)
+        var elck = g('#cookie_notice'),
+            skipSel = '#top span img[src*=sk'+'ip_'+'ad]'
+        ;
         if( elck )
           elck.parentNode.removeChild( elck );
+
+
 
         that.killevents(null, 'click');
         that.killevents(null, 'mousedown');
