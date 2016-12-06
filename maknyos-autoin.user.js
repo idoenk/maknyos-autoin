@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.9.6
+// @version        3.9.7
 // @description    Auto click get link, iframe killer. Hosts: indowebster,2shared,zippyshare,mediafire,sendspace,uptobox,howfile,uppit,imzupload,jumbofiles,sendmyway,tusfiles,dropbox,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,kumpulbagi,moesubs,uploadrocket,my.pcloud.com,kirino.ga,seiba.ga,mylinkgen,rgho.st,uploads.to,upload.ee,upload.so,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen.io,golibgen.io,bookzz.org,bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -1347,7 +1347,7 @@
       run: function(){
         var that = this,
             loc = location.href,
-            btnSel = '.skip_btn'
+            btnSel = '#skip_btt'
         ;
 
         if( loc.indexOf('#') == -1 ){
@@ -1358,6 +1358,15 @@
         else{
           if('function' === typeof window['IFrameLoaded'])
             window['IFrameLoaded']();
+
+          try{
+            $('body>iframe')
+              .css('position','absolute')
+              .css('width',0)
+              .css('height',0)
+              .css('left','-999999px')
+            ;
+          }catch(e){}
 
           (function wait2Click(){
           
