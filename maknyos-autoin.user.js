@@ -40,6 +40,7 @@
 // @include        /^https?://(|www\.)(upload.so|uplod.ws)/*/
 // @include        /^https?://(|www\.)upload.ee/files/*/
 // @include        /^https?://(|www\.)uploads.to/*/
+// @include        /^https?://(|www\.)uploadbank.com/*/
 // @include        /^https?://cloud.mail.ru/public/*/
 // @include        /^https?://drive.google.com/file/d/*/
 // @include        /^https?://docs.google.com/uc\?*/
@@ -1957,6 +1958,29 @@
         ;
         if( btnDl = g('#btn_download') )
           SimulateMouse( btnDl, "click", true );
+      }
+    },
+
+    uploadbank: {
+      rule: /uploadbank.com/,
+      run: function(){
+        var that  = this,
+            btnDl = null
+        ;
+        // is there report file?
+        if( xp('//a[contains(@href,"op=report")]', null, true) ){
+          if( btnDl = g('#downloadbtn') ){
+            SimulateMouse( btnDl, "click", true );
+          }
+          else{
+            btnDl = xp('//a[contains(@href,"uploadbank.com/files/")]', null, true);
+            SimulateMouse( btnDl, "click", true );
+          }
+        }
+        else{
+
+          that.clog('not download page');
+        }
       }
     }
   };
