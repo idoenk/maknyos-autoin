@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.9.9
+// @version        3.9.10
 // @description    Auto click get link, iframe killer. Hosts: indowebster,2shared,zippyshare,mediafire,sendspace,uptobox,howfile,uppit,imzupload,jumbofiles,sendmyway,tusfiles,dropbox,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,kumpulbagi,moesubs,uploadrocket,my.pcloud.com,kirino.ga,seiba.ga,mylinkgen,rgho.st,uploads.to,upload.ee,upload.so,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen.io,golibgen.io,bookzz.org,bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -1140,27 +1140,30 @@
       run: function(){
         var that = this, el, FORM, btnDownload;
 
-        if( FORM = xp('//form[@name="F1"]', null, true) ){
-          // uncheck download-manager
-          el = g('[name="chkIsAdd"]');
-          if( el )
-            el.removeAttribute('checked');
+        // is there report file?
+        if( xp('//a[contains(@href,"op=report")]', null, true) ){
+          if( FORM = xp('//form[@name="F1"]', null, true) ){
+            // uncheck download-manager
+            el = g('[name="chkIsAdd"]');
+            if( el )
+              el.removeAttribute('checked');
 
-          setTimeout(function(){ FORM.submit() }, 345);
+            setTimeout(function(){ FORM.submit() }, 345);
+          }
         }
-        else if( g(".inner") ){
-          
+        else{
           btnDownload = xp('//a[contains(@href,"dailyuploads.net") and contains(@href,"/d/")]', g(".inner"), true);
+          if( btnDownload ){
+            // since loading this href to iframe is not gonna work,
+            // bypass load it in `top.location` instead.
+            btnDownload && SimulateMouse(btnDownload, "click", true, function(href){
+              href = encodeURI( href );
+              top.location.href = href;
 
-          // since loading this href to iframe is not gonna work,
-          // bypass load it in `top.location` instead.
-          btnDownload && SimulateMouse(btnDownload, "click", true, function(href){
-            href = encodeURI( href );
-            top.location.href = href;
-
-            // dont let simulate continue with click events
-            return true;
-          });
+              // dont let simulate continue with click events
+              return true;
+            });
+          }
         }
       }
     },
