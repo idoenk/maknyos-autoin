@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.9.10
+// @version        3.9.11
 // @description    Auto click get link, iframe killer. Hosts: indowebster,2shared,zippyshare,mediafire,sendspace,uptobox,howfile,uppit,imzupload,jumbofiles,sendmyway,tusfiles,dropbox,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,kumpulbagi,moesubs,uploadrocket,my.pcloud.com,kirino.ga,seiba.ga,mylinkgen,rgho.st,uploads.to,upload.ee,upload.so,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen.io,golibgen.io,bookzz.org,bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -64,9 +64,25 @@
   gvar.__DEBUG__ = !1;
 
   function MaknyosHelper(baseURI){
-    this.baseURI=baseURI;
-    this.domain=null;
-    this.action=new Actions();
+    this.baseURI = baseURI;
+    this.domain  = null;
+    gvar.isFF    = !1;
+
+    if("function" !== typeof GM_log || (gvar.isFF = (navigator.userAgent.indexOf('Firefox') !== -1)) ){
+      GM_log = function(_msg) {
+        try {
+          unsafeWindow.console.log('GM_log: '+_msg)
+        }
+        catch(e){}
+      };
+
+      try {
+        GM_log('GM_log function GM_log rewriten');
+      }
+      catch(e){}
+    }
+
+    this.action  = new Actions();
   }
   MaknyosHelper.prototype = {
     matchDomain: function(){
@@ -384,13 +400,15 @@
       }else {
         arguments.callee.counter = 1
       }
+
       if("function" == typeof GM_log){
         GM_log("(" + arguments.callee.counter + ") " + (typeof msg == "object" ? ">>" : msg));
         if( typeof msg == "object" )
-          GM_log(msg);
+          GM_log( msg );
       }
-      else
+      else{
         console && console.log && console.log(msg);
+      }
       if( force == 0 )
         return
     },
@@ -524,7 +542,6 @@
         }
       }
     },
-
 
     sendspace: {
       rule: /sendspace\.com/,
@@ -818,7 +835,6 @@
       }
     },
 
-
     tusfiles: {
       rule: /tusfiles\.net/,
       run: function(){
@@ -893,6 +909,7 @@
         }, 100);
       }
     },
+
     dropbox: {
       rule: /dropbox\.com/,
       run: function(){
@@ -905,6 +922,7 @@
           this.clog('dropbox: missing download button, page may changed');
       }
     },
+
     solidfiles: {
       rule: /solidfiles\.com/,
       run: function(){
@@ -930,6 +948,7 @@
         }
       }
     },
+
     yadi: {
       rule: /yadi\.sk/,
       run: function(){
@@ -1006,6 +1025,7 @@
         }, 100);
       }
     },
+
     datafilehost: {
       rule: /datafilehost\.com/,
       run: function(){
@@ -1028,6 +1048,7 @@
           this.clog('datafilehost: missing download button, page may changed');
       }
     },
+
     userscloud: {
       rule: /userscloud\.com/,
       run: function(){
@@ -1056,6 +1077,7 @@
         }
       }
     },
+
     hulkload: {
       rule: /hulkload\.com/,
       run: function(){
@@ -1186,6 +1208,7 @@
         }
       }
     },
+
     "simple-aja": {
       rule: /simple-aja\.info/,
       run: function(){
@@ -1277,13 +1300,43 @@
             streamurl   = g(streamsel),
             secondsleft = null,
             btnDl       = null,
+            el_observed = !1;
             btn_selector = '.main-button.dlbutton'
         ;
-
         if( streamurl ){
+          if( gvar.isFF ){
+            var target = g(streamsel),
+                param_observe = {
+                  config: {
+                    attributes: false,
+                    childList: true,
+                    subtree: true,
+                    characterData: false
+                  },
+                  callback: function(e){
+                    if( el_observed )
+                      return !1;
 
-          that.set_href('/stream/'+streamurl.innerText);
+                    if( e && e.innerText ){
+                      that.set_href('/stream/'+e.innerText);
+                      
+                      // flag to not returning back
+                      el_observed = true;
+                      if( gvar.observer )
+                        gvar.observer.disconnect();
+                    }
+                  }
+                }
+            ;
+            that.observe(target, param_observe);
+          }
+          else{
+            setTimeout(function(){
+              that.set_href('/stream/'+streamurl.innerText);
+            }, 0)
+          }
         }
+        // end: streamurl
         else{
           that.clog('Error: Download failed missing '+streamsel);
           btnDl = g(btn_selector);
