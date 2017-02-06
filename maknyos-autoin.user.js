@@ -1226,17 +1226,29 @@
     moesubs: {
       rule: /(?:www\.)?moesubs\.com/,
       run: function(){
-        var btnDownload = null,
-            img_click = xp('//img[contains(@src, "click.")]', null, true)
+        var that = this,
+            btnDownload = null,
+            img_click = xp('//img[contains(@src, "click.")]', null, true),
+            btnDl = xp('//a[contains(.,"Download")]', null, true)
         ;
         btnDownload = (img_click ? img_click.parentNode : null);
-        if( btnDownload && btnDownload.nodeName === 'A' )
+
+        if( btnDl ){
+
+          setTimeout(function(){
+
+            location.href = btnDl.getAttribute('href');
+          }, 125);
+        }
+        else if( btnDownload && btnDownload.nodeName === 'A' )
           setTimeout(function(){
 
             location.href = btnDownload.getAttribute('href');
           }, 125);
-        else
+        else{
+          
           this.clog('moesubs\: missing download button, page may changed');
+        }
       }
     },
 
