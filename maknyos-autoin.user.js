@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.9.11
+// @version        3.9.12
 // @description    Auto click get link, iframe killer. Hosts: indowebster,2shared,zippyshare,mediafire,sendspace,uptobox,howfile,uppit,imzupload,jumbofiles,sendmyway,tusfiles,dropbox,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,kumpulbagi,moesubs,uploadrocket,my.pcloud.com,kirino.ga,seiba.ga,mylinkgen,rgho.st,uploads.to,upload.ee,upload.so,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen.io,golibgen.io,bookzz.org,bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -41,6 +41,7 @@
 // @include        /^https?://(|www\.)upload.ee/files/*/
 // @include        /^https?://(|www\.)uploads.to/*/
 // @include        /^https?://(|www\.)uploadbank.com/*/
+// @include        /^https?://up.top4top.net/*/
 // @include        /^https?://cloud.mail.ru/public/*/
 // @include        /^https?://drive.google.com/file/d/*/
 // @include        /^https?://docs.google.com/uc\?*/
@@ -2036,6 +2037,48 @@
         else{
 
           that.clog('not download page');
+        }
+      }
+    },
+
+    top4top: {
+      rule: /top4top.net/,
+      run: function(){
+        var that  = this,
+            parent = g('#url'),
+            btnDl = null, 
+            scripts, inner, cucok, gotit
+        ;
+        if( parent ){
+          btnDl = g('a', parent);
+          scripts = document.getElementsByTagName( 'script' );
+          gotit = !1;
+          for( var i = 0; i < scripts.length; ++i ) {
+            inner = scripts[i].innerHTML;
+            if( !inner ) continue;
+            if( inner.indexOf('timer') === -1 ) continue;
+
+            if( cucok = /<a\shref=['"]([^'"]+)/.exec(inner) ){
+              btnDl = document.createElement('a');
+              btnDl.setAttribute('href', cucok[1]);
+
+              gotit = true;
+              setTimeout(function(){
+                SimulateMouse( btnDl, "click", true );
+              }, 100);
+              break;
+            }
+          }
+          // end: for
+
+          if( !gotit )
+          this.waitforit(function(){
+            return g('.download', parent);
+          }, function(el){
+            btnDl = g('a', el);
+            if( btnDl )
+              SimulateMouse( btnDl, "click", true );
+          }, 100);
         }
       }
     }
