@@ -41,6 +41,7 @@
 // @include        /^https?://(|www\.)upload.ee/files/*/
 // @include        /^https?://(|www\.)uploads.to/*/
 // @include        /^https?://(|www\.)uploadbank.com/*/
+// @include        /^https?://(|www\.)drop.me/*/
 // @include        /^https?://up.top4top.net/*/
 // @include        /^https?://cloud.mail.ru/public/*/
 // @include        /^https?://drive.google.com/file/d/*/
@@ -2080,6 +2081,20 @@
               SimulateMouse( btnDl, "click", true );
           }, 100);
         }
+      }
+    },
+
+    dropme: {
+      rule: /drop.me/,
+      run: function(){
+        var that  = this;
+
+        return this.waitforit(function(){
+          return g('form[name="myFile"]');
+        }, function(el){
+          if( el )
+            return el.submit();
+        }, 100);
       }
     }
   };
