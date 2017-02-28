@@ -42,6 +42,7 @@
 // @include        /^https?://(|www\.)uploads.to/*/
 // @include        /^https?://(|www\.)uploadbank.com/*/
 // @include        /^https?://(|www\.)drop.me/*/
+// @include        /^https?://(|www\.)dropapk.com/*/
 // @include        /^https?://up.top4top.net/*/
 // @include        /^https?://cloud.mail.ru/public/*/
 // @include        /^https?://drive.google.com/file/d/*/
@@ -837,7 +838,6 @@
         this.clog('inside imzupload');
 
         var main, btnDownload = g('[type="submit"][name="method_free"]',null,true);
-        this.clog('method_free='+btnDownload);
         if( btnDownload ){
           SimulateMouse(btnDownload, "click", true);
         }
@@ -2136,6 +2136,25 @@
             return el.submit();
         }, 100);
       }
+    },
+
+    dropapk: {
+      rule: /dropapk.com/,
+      run: function(){
+        var that  = this;
+        
+        return that.waitforit(function(){
+          var sel = '#downloadbtn';
+          if( !g(sel) )
+            sel = '[type="submit"][name="method_free"]';
+
+          return g(sel, null, true);
+        }, function(el){
+          if( el )
+            SimulateMouse(el, "click", true);
+        }, 100);
+      }
+
     }
   };
   // end of patterns
