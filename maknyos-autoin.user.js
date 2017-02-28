@@ -421,6 +421,41 @@
       return (clss.indexOf(cName) != -1);
     },
 
+    // get nearest parent element matching selector
+    closest: function (el, selector) {
+      var parent, matchesFn;
+
+      // find vendor prefix
+      ['matches','webkitMatchesSelector','mozMatchesSelector','msMatchesSelector','oMatchesSelector'].some(function(fn) {
+        if (typeof document.body[fn] == 'function') {
+          matchesFn = fn;
+          return true;
+        }
+        return false;
+      });
+
+      // traverse parents
+      while (el) {
+        parent = el.parentElement;
+        if (parent && parent[matchesFn](selector)) {
+          return parent;
+        }
+        el = parent;
+      }
+
+      return null;
+    },
+    // closest: function (el, selector) {
+    //   var matchesSelector = el.matches || el.webkitMatchesSelector || el.mozMatchesSelector || el.msMatchesSelector;
+    //   while (el) {
+    //     if (matchesSelector.call(el, selector)) {
+    //       break;
+    //     }
+    //     el = el.parentElement;
+    //   }
+    //   return el;
+    // },
+
     show_alert: function(msg, force) {
       if(arguments.callee.counter) {
         arguments.callee.counter++
@@ -2150,8 +2185,21 @@
 
           return g(sel, null, true);
         }, function(el){
-          if( el )
-            SimulateMouse(el, "click", true);
+          var hid = null;
+          if( el ){
+            hid = document.createElement('input')
+            hid.setAttribute('type', 'hidden');
+            hid.setAttribute('name', el.getAttribute('name'));
+            hid.setAttribute('value', ( el.nodeName == 'BUTTON' ? el.innerText : el.getAttribute('value')));
+            
+            el = that.closest(el, 'form');
+            if( el ){
+              el.appendChild( hid );
+              el.submit();
+            }
+            else
+              SimulateMouse(el, "click", true);
+          }
         }, 100);
       }
 
@@ -2256,6 +2304,6 @@
       }
     }
     return root.getElementsByTagName(q)
-  };
+  }
 })();
 /* eof. */
