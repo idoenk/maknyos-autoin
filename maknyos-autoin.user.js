@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.9.12
+// @version        3.9.13
 // @description    Auto click get link, iframe killer. Hosts: indowebster,2shared,zippyshare,mediafire,sendspace,uptobox,howfile,uppit,imzupload,jumbofiles,sendmyway,tusfiles,dropbox,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,kumpulbagi,moesubs,uploadrocket,my.pcloud.com,kirino.ga,seiba.ga,mylinkgen,rgho.st,uploads.to,upload.ee,upload.so,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen.io,golibgen.io,bookzz.org,bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -340,6 +340,25 @@
       return codes;
     },
 
+    scrapScriptsByRegex: function(pattern, parent){
+      // must be ( match instanceof RegExp )
+
+      if( 'undefined' == typeof parent )
+        parent = document;
+
+      var scripts = parent.getElementsByTagName('script'),
+          cucok = null,
+          inner = ''
+      ;
+      for( var i = 0; i < scripts.length; i++ ){
+        if( inner = scripts[i].innerHTML ){
+          if( cucok = pattern.exec(inner) )
+            break;
+        }
+      }
+      return cucok;
+    },
+
     // basic cleanup document from anoying things
     // eg. iframe, onclick body, etc
     baseCleanUp: function(){
@@ -351,8 +370,7 @@
       this.killevents(null, 'mousedown');
 
       this.clog("killing onbeforeunload events.");
-      window.onbeforeunload = null;
-      unsafeWindow.onbeforeunload = null;
+      this.killunload();
     },
 
     // brutaly kill frames
@@ -378,6 +396,12 @@
         }
       }
       this.clog("killevents done");
+    },
+
+    killunload: function(){
+      window.onbeforeunload = null;
+      window.onunload = null;
+      unsafeWindow.onbeforeunload = null;
     },
 
     isVisible: function (ele) {
@@ -1538,8 +1562,8 @@
       run: function(){
         var that = this,
             lpath = location.pathname,
-            id   = '#home',
-            neededVar = !1
+            id    = '#home',
+            ndv   = ''
         ;
         if( /\/ad\/locked/.test(lpath) ){
           return that.waitforit(function(){
@@ -1558,33 +1582,42 @@
           return !1;
         }
         else{
-          neededVar = (isDefined(ysmm) ? ysmm : null);
-          if( !neededVar && 'undefined' != typeof unsafeWindow['ysmm'] )
-            neededVar = unsafeWindow['ysmm'];
-          if( !neededVar && 'undefined' != typeof window['ysmm'] )
-            neededVar = window['ysmm'];
+          ndv = that.scrapScriptsByRegex(/var\s+eu\s+=\s+'(?!false)(.+)'/);
+          if( ndv )
+            ndv = ndv[1];
         }
 
+
+        that.killunload();
+        that.killevents(null, 'click');
+        that.killevents(null, 'mousedown');
+        that.injectBodyStyle('iframe{visibility:hidden!important;}');
+
+
         // stage-1
-        if( 'undefined' != neededVar && neededVar && 'function' == typeof atob ){
-          // snippet-code src:
-          // greasyfork.org/en/scripts/2669-adf-ly-lienscash-com-adfoc-us-bc-vc-sh-st-bypasser
-          var f = "", z = "", result = null;
-          for (var l = 0; l < neededVar.length; l++) {
-            if (l % 2 == 0)
-              f += neededVar.charAt (l);
-            else
-              z  = neededVar.charAt (l) + z;
+        if( ndv ){
+          var poluted = ndv.indexOf('!HiT'+'o'+'mmy'),
+              a = '',
+              b = ''
+          ;
+          if (poluted >= 0) 
+            ndv = ndv.substring(0, poluted);
+
+          for (var i = 0; i < ndv.length; ++i) {
+            if (i % 2 === 0) {
+              a = a + ndv.charAt(i);
+            } else {
+              b = ndv.charAt(i) + b;
+            }
           }
-          if( result = f + z ){
-            window.onbeforeunload = null;
-            unsafeWindow.onbeforeunload = null;
-            result = atob(result).substring(2);
-            that.set_href( result );
-            
-            return !1;
-          }
+          ndv = atob(a + b);
+          ndv = ndv.substr(2);
+          if( location.hash )
+            ndv += location.hash;
+
+          that.set_href( ndv );
         }
+
 
 
         // stage-2 (failover)
@@ -1594,11 +1627,6 @@
         if( elck )
           elck.parentNode.removeChild( elck );
 
-
-
-        that.killevents(null, 'click');
-        that.killevents(null, 'mousedown');
-        that.injectBodyStyle('iframe{visibility:hidden!important;}');
 
         that.waitforit(function(){
           var btn = g(skipSel), href;
