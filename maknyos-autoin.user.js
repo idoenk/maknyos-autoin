@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.9.13
+// @version        3.9.14
 // @description    Auto click get link, iframe killer. Hosts: indowebster,2shared,zippyshare,mediafire,sendspace,uptobox,howfile,uppit,imzupload,jumbofiles,sendmyway,tusfiles,dropbox,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,kumpulbagi,moesubs,uploadrocket,my.pcloud.com,kirino.ga,seiba.ga,mylinkgen,rgho.st,uploads.to,upload.ee,upload.so,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen.io,golibgen.io,bookzz.org,bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -32,6 +32,7 @@
 // @include        /^https?://(|www\.)kb.simple-aja.info/*/
 // @include        /^https?://(|www\.)moesubs.com/url/*/
 // @include        /^https?://kirino.ga/lak/*/
+// @include        /^https?://(|www\.)kirino.sexy/*/
 // @include        /^https?://(|www\.)seiba.ga/*/
 // @include        /^https?://(|www\.)mylinkgen.com/*/
 // @include        /^https?://(|www\.)openload.co/*/
@@ -1312,7 +1313,7 @@
     },
 
     "kirino-uguu-seiba": {
-      rule: /kirino\.ga|seiba\.ga/,
+      rule: /kirino\.ga|seiba\.ga|kirino\.sexy/,
       run: function(){
         var btnDownload = null;
 
