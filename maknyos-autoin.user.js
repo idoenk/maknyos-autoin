@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.9.14
+// @version        3.9.15
 // @description    Auto click get link, iframe killer. Hosts: indowebster,2shared,zippyshare,mediafire,sendspace,uptobox,howfile,uppit,imzupload,jumbofiles,sendmyway,tusfiles,dropbox,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,kumpulbagi,moesubs,uploadrocket,my.pcloud.com,kirino.ga,seiba.ga,mylinkgen,rgho.st,uploads.to,upload.ee,upload.so,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen.io,golibgen.io,bookzz.org,bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -44,7 +44,9 @@
 // @include        /^https?://(|www\.)uploadbank.com/*/
 // @include        /^https?://(|www\.)drop.me/*/
 // @include        /^https?://(|www\.)dropapk.com/*/
+// @include        /^https?://(|www\.)file-upload.com/*/
 // @include        /^https?://up.top4top.net/*/
+// @include        /^https?://public.upera.co/*/
 // @include        /^https?://cloud.mail.ru/public/*/
 // @include        /^https?://drive.google.com/file/d/*/
 // @include        /^https?://docs.google.com/uc\?*/
@@ -2203,8 +2205,109 @@
           }
         }, 100);
       }
+    },
 
+    publicopera: {
+      rule: /public.upera.co/,
+      run: function(){
+        var that = this;
+        that.waitforit(function(){
+
+          return xp('//*[contains(@class,"btn") and contains(.,"ownloa")]', null, true);
+        }, function(btn){
+
+          if( btn ){
+            SimulateMouse(btn, "click", true);
+          }
+          else{
+            that.clog("Unable find download-button");
+          }
+        }, 234);
+      }
+    },
+
+    fileupload: {
+      rule: /file-upload.com/,
+      run: function(){
+        var that = this,
+            btnDownload = g('[type="submit"][name="method_free"]',null,true),
+            elcap = null
+        ;
+
+        // # 1
+        if( btnDownload ){
+
+          SimulateMouse(btnDownload, "click", true);
+        }
+        else{
+          elcap = g('.captcha_code')
+
+          // # 2
+          if( elcap ){
+            setTimeout(function(){
+              var row   = that.closest(elcap, 'tr'),
+                  spans = gAll('div>span', row),
+                  btnDownload  = null,
+                  num  = '',
+                  numIndexed = {},
+                  ordIndexKeys = [],
+                  waitSec = parseInt(g('#countdown .seconds').innerText.trim())
+              ;
+              elcap.focus();
+              that.clog(spans);
+              for(var i=0, iL=spans.length; i<iL; i++){
+                var el = spans[i],
+                    atrs = el.getAttribute('style'),
+                    cucok = null
+                ;
+                if( cucok = /-left\:\s*(\d+)\w/i.exec(atrs) )
+                  numIndexed[cucok[1]] = el.innerText;
+              }
+              that.clog('numIndexed');
+              that.clog(numIndexed);
+
+              ordIndexKeys = Object.keys(numIndexed);
+              ordIndexKeys.sort(function(a, b){
+                return parseInt(a) -  parseInt(b);
+              });
+
+              for(var j=0, jL=ordIndexKeys.length; j<jL; j++){
+                if('undefined' != typeof numIndexed[ordIndexKeys[j]])
+                  num += ''+numIndexed[ordIndexKeys[j]];
+              }
+              num = num.trim();
+              if( num ){
+                elcap.value = num;
+
+                if( waitSec ){
+                  waitSec += 1;
+                  setTimeout(function(){
+                    btnDownload = g('#downloadbtn');
+                    if( btnDownload )
+                      SimulateMouse(btnDownload, "click", true);
+                  }, 1000 * waitSec);
+                }
+              }
+            }, 10);
+          }
+
+          // # 3
+          else{
+            btnDownload = g('#download-btn');
+            btnDownload.setAttribute('data-href', btnDownload.getAttribute('href'));
+            btnDownload.setAttribute('href', 'javascript:;');
+            btnDownload.onclick = function(){
+              top.location.href = this.getAttribute('data-href');
+              return !1;
+            };
+
+            if( btnDownload )
+              SimulateMouse(btnDownload, "click", true);
+          }
+        }
+      }
     }
+
   };
   // end of patterns
 
