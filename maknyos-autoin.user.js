@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.9.15
+// @version        3.9.16
 // @description    Auto click get link, iframe killer. Hosts: indowebster,2shared,zippyshare,mediafire,sendspace,uptobox,howfile,uppit,imzupload,jumbofiles,sendmyway,tusfiles,dropbox,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,kumpulbagi,moesubs,uploadrocket,my.pcloud.com,kirino.ga,seiba.ga,mylinkgen,rgho.st,uploads.to,upload.ee,upload.so,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen.io,golibgen.io,bookzz.org,bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -36,6 +36,7 @@
 // @include        /^https?://(|www\.)seiba.ga/*/
 // @include        /^https?://(|www\.)mylinkgen.com/*/
 // @include        /^https?://(|www\.)openload.co/*/
+// @include        /^https?://(|www\.)oload.tv/*/
 // @include        /^https?://(|www\.)rgho.st/*/
 // @include        /^https?://(|www\.)uploadrocket.net/*/
 // @include        /^https?://(|www\.)(upload.so|uplod.ws)/*/
@@ -1369,7 +1370,7 @@
     },
 
     openload: {
-      rule: /openload.co/,
+      rule: /openload.co|oload.tv/,
       run: function(){
         var that        = this,
             streamsel   = '#streamurl',
@@ -2210,19 +2211,37 @@
     publicopera: {
       rule: /public.upera.co/,
       run: function(){
-        var that = this;
-        that.waitforit(function(){
+        var that    = this, 
+            section = g('.hbox'),
+            anyform = null,
+            btnDl   = null
+        ;
 
-          return xp('//*[contains(@class,"btn") and contains(.,"ownloa")]', null, true);
-        }, function(btn){
+        if( section ) {
+          anyform = g('form');
+            
+          // # stage-1
+          if( anyform ){
 
-          if( btn ){
-            SimulateMouse(btn, "click", true);
+            anyform.submit();
           }
+
+          // # stage-2
           else{
-            that.clog("Unable find download-button");
+            btnDl = xp('//*[contains(@class,"btn") and contains(.,"ownloa")]', null, true);
+            if( !btnDl ){
+              btnDl = xp('.//a[contains(@href,"upera.co") and last()]', g('.panel', section), true);
+            }
+            
+            if( btnDl )
+              SimulateMouse(btnDl, "click", true);
           }
-        }, 234);
+        }
+        else{
+
+          that.clog("Not a download page");
+          return !1;
+        }
       }
     },
 
