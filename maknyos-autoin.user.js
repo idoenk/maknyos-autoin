@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.9.16
+// @version        3.9.17
 // @description    Auto click get link, iframe killer. Hosts: indowebster,2shared,zippyshare,mediafire,sendspace,uptobox,howfile,uppit,imzupload,jumbofiles,sendmyway,tusfiles,dropbox,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,kumpulbagi,moesubs,uploadrocket,my.pcloud.com,kirino.ga,seiba.ga,mylinkgen,rgho.st,uploads.to,upload.ee,upload.so,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen.io,golibgen.io,bookzz.org,bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -449,16 +449,6 @@
 
       return null;
     },
-    // closest: function (el, selector) {
-    //   var matchesSelector = el.matches || el.webkitMatchesSelector || el.mozMatchesSelector || el.msMatchesSelector;
-    //   while (el) {
-    //     if (matchesSelector.call(el, selector)) {
-    //       break;
-    //     }
-    //     el = el.parentElement;
-    //   }
-    //   return el;
-    // },
 
     show_alert: function(msg, force) {
       if(arguments.callee.counter) {
@@ -1377,15 +1367,20 @@
             streamurl   = g(streamsel),
             secondsleft = null,
             btnDl       = null,
-            el_observed = !1;
-            btn_selector = '.main-button.dlbutton'
+            el_observed = !1,
+            isStreamExists = (g('.video-js') || /\/embed\//.test(location.href)),
+            btn_selector = '.main-button.dlbutton',
+            cb_replacer = function(url){
+              var link = document.createElement('a'),
+              target = g('#btnDl');
+              if( target ){
+                link.setAttribute('href', url);
+                link.setAttribute('class', "main-button");
+                link.innerText = '[[ D0WNL0AD ]]';
+                target.replaceWith(link);
+              }
+            }
         ;
-        // # abort download when embed player to stream video exists
-        if( g('.video-js') || /\/embed\//.test(location.href) ){
-          that.clog('stream video exists, exiting..');
-          return !1;
-        }
-
         
         if( streamurl ){
           if( gvar.isFF ){
@@ -1402,7 +1397,10 @@
                       return !1;
 
                     if( e && e.innerText ){
-                      that.set_href('/stream/'+e.innerText);
+                      cb_replacer('/stream/'+e.innerText);
+
+                      if( !isStreamExists )
+                        that.set_href('/stream/'+e.innerText);
                       
                       // flag to not returning back
                       el_observed = true;
@@ -1416,11 +1414,16 @@
           }
           else{
             setTimeout(function(){
-              that.set_href('/stream/'+streamurl.innerText);
+              cb_replacer('/stream/'+streamurl.innerText);
+
+              if( !isStreamExists )
+                that.set_href('/stream/'+streamurl.innerText);
             }, 0)
           }
         }
         // end: streamurl
+
+        // fail-over: remote click element
         else{
           that.clog('Error: Download failed missing '+streamsel);
           btnDl = g(btn_selector);
@@ -1442,6 +1445,14 @@
             that.clog('Error: Missing download button, exiting');
           }
         }
+
+        // bypass: frustrated-mode avoid open popup
+        setTimeout(function(){
+          window.open = function(){};
+          unsafeWindow.open = function(){};
+          window.popAdsLoaded = true;
+          unsafeWindow.popAdsLoaded = true;
+        }, 345);
       }
     },
 
