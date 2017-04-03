@@ -1380,6 +1380,13 @@
             el_observed = !1;
             btn_selector = '.main-button.dlbutton'
         ;
+        // # abort download when embed player to stream video exists
+        if( g('.video-js') || /\/embed\//.test(location.href) ){
+          that.clog('stream video exists, exiting..');
+          return !1;
+        }
+
+        
         if( streamurl ){
           if( gvar.isFF ){
             var target = g(streamsel),
