@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.9.17
+// @version        3.9.18
 // @description    Auto click get link, iframe killer. Hosts: indowebster,2shared,zippyshare,mediafire,sendspace,uptobox,howfile,uppit,imzupload,jumbofiles,sendmyway,tusfiles,dropbox,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,kumpulbagi,moesubs,uploadrocket,my.pcloud.com,kirino.ga,seiba.ga,mylinkgen,rgho.st,uploads.to,upload.ee,upload.so,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen.io,golibgen.io,bookzz.org,bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -68,7 +68,7 @@
 
 (function() {
   var gvar=function(){};
-  gvar.__DEBUG__ = !1;
+  gvar.__DEBUG__ = 1;
 
   function MaknyosHelper(baseURI){
     this.baseURI = baseURI;
@@ -1279,28 +1279,21 @@
     moesubs: {
       rule: /(?:www\.)?moesubs\.com/,
       run: function(){
-        var that = this,
-            btnDownload = null,
-            img_click = xp('//img[contains(@src, "click.")]', null, true),
-            btnDl = xp('//a[contains(.,"Download")]', null, true)
+        var that  = this,
+            cucok = null,
+            btnDl = null
         ;
-        btnDownload = (img_click ? img_click.parentNode : null);
+        if( (cucok = /\burl=([^\&]+)/.exec(location.href)) ){
 
-        if( btnDl ){
-
-          setTimeout(function(){
-
-            location.href = btnDl.getAttribute('href');
-          }, 125);
+          top.location.href = cucok[1];
+          return !1;
         }
-        else if( btnDownload && btnDownload.nodeName === 'A' )
-          setTimeout(function(){
-
-            location.href = btnDownload.getAttribute('href');
-          }, 125);
         else{
-          
-          this.clog('moesubs\: missing download button, page may changed');
+          btnDl = g('.information a:last-child');
+          if( btnDl )
+            top.location.href = btnDl.getAttribute('href');
+          else
+            this.clog('missing download button');
         }
       }
     },
