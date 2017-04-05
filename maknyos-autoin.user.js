@@ -68,7 +68,7 @@
 
 (function() {
   var gvar=function(){};
-  gvar.__DEBUG__ = 1;
+  gvar.__DEBUG__ = !1;
 
   function MaknyosHelper(baseURI){
     this.baseURI = baseURI;
