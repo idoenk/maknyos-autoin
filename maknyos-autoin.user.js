@@ -2104,7 +2104,7 @@
         var that  = this,
             btnDl = null
         ;
-        if( btnDl = g('#btn_download') )
+        if( btnDl = xp('//a[contains(.,"ownloa")]', null, true) )
           SimulateMouse( btnDl, "click", true );
       }
     },
