@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.9.20
+// @version        3.9.21
 // @description    Auto click get link, iframe killer. Hosts: indowebster,2shared,zippyshare,mediafire,sendspace,uptobox,howfile,uppit,imzupload,jumbofiles,sendmyway,tusfiles,dropbox,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,kumpulbagi,moesubs,uploadrocket,my.pcloud.com,kirino.ga,seiba.ga,mylinkgen,rgho.st,uploads.to,upload.ee,upload.so,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen.io,golibgen.io,bookzz.org,bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -60,6 +60,7 @@
 // @include        /^https?://filescdn.com/*/
 // @include        /^https?://gen.lib.rus.ec/*/
 // @include        /^https?://libgen.io/*/
+// @include        /^https?://libgen.me/*/
 // @include        /^https?://golibgen.io/*/
 // @include        /^https?://bookzz.org/*/
 // @include        /^https?://(|\w+.)bookfi.net/*/
@@ -1996,7 +1997,7 @@
     },
 
     "e-book:genlib": {
-      rule: /gen.lib.rus.ec|libgen.io|golibgen.io|bookzz.org|(|\w+\.)bookfi.net/,
+      rule: /gen.lib.rus.ec|libgen.me|libgen.io|golibgen.io|bookzz.org|(|\w+\.)bookfi.net/,
       run: function(){
         var that      = this,
             pathname  = location.pathname,
@@ -2006,24 +2007,42 @@
         that.clog('location.hostname='+location.hostname);
 
         healLinks = function(){
-          $('a[href*="md5"]').each(function(){
-            var $me = $(this),
-            href = $me.attr('href')
-            ;
-            if( /ads\.php/.test(href) ){
+          var $parent = $('table.c');
+          if( !$parent.length || !$parent.html() ){
+            if( $parent.length )
+              $parent = $('table[rules="cols"]');
+            else
+              $parent = $('table');
+          }
+
+          setTimeout(function(){
+            $('a[href*="ads.php"], a[href*="book/index"], a[href*="libgen.me"], a[href*="bookzz.org"], a[href*="bookfi.net"]', $parent).each(function(){
+              var $me = $(this),
+                  href = $me.attr('href')
+              ;
               $me.html(''
                 +'<strong>'+$me.text()+'</strong>'
-                );
-              href = href.replace('ads.php', 'get.php');
-              $me.attr('href', href);
-              $me.on('click', function(e){
-                e.preventDefault();
-                $(this).addClass('opened');
-                window.open(this, href.replace(/\W/g,''));
-                return !1;
-              });
-            }
-          });
+              );
+              if( /ads\.php/.test(href) ){
+                href = href.replace('ads.php', 'get.php');
+                $me.attr('href', href);
+                $me.on('click', function(e){
+                  e.preventDefault();
+                  $(this).addClass('opened');
+                  window.open(this, href.replace(/\W/g,''));
+                  return !1;
+                });
+              }
+              else{
+                $me.on('click', function(e){
+                  e.preventDefault();
+                  $(this).addClass('opened');
+                  window.open(this, href);
+                  return !1;
+                });
+              }
+            });
+          }, 10);
         };
         var cssString = ''
           +'a#mlink:link{color: #1a0dab;text-decoration:none;}'
@@ -2069,6 +2088,7 @@
           break;
 
           case "golibgen.io":
+          case "libgen.me":
             if( form = g('form[action*="noleech1.php"]') ){
 
               if( btnDl = g('[type=submit]', form) )
