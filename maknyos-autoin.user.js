@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.9.22
+// @version        3.9.23
 // @description    Auto click get link, iframe killer. Hosts: indowebster,2shared,zippyshare,mediafire,sendspace,uptobox,howfile,uppit,imzupload,jumbofiles,sendmyway,tusfiles,dropbox,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,kumpulbagi,moesubs,uploadrocket,my.pcloud.com,kirino.ga,seiba.ga,mylinkgen,rgho.st,uploads.to,upload.ee,upload.so,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen.io,golibgen.io,bookzz.org,bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -359,6 +359,7 @@
       ;
       for( var i = 0; i < scripts.length; i++ ){
         if( inner = scripts[i].innerHTML ){
+          this.clog(inner);
           if( cucok = pattern.exec(inner) )
             break;
         }
@@ -1615,8 +1616,11 @@
         var that = this,
             lpath = location.pathname,
             id    = '#home',
-            ndv   = ''
+            ndv   = '',
+            link  = ''
         ;
+        that.clog(location.href);
+
         if( /\/ad\/locked/.test(lpath) ){
           return that.waitforit(function(){
             var el = g('#continue');
@@ -1628,17 +1632,79 @@
             });
           });
         }
+        //https://adf.ly/redirecting/aHR0cDovL3d3dy5tZWRpYWZpcmUuY29tLz83ajczODR3NjdiM3RyOXE=
+        else if( /\/redirecting\/\w+/.test(lpath) ){
+          that.clog('inside redirecting page...');
+          if( (link = g('a')) ){
+            that.set_href( link.getAttribute('href') );
+            return !1;
+          }
+        }
         else if( !g(id) || !/\/\w+$/.test(lpath) ) {
 
           that.clog('['+location.href+']:: Not a redirecter page..');
           return !1;
         }
-        else{
-          ndv = that.scrapScriptsByRegex(/var\s+eu\s+=\s+'(?!false)(.+)'/);
-          if( ndv )
-            ndv = ndv[1];
-        }
 
+        var continuum = function(ndv){
+          // stage-1
+          if( ndv ){
+            var poluted = ndv.indexOf('!HiT'+'o'+'mmy'),
+                a = '',
+                b = ''
+            ;
+            if (poluted >= 0) 
+              ndv = ndv.substring(0, poluted);
+
+            for (var i = 0; i < ndv.length; ++i) {
+              if (i % 2 === 0) {
+                a = a + ndv.charAt(i);
+              } else {
+                b = ndv.charAt(i) + b;
+              }
+            }
+            ndv = atob(a + b);
+            ndv = ndv.substr(2);
+            if( location.hash )
+              ndv += location.hash;
+
+            that.set_href( ndv );
+
+            that.clog('stage-1: found link: '+ndv);
+            return !1;
+          }
+          else{
+
+            that.clog('stage-1: FAIL');
+          }
+
+
+
+          // stage-2 (failover)
+          var elck = g('#cookie_notice'),
+              skipSel = '#top span img[src*=sk'+'ip_'+'ad]'
+          ;
+          if( elck )
+            elck.parentNode.removeChild( elck );
+
+
+          that.waitforit(function(){
+            var btn = g(skipSel), href;
+            if( btn ){
+              btn = btn.parentNode;
+              href = btn.getAttribute('href');
+            }
+            return href && /^((?:(?:ht|f)tps?\:\/\/){1}\S+)/.test(href);
+          }, function(){
+            var btn = g(skipSel).parentNode,
+                href = btn.getAttribute('href')
+            ;
+            if( href )
+              location.href = href;
+            else
+              that.clog('Unable get redirect link');
+          }, 345);
+        };
 
         that.killunload();
         that.killevents(null, 'click');
@@ -1646,56 +1712,39 @@
         that.injectBodyStyle('iframe{visibility:hidden!important;}');
 
 
-        // stage-1
-        if( ndv ){
-          var poluted = ndv.indexOf('!HiT'+'o'+'mmy'),
-              a = '',
-              b = ''
-          ;
-          if (poluted >= 0) 
-            ndv = ndv.substring(0, poluted);
 
-          for (var i = 0; i < ndv.length; ++i) {
-            if (i % 2 === 0) {
-              a = a + ndv.charAt(i);
-            } else {
-              b = ndv.charAt(i) + b;
-            }
-          }
-          ndv = atob(a + b);
-          ndv = ndv.substr(2);
-          if( location.hash )
-            ndv += location.hash;
-
-          that.set_href( ndv );
-        }
-
-
-
-        // stage-2 (failover)
-        var elck = g('#cookie_notice'),
-            skipSel = '#top span img[src*=sk'+'ip_'+'ad]'
+        // wait to find these elements
+        that.clog('finding ndv');
+        var ping_url = location.protocol+'//'+location.hostname+'/callback/',
+            id = $('#adReporter').find('[name="lt"]').val()
         ;
-        if( elck )
-          elck.parentNode.removeChild( elck );
+        if( id ){
+          ping_url += id;
 
+          return $.post(ping_url, {hithere:(new Date().getTime())}, function(){
+            return $.get(location.href, function(ret){
+              var patterns = [
+                    /var\s+eu\s+=\s+'(?!false)(.+)'/,
+                    /var\s+ysmm\s+=\s+'(.+)'/
+                  ],
+                  cucok = null
+              ;
+              if( cucok = patterns[0].exec(ret) ){
+                that.clog('patterns[0]');
+                cucok = cucok[1];
+              }
+              else if( cucok = patterns[1].exec(ret) ){
+                that.clog('patterns[1]');
+                cucok = cucok[1];
+              }
+              return continuum( cucok );
+            });
+          });
+        }
+        else{
 
-        that.waitforit(function(){
-          var btn = g(skipSel), href;
-          if( btn ){
-            btn = btn.parentNode;
-            href = btn.getAttribute('href');
-          }
-          return href && /^((?:(?:ht|f)tps?\:\/\/){1}\S+)/.test(href);
-        }, function(){
-          var btn = g(skipSel).parentNode,
-              href = btn.getAttribute('href')
-          ;
-          if( href )
-            location.href = href;
-          else
-            that.clog('Unable get redirect link');
-        }, 345);
+          continuum( null );
+        }
       }
     },
 
