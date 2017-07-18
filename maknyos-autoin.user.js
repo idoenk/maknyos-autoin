@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
-// @version        3.9.24
+// @version        3.9.25
 // @description    Auto click get link, iframe killer. Hosts: indowebster,2shared,zippyshare,mediafire,sendspace,uptobox,howfile,uppit,imzupload,jumbofiles,sendmyway,tusfiles,dropbox,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,kumpulbagi,moesubs,uploadrocket,my.pcloud.com,kirino.ga,seiba.ga,mylinkgen,rgho.st,uploads.to,upload.ee,upload.so,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen.io,golibgen.io,bookzz.org,bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -1896,43 +1896,106 @@
       }
     },
 
-    //uploads.to
-    uploadso: {
+    uploadsto: {
       rule: /uploads.to/,
       run: function(){
-        var that    = this,
-            btnChk  = null,
-            btnDl   = null
+        var that   = this,
+            gaRc   = g('.g-recaptcha'),
+            site_key = null,
+            btnDlFin = $(".btn:contains('DOWNLOAD')"),
+            btnDl  = $('#btn_download')
         ;
         $(function(){
           setTimeout(function(){
-            $('body>div').each(function(){
+            $('body div[style]').each(function(){
               var $me   = $(this);
               if( !/\bnavbar-fixed\b/.test($me.attr('class')) && ['absolute','fixed'].indexOf($me.css('position')) !== -1 ){
-                $me.remove();
+
+                $me.css('visibility', 'hidden!important');
               }
             });
-          }, 100);
+          }, 600);
         });
 
-        if( btnChk = g('#chkIsAdd') )
-          btnChk.checked = false;
+        // 
+        if( gaRc ){
+          site_key = gaRc.getAttribute('data-sitekey');
+          that.clog('page: #1')
+        }
+        else if( btnDl.length ){
+          
+          that.clog('page: #2');
+          if( btnDl ){
+            btnDl.closest('form').submit();
 
-        if( btnDl = g('#btn_download') ){
+            setTimeout(function(){
+              SimulateMouse( btnDl.get(0), "click", true);
+            }, 2100);
+          }
+          $('#chkIsAdd').prop('checked', !1);
+        }
+        else if( btnDlFin.length ){
+          that.clog('page: #3');
 
-          $('[name=down_script]').val(0);
-          return $(btnDl).closest('form').get(0).submit();
+          SimulateMouse( btnDlFin.get(0), "click", true );
         }
         else{
-          $(function(){
-            setTimeout(function(){
-              if( btnDl = xp('//a[contains(@href,"/d/")]', null, true) )
-                SimulateMouse(btnDl, "click", true);
-              else
-                that.clog('Download link not found, page may changed');
-            }, 100);
-          });
+
+          that.clog('Page may changed!!');
         }
+
+
+
+        if( !1 ){
+          // can not inject inline script
+          if('function' === typeof $ && site_key){
+
+            that.clog('replacing g-recaptcha..;site_key='+site_key);
+            $('.g-recaptcha')
+              .replaceWith($('<div id="tampered-recaptcha" data-bijikuda="1" data-sitekey="'+site_key+'"></div>'));
+
+            // recaptcha-rebuilder
+            var scriptHandler = function(_site_key){
+              return (function(win, $){
+                var maxTry = 10,
+                    iTry   = 0,
+                    tryRenderRecaptcha = function(){
+                      iTry++;
+                      if("undefined" !== typeof grecaptcha){
+                        grecaptcha.render("tampered-recaptcha", {
+                          sitekey: "___SITEKEY___",
+                          callback: function(){
+
+                            $('.btn[name="method_free"]').closest('form').submit();
+                          }
+                        });
+                      }
+                      else{
+                        if( iTry > maxTry ){
+
+                          return !1;
+                        }
+
+                        setTimeout(function(){
+                          tryRenderRecaptcha();
+                        }, 1 * 567);
+                      }
+                    }
+                ;
+                tryRenderRecaptcha();
+              })(window, $);
+            };
+            scriptHandler = scriptHandler.toString();
+            scriptHandler = scriptHandler.replace(/___SITEKEY___/, site_key);
+            that.injectBodyScript(scriptHandler);
+          }
+          else{
+
+            that.clog('site_key missing or $ is not defineed');
+          }
+        }
+
+
       }
     },
 
