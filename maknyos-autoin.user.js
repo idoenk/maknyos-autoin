@@ -1011,17 +1011,14 @@
     yadi: {
       rule: /yadi\.sk/,
       run: function(){
-        var that = this,
-            btnSelector = '.button_download'
-        ;
-
+        var that = this;
         that.clog('inside yadi, '+that.get_href());
 
         this.waitforit(function(){
 
-          return g(btnSelector);
-        }, function(){
-          var btnDownload = g('.button_download');
+          return el = xp('//button[contains(@class,"button2") and contains(.,"ownloa")]', null, true);
+        }, function(btnDownload){
+
           if( btnDownload ){
 
             // models-client json
