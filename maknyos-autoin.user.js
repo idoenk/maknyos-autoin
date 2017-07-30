@@ -71,7 +71,7 @@
 
 (function() {
   var gvar=function(){};
-  gvar.__DEBUG__ = !1;
+  gvar.__DEBUG__ = 1;
 
   function MaknyosHelper(baseURI){
     this.baseURI = baseURI;
@@ -2247,21 +2247,19 @@
       rule: /uploadbank.com/,
       run: function(){
         var that  = this,
+            cont  = g('#container'),
             btnDl = null
         ;
-        // is there report file?
-        if( xp('//a[contains(@href,"op=report")]', null, true) ){
-          if( btnDl = g('#downloadbtn') ){
-            SimulateMouse( btnDl, "click", true );
-          }
-          else{
-            btnDl = xp('//a[contains(@href,"uploadbank.com/files/")]', null, true);
+        if( !g('.g-recaptcha', cont) ){
+          btnDl = g('img[src*="downloadbutton.png"]');
+          if( btnDl ){
+
             SimulateMouse( btnDl, "click", true );
           }
         }
         else{
 
-          that.clog('not download page');
+          that.clog('g-recaptcha detected.');
         }
       }
     },
