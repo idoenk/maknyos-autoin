@@ -2330,26 +2330,51 @@
         var that  = this;
         
         return that.waitforit(function(){
-          var sel = '#downloadbtn';
-          if( !g(sel) )
-            sel = '[type="submit"][name="method_free"]';
+          var sel = '#downloadbtn',
+              el  = null,
+              daform = null
+          ;
 
-          return g(sel, null, true);
+          if( !g(sel) ){
+            if( g('img[src*="down_final.png"]') )
+              sel = 'img[src*="down_final.png"]';
+            else
+              sel = '[type="submit"][name="method_free"]';
+          }
+          that.clog('sel='+sel);
+          
+          if( sel )
+            return g(sel, null, true);
         }, function(el){
           var hid = null;
-          if( el ){
-            hid = document.createElement('input')
-            hid.setAttribute('type', 'hidden');
-            hid.setAttribute('name', el.getAttribute('name'));
-            hid.setAttribute('value', ( el.nodeName == 'BUTTON' ? el.innerText : el.getAttribute('value')));
-            
-            el = that.closest(el, 'form');
-            if( el ){
-              el.appendChild( hid );
-              el.submit();
+
+          that.clog('da callback..');
+          that.clog(el.nodeName);
+          if( el ) {
+            if( el.nodeName == 'IMG' ){
+
+              SimulateMouse(el.parentNode, "click", true);
             }
-            else
-              SimulateMouse(el, "click", true);
+            else{
+
+              if( el.nodeName == 'INPUT' ){
+                hid = document.createElement('input')
+                hid.setAttribute('type', 'hidden');
+                hid.setAttribute('name', el.getAttribute('name'));
+                hid.setAttribute('value', el.getAttribute('value'));
+              }
+
+              daform = that.closest(el, 'form');
+              if( daform ){
+                if( hid )
+                  daform.appendChild( hid );
+                daform.submit();
+              }
+              else{
+
+                SimulateMouse(el, "click", true);
+              }
+            }
           }
         }, 100);
       }
@@ -2523,9 +2548,18 @@
 
         if( typeof href === "string" && href ){
 
-          MNy.action.clog("SimulateMouse trying href loaded to iFrame");
-          MNy.action.frameload(href);
-          is_error = false;
+          // is the direct-link is not Mixed Content with https of parent location
+          var rgx = new RegExp("^"+location.protocol);
+          if( !rgx.test(href) ){
+
+            is_error = true;
+          }
+          else{
+
+            MNy.action.clog("SimulateMouse trying href loaded to iFrame");
+            MNy.action.frameload(href);
+            is_error = false;
+          }
         }
         else{
 
