@@ -45,6 +45,7 @@
 // @include        /^https?://(|www\.)uploadbank.com/*/
 // @include        /^https?://(|www\.)drop.me/*/
 // @include        /^https?://(|www\.)dropapk.com/*/
+// @include        /^https?://(|www\.)suprafiles.org/*/
 // @include        /^https?://(|www\.)file-upload.com/*/
 // @include        /^https?://(|www\.)topddl.net/file/*/
 // @include        /^https?://up.top4top.net/*/
@@ -2377,6 +2378,42 @@
             }
           }
         }, 100);
+      }
+    },
+
+    suprafiles:{
+      rule: /suprafiles.org/,
+      run: function(){
+        var that = this,
+            btnDownload = g('[type="submit"][name="method_free"]',null,true),
+            cont = null,
+            el = null
+        ;
+
+        // # 1
+        if( btnDownload ){
+
+          SimulateMouse(btnDownload, "click", true);
+        }
+        else{
+          // # 3
+          el = g('form[name="F1"]');
+          if( el ){
+
+            el.submit();
+          }
+          else{
+            // # 2
+            el   = null;
+            cont = g('#container');
+            if( cont ){
+
+              el = g('a[href*="suprafiles.org"]', cont);
+              if( el )
+                SimulateMouse(el, "click", true);
+            }
+          }
+        }
       }
     },
 
