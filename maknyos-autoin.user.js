@@ -2496,79 +2496,106 @@
       rule: /file-upload\.com/,
       run: function(){
         var that = this,
-            btnDownload = g('[type="submit"][name="method_free"]',null,true),
-            elcap = null
+            recapcay  = g('.g-recaptcha'),
+            site_key  = null,
+            countdown = null,
+            btnDl     = null,
+            cb_countdown = function(){}
         ;
+        if( btnDl = g('[type="submit"][name="method_free"]', null, true) ){
+          // # Stage 1
 
-        // # 1
-        if( btnDownload ){
+          SimulateMouse(btnDl, "click", true);
+        }
+        else if( btnDl = g('#download-btn') ){
+          // # Stage 3
 
-          SimulateMouse(btnDownload, "click", true);
+          SimulateMouse(btnDl, "click", true);
         }
         else{
-          elcap = g('.captcha_code')
+          // # Stage 2
 
-          // # 2
-          if( elcap ){
-            setTimeout(function(){
-              var row   = that.closest(elcap, 'tr'),
-                  spans = gAll('div>span', row),
-                  btnDownload  = null,
-                  num  = '',
-                  numIndexed = {},
-                  ordIndexKeys = [],
-                  waitSec = parseInt(g('#countdown .seconds').innerText.trim())
-              ;
-              elcap.focus();
-              that.clog(spans);
-              for(var i=0, iL=spans.length; i<iL; i++){
-                var el = spans[i],
-                    atrs = el.getAttribute('style'),
-                    cucok = null
-                ;
-                if( cucok = /-left\:\s*(\d+)\w/i.exec(atrs) )
-                  numIndexed[cucok[1]] = el.innerText;
-              }
-              that.clog('numIndexed');
-              that.clog(numIndexed);
+          if( 'undefined' != typeof $ ){
 
-              ordIndexKeys = Object.keys(numIndexed);
-              ordIndexKeys.sort(function(a, b){
-                return parseInt(a) -  parseInt(b);
-              });
-
-              for(var j=0, jL=ordIndexKeys.length; j<jL; j++){
-                if('undefined' != typeof numIndexed[ordIndexKeys[j]])
-                  num += ''+numIndexed[ordIndexKeys[j]];
-              }
-              num = num.trim();
-              if( num ){
-                elcap.value = num;
-
-                if( waitSec ){
-                  waitSec += 1;
-                  setTimeout(function(){
-                    btnDownload = g('#downloadbtn');
-                    if( btnDownload )
-                      SimulateMouse(btnDownload, "click", true);
-                  }, 1000 * waitSec);
-                }
-              }
-            }, 10);
+            $('.page-wrap>.text-center').each(function(){
+              var $me = $(this);
+              if( $me.find('ins').length )
+                $me.remove();
+            });
+            $('#downloadbtn')
+              .css('font-size', '2em');
           }
 
-          // # 3
-          else{
-            btnDownload = g('#download-btn');
-            btnDownload.setAttribute('data-href', btnDownload.getAttribute('href'));
-            btnDownload.setAttribute('href', 'javascript:;');
-            btnDownload.onclick = function(){
-              top.location.href = this.getAttribute('data-href');
-              return !1;
-            };
+          cb_countdown = function(){
+            if( recapcay ){
+              
+              that.waitforit(function(){
 
-            if( btnDownload )
-              SimulateMouse(btnDownload, "click", true);
+                return ('undefined' == typeof grecaptcha ? !1 : grecaptcha);
+              }, function(gr){
+                
+                gr.render("maknyos-recaptcha", {
+                  sitekey: recapcay.getAttribute('data-sitekey'),
+                  callback: function(){ $("#downloadbtn").trigger("click") }
+                });
+
+                var btnDl_ = g('#downloadbtn');
+                if( btnDl_ && 'undefined' != typeof $)
+                  $(btnDl_).prev().remove();
+              });
+            }
+            else if( btnDl = g('#downloadbtn') ){
+
+              SimulateMouse( btnDl, "click", true );
+            }
+            else{
+
+              that.clog('Missing download button')
+            }
+          };
+
+
+          // is there recapcay, early tampered dom g-recaptcha
+          if( recapcay ){
+            site_key = recapcay.getAttribute('data-sitekey')
+
+            if('function' === typeof $ && site_key){
+
+              $(recapcay)
+                .replaceWith($('<div id="maknyos-recaptcha" data-bijikuda="1" data-sitekey="'+site_key+'"></div>'));
+
+              if( g('#maknyos-recaptcha') )
+                that.clog('g-recaptcha tampered');
+              else
+                that.clog('tampering g-recaptcha FAILED');
+            }
+          }
+
+
+          countdown = g('#countdown .seconds');
+          if( countdown && (countdown = (parseInt(countdown.textContent)-1) ) ){
+            countdown = Math.floor(countdown / 3);
+
+            that.waitforit(function(){
+
+              var cnt = g('#countdown .seconds');
+              return ((parseInt(cnt.textContent)-1) > 0 ? !1 : true);
+            }, function(){
+              
+              cb_countdown();
+            }, countdown * 1000);
+          }
+          else{
+
+            // remove disabled
+            if( btnDl = g('#downloadbtn') ){
+              btnDl.disabled = false;
+
+              if( recapcay )
+                cb_countdown();
+              else
+                SimulateMouse(btnDl, "click", true);
+            }
           }
         }
       }
