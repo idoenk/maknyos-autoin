@@ -1355,7 +1355,7 @@
     },
 
     openload: {
-      rule: /openload.co|oload.tv/,
+      rule: /openload\.co|oload\.tv/,
       run: function(){
         var that        = this,
             streamsel   = '#streamurl',
@@ -1452,7 +1452,7 @@
     },
 
     rgho: {
-      rule: /rgho.st/,
+      rule: /rgho\.st/,
       run: function(){
         var that = this,
             href = '',
@@ -1473,7 +1473,7 @@
     },
 
     uploadee: {
-      rule: /upload.ee/,
+      rule: /upload\.ee/,
       run: function(){
         var wrapBox = g('.textbody:last-child'),
             btnDl = null
@@ -1493,7 +1493,7 @@
     },
 
     bcvc: {
-      rule: /bc.vc/,
+      rule: /bc\.vc/,
       noBaseClean: true,
       run: function(){
         var that = this,
@@ -1534,7 +1534,7 @@
     },
 
     shst: {
-      rule: /sh.st/,
+      rule: /sh\.st/,
       run: function(){
         var that = this,
             scripts = document.getElementsByTagName( 'script' ),
@@ -1609,7 +1609,7 @@
     },
 
     adfly: {
-      rule: /adf.ly/,
+      rule: /adf\.ly/,
       noBaseClean: true,
       run: function(){
         var that = this,
@@ -1748,7 +1748,7 @@
     },
 
     adfocus: {
-      rule: /adfoc.us/,
+      rule: /adfoc\.us/,
       run: function(){
         var that = this,
             id = '#interstitial',
@@ -1778,7 +1778,7 @@
     },
 
     mypcloudcom: {
-      rule: /my.pcloud.com/,
+      rule: /my\.pcloud\.com/,
       run: function(){
         var that = this,
             btn_selector = '//div[contains(@class,"button") and contains(text(),"ownload")]'
@@ -1821,7 +1821,7 @@
     },
 
     uploadrocket: {
-      rule: /uploadrocket.net/,
+      rule: /uploadrocket\.net/,
       run: function(){
         var that = this,
             form = g('[name=freeorpremium]'),
@@ -1908,7 +1908,7 @@
     },
 
     uploadsto: {
-      rule: /uploads.to/,
+      rule: /uploads\.to/,
       run: function(){
         var that   = this,
             gaRc   = g('.g-recaptcha'),
@@ -2011,7 +2011,7 @@
     },
 
     cloudmailru: {
-      rule: /cloud.mail.ru/,
+      rule: /cloud\.mail\.ru/,
       run: function(){
         var that    = this;
 
@@ -2047,7 +2047,7 @@
     },
 
     gdrive: {
-      rule: /drive.google.com|docs.google.com/,
+      rule: /drive\.google\.com|docs\.google\.com/,
       run: function(){
         var that  = this,
             loc   = that.get_href()
@@ -2120,7 +2120,7 @@
     },
 
     "e-book:genlib": {
-      rule: /gen.lib.rus.ec|libgen.me|libgen.io|golibgen.io|bookzz.org|(|\w+\.)bookfi.net/,
+      rule: /gen\.lib\.rus\.ec|libgen\.me|libgen\.io|golibgen\.io|bookzz\.org|(|\w+\.)bookfi\.net/,
       run: function(){
         var that      = this,
             pathname  = location.pathname,
@@ -2243,7 +2243,7 @@
     },
 
     filescdn: {
-      rule: /filescdn.com/,
+      rule: /filescdn\.com/,
       run: function(){
         var that  = this,
             btnDl = null
@@ -2257,7 +2257,7 @@
     },
 
     uploadbank: {
-      rule: /uploadbank.com/,
+      rule: /uploadbank\.com/,
       run: function(){
         var that  = this,
             cont  = g('#container'),
@@ -2278,7 +2278,7 @@
     },
 
     top4top: {
-      rule: /top4top.net/,
+      rule: /top4top\.net/,
       run: function(){
         var that  = this,
             parent = g('#url'),
@@ -2320,7 +2320,7 @@
     },
 
     dropme: {
-      rule: /drop.me/,
+      rule: /drop\.me/,
       run: function(){
         var that  = this;
 
@@ -2334,7 +2334,7 @@
     },
 
     dropapk: {
-      rule: /dropapk.com/,
+      rule: /dropapk\.com/,
       run: function(){
         var that  = this;
         
@@ -2390,7 +2390,7 @@
     },
 
     suprafiles:{
-      rule: /suprafiles.org/,
+      rule: /suprafiles\.org/,
       run: function(){
         var that = this,
             btnDownload = g('[type="submit"][name="method_free"]',null,true),
@@ -2426,7 +2426,7 @@
     },
 
     publicopera: {
-      rule: /public.upera.co/,
+      rule: /public\.upera\.co/,
       run: function(){
         var that    = this, 
             section = g('.hbox'),
@@ -2463,7 +2463,7 @@
     },
 
     fileupload: {
-      rule: /file-upload.com/,
+      rule: /file-upload\.com/,
       run: function(){
         var that = this,
             btnDownload = g('[type="submit"][name="method_free"]',null,true),
@@ -2545,7 +2545,7 @@
     },
 
     topddl: {
-      rule: /topddl.net/,
+      rule: /topddl\.net/,
       run: function(){
         var that = this,
             btnDownload = g('#btn-download',null,true)
