@@ -1938,103 +1938,71 @@
     uploadsto: {
       rule: /uploads\.to/,
       run: function(){
-        var that   = this,
-            gaRc   = g('.g-recaptcha'),
-            site_key = null,
-            btnDlFin = $(".btn:contains('DOWNLOAD')"),
-            btnDl  = $('#btn_download')
+        var that      = this,
+            gtable    = g('.table'),
+            recapcay  = g('.g-recaptcha', gtable),
+            site_key  = null,
+            btnCheck  = null,
+            tform     = null,
+            btnDl     = g("#method_free")
         ;
-        $(function(){
-          setTimeout(function(){
-            $('body div[style]').each(function(){
-              var $me   = $(this);
-              if( !/\bnavbar-fixed\b/.test($me.attr('class')) && ['absolute','fixed'].indexOf($me.css('position')) !== -1 ){
+        if( recapcay ){
+          site_key = recapcay.getAttribute('data-sitekey')
 
-                $me.css('visibility', 'hidden!important');
-              }
-            });
-          }, 600);
-        });
-
-        // 
-        if( gaRc ){
-          site_key = gaRc.getAttribute('data-sitekey');
-          that.clog('page: #1')
-        }
-        else if( btnDl.length ){
-          
-          that.clog('page: #2');
-          if( btnDl ){
-            btnDl.closest('form').submit();
-
-            setTimeout(function(){
-              SimulateMouse( btnDl.get(0), "click", true);
-            }, 2100);
-          }
-          $('#chkIsAdd').prop('checked', !1);
-        }
-        else if( btnDlFin.length ){
-          that.clog('page: #3');
-
-          SimulateMouse( btnDlFin.get(0), "click", true );
-        }
-        else{
-
-          that.clog('Page may changed!!');
-        }
-
-
-
-        if( !1 ){
-          // can not inject inline script
           if('function' === typeof $ && site_key){
 
-            that.clog('replacing g-recaptcha..;site_key='+site_key);
-            $('.g-recaptcha')
-              .replaceWith($('<div id="tampered-recaptcha" data-bijikuda="1" data-sitekey="'+site_key+'"></div>'));
+            $(recapcay)
+              .replaceWith($('<div id="maknyos-recaptcha" data-bijikuda="1" data-sitekey="'+site_key+'"></div>'));
 
-            // recaptcha-rebuilder
-            var scriptHandler = function(_site_key){
-              return (function(win, $){
-                var maxTry = 10,
-                    iTry   = 0,
-                    tryRenderRecaptcha = function(){
-                      iTry++;
-                      if("undefined" !== typeof grecaptcha){
-                        grecaptcha.render("tampered-recaptcha", {
-                          sitekey: "___SITEKEY___",
-                          callback: function(){
+            if( g('#maknyos-recaptcha') )
+              that.clog('g-recaptcha tampered');
+            else
+              that.clog('tampering g-recaptcha FAILED');
 
-                            $('.btn[name="method_free"]').closest('form').submit();
-                          }
-                        });
-                      }
-                      else{
-                        if( iTry > maxTry ){
+            that.waitforit(function(){
 
-                          return !1;
-                        }
-
-                        setTimeout(function(){
-                          tryRenderRecaptcha();
-                        }, 1 * 567);
-                      }
-                    }
-                ;
-                tryRenderRecaptcha();
-              })(window, $);
-            };
-            scriptHandler = scriptHandler.toString();
-            scriptHandler = scriptHandler.replace(/___SITEKEY___/, site_key);
-            that.injectBodyScript(scriptHandler);
+              return ('undefined' == typeof grecaptcha ? !1 : grecaptcha);
+            }, function(gr){
+              
+              gr.render("maknyos-recaptcha", {
+                sitekey: site_key,
+                callback: function(){ $("#method_free").trigger("click") }
+              });
+            });
           }
           else{
 
-            that.clog('site_key missing or $ is not defineed');
+            that.clog('Error: site_key or jQuery is not defined');
           }
         }
+        else{
+          if( btnDl ){
+            // # Stage 1, incase no recapcay
+            SimulateMouse( btnDl, "click", true);
+          }
+          else if( btnDl = g('#btn_download') ){
+            // # Stage 2
+            
+            if( btnCheck = g('#chkIsAdd') )
+              btnCheck.checked = false;
 
+            tform = that.closest(btnDl, 'form');
+            if( tform )
+              tform.submit();
+            else
+              SimulateMouse( btnDl, "click", true);
+          }
+          else if( btnDl = g('.btn.btn-primary[href*="downlod.me"]') ){
+            that.clog('Stage 3');
 
+            // # Stage 3
+            SimulateMouse( btnDl, "click", true);
+          }
+          else{
+
+            that.clog('Missing download button [Stage-?], page may changed');
+          }
+        }
       }
     },
 
