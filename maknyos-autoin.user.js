@@ -2255,20 +2255,54 @@
     uploadbank: {
       rule: /uploadbank\.com/,
       run: function(){
-        var that  = this,
-            cont  = g('#container'),
-            btnDl = null
+        var that     = this,
+            cont     = g('#container'),
+            recapcay = g('.g-recaptcha', cont),
+            site_key = null,
+            btnDl    = null
         ;
-        if( !g('.g-recaptcha', cont) ){
-          btnDl = g('img[src*="downloadbutton.png"]');
-          if( btnDl ){
 
-            SimulateMouse( btnDl, "click", true );
+        if( recapcay ){
+          site_key = recapcay.getAttribute('data-sitekey')
+
+          if('function' === typeof $ && site_key){
+
+            $(recapcay)
+              .replaceWith($('<div id="maknyos-recaptcha" data-bijikuda="1" data-sitekey="'+site_key+'"></div>'));
+
+            if( g('#maknyos-recaptcha') )
+              that.clog('g-recaptcha tampered');
+            else
+              that.clog('tampering g-recaptcha FAILED');
+
+            that.waitforit(function(){
+
+              return ('undefined' == typeof grecaptcha ? !1 : grecaptcha);
+            }, function(gr){
+              
+              gr.render("maknyos-recaptcha", {
+                sitekey: site_key,
+                callback: function(){ $("#downloadbtn").trigger("click") }
+              });
+            });
           }
+          else{
+
+            that.clog('Error: site_key or jQuery is not defined');
+          }
+        }
+        else if( btnDl = g('#downloadbtn') ){
+
+          SimulateMouse( btnDl, "click", true );
+        }
+        else if( btnDl = g('img[src*="downloadbutton"]') ){
+
+          btnDl = btnDl.parentNode;
+          SimulateMouse( btnDl, "click", true );
         }
         else{
 
-          that.clog('g-recaptcha detected.');
+          that.clog('Missing download button');
         }
       }
     },
