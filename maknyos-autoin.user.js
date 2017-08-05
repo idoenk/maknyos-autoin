@@ -755,8 +755,12 @@
       rule: /uptobox\.com/,
       run: function(){
 
-        this.clog('inside uptobox');
-        var btnDownload, that = this;
+        var that        = this
+            waitStr     = null,
+            waitFor     = !1,
+            countdown   = g('#timeLeft'),
+            btnDownload = g('#btn_download')
+        ;
 
         // force download link with https based on its parent protocol
         var prefilter_uptobox_https = function(href_){
@@ -768,54 +772,78 @@
           }
           return href_;
         };
-        btnDownload = g('[type=submit][value*="ownload"]');
+        
 
-        if( btnDownload ){
-
-          SimulateMouse(btnDownload, "click", true, prefilter_uptobox_https);
-        }
-        else{
-          btnDownload = g('#countdown_str');
-          if( btnDownload ){
-            this.clog('disabled='+btnDownload.getAttribute('disabled'));
-            if( btnDownload.getAttribute('disabled') ){
-
-              // do downoad
-            }
-            else{
-              var waitstr = String(g('#countdown_str').textContent).replace(/[\s\W]/g,'').toLowerCase();
-              this.clog(waitstr);
-              if( cucok = /(?:[a-zA-Z]+)?(\d+)(?:[a-zA-Z]+)?/.exec(waitstr) ){
-                this.clog(cucok);
-
-                this.waitforit(function(){
-                  return g('#btn_download');
-                }, function(){
-                  SimulateMouse(g('#btn_download'), "click", true, prefilter_uptobox_https);
-                }, parseInt(cucok[1] * 1000));
-
-              }
+        if( countdown ){
+          scripts = document.getElementsByTagName( 'script' );
+          for( var i = 0; i < scripts.length; ++i ) {
+            if( cucok = /\bcountdownNum\s*=\s*(\d+)/.exec(scripts[i].innerHTML)) {
+              waitFor = Math.floor(parseInt( cucok[1] ) / 3);
+              break;
             }
           }
-          else if( g('.button_upload') ){
-            // take-care of fake exe download
-            var link, rlink, el = g('.button_upload');
-            if( link = el.parentNode ){
-              rlink = getParameterByName("prod"+"uct_d"/*fo*/+"ownloa"+"d_url", link.getAttribute("href"));
-              
-              // hiding the-arse
-              if( rlink ){
-                rlink = 'http://blankrefer.com/?'+rlink;
-                this.frameload(rlink);
+
+          if( waitFor ){
+            this.waitforit(function(){
+
+              var disabled = btnDownload.getAttribute('disabled');
+              return ('undefined' != typeof disabled && disabled ? !1 : btnDownload);
+            }, function(el){
+
+              SimulateMouse(el, "click", true);
+            }, waitFor * 1000);
+          }
+        }
+        else{
+          // is the timeleft timer simply not activated
+          if( btnDownload ){
+
+            SimulateMouse(btnDownload, "click", true, prefilter_uptobox_https);
+          }
+          else{
+            btnDownload = g('#countdown_str');
+            if( btnDownload ){
+              this.clog('disabled='+btnDownload.getAttribute('disabled'));
+              if( !btnDownload.getAttribute('disabled') ){
+
+                // do downoad
               }
               else{
-                // last-resort, key may changed.
-                SimulateMouse(link, "click", true, prefilter_uptobox_https);
+                waitStr = String(g('#countdown_str').textContent).replace(/[\s\W]/g,'').toLowerCase();
+                if( cucok = /(?:[a-zA-Z]+)?(\d+)(?:[a-zA-Z]+)?/.exec(waitStr) ){
+
+                  this.waitforit(function(){
+
+                    return g('#btn_download');
+                  }, function(el){
+
+                    SimulateMouse(el, "click", true, prefilter_uptobox_https);
+                  }, parseInt(cucok[1] * 1000));
+
+                }
               }
             }
+            else if( g('.button_upload') ){
+              // take-care of fake exe download
+              var link, rlink, el = g('.button_upload');
+              if( link = el.parentNode ){
+                rlink = getParameterByName("prod"+"uct_d"/*fo*/+"ownloa"+"d_url", link.getAttribute("href"));
+                
+                // hiding the-arse
+                if( rlink ){
+                  rlink = 'http://blankrefer.com/?'+rlink;
+                  this.frameload(rlink);
+                }
+                else{
+                  // last-resort, key may changed.
+                  SimulateMouse(link, "click", true, prefilter_uptobox_https);
+                }
+              }
 
-          }else{
-            this.clog('tpl-changed, mismatch element');
+            }else{
+
+              this.clog('tpl-changed, mismatch element');
+            }
           }
         }
       }
