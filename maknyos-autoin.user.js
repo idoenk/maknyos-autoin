@@ -2,70 +2,70 @@
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
 // @icon           https://github.com/idoenk/maknyos-autoin/raw/master/assets/img/icon-60x60.png
-// @version        3.9.26
+// @version        3.9.27
 // @description    Auto click get link, iframe killer. Hosts: indowebster,2shared,zippyshare,mediafire,sendspace,uptobox,howfile,uppit,imzupload,jumbofiles,sendmyway,tusfiles,dropbox,dropapk,uploadbank,suprafiles,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,kumpulbagi,moesubs,uploadrocket,my.pcloud.com,kirino.ga,seiba.ga,mylinkgen,rgho.st,uploads.to,upload.ee,upload.so,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen.io,golibgen.io,bookzz.org,bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
 // @grant          GM_log
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js
-// @include        /^https?://(files|maknyos).indowebster.com/*/
-// @include        /^https?://(.+\.)2shared.com/file/*/
-// @include        /^https?://(.+\.)zippyshare.com/v/*/
-// @include        /^https?://(|www\.)mediafire.com/(download|view|file)/*/
-// @include        /^https?://(|www\.)sendspace.com/file/*/
+// @include        /^https?://(files|maknyos).indowebster.com/\w/
+// @include        /^https?://(.+\.)2shared.com/file/\w/
+// @include        /^https?://(.+\.)zippyshare.com/v/\w/
+// @include        /^https?://(|www\.)mediafire.com/(download|view|file)/\w/
+// @include        /^https?://(|www\.)sendspace.com/file/\w/
 // @include        /^https?://(|www\.)uptobox.com\/\w/
-// @include        /^https?://(|www\.)howfile.com/file/*/
-// @include        /^https?://(|www\.)uppit.com/*/
-// @include        /^https?://(|www\.)imzupload.com/*/
-// @include        /^https?://(|www\.)jumbofiles.com/*/
-// @include        /^https?://(|www\.)sendmyway.com/*/
-// @include        /^https?://(|www\.)tusfiles.net/*/
-// @include        /^https?://(|www\.)dropbox.com/s/*/
-// @include        /^https?://(|www\.)solidfiles.com/*/
-// @include        /^https?://(|www\.)yadi.sk/*/
-// @include        /^https?://(|www\.)datafilehost.com/d/*/
-// @include        /^https?://(|www\.)userscloud.com/*/
-// @include        /^https?://(|www\.)hulkload.com/*/
-// @include        /^https?://app.box.com/s/*/
-// @include        /^https?://(|www\.)dailyuploads.net/*/
-// @include        /^https?://(|www\.)kumpulbagi.id/*/
-// @include        /^https?://(|www\.)kbagi.com/*/
-// @include        /^https?://(|www\.)kb.simple-aja.info/*/
-// @include        /^https?://(|www\.)moesubs.com/url/*/
-// @include        /^https?://kirino.ga/lak/*/
-// @include        /^https?://(|www\.)kirino.sexy/*/
-// @include        /^https?://(|www\.)seiba.ga/*/
-// @include        /^https?://(|www\.)mylinkgen.com/*/
-// @include        /^https?://(|www\.)openload.co/*/
-// @include        /^https?://(|www\.)oload.tv/*/
-// @include        /^https?://(|www\.)rgho.st/*/
-// @include        /^https?://(|www\.)uploadrocket.net/*/
-// @include        /^https?://(|www\.)(upload.so|uplod.ws)/*/
-// @include        /^https?://(|www\.)upload.ee/files/*/
-// @include        /^https?://(|www\.)uploads.to/*/
-// @include        /^https?://(|www\.)uploadbank.com/*/
-// @include        /^https?://(|www\.)drop.me/*/
-// @include        /^https?://(|www\.)dropapk.com/*/
-// @include        /^https?://(|www\.)suprafiles.org/*/
-// @include        /^https?://(|www\.)file-upload.com/*/
-// @include        /^https?://(|www\.)topddl.net/file/*/
-// @include        /^https?://up.top4top.net/*/
-// @include        /^https?://public.upera.co/*/
-// @include        /^https?://cloud.mail.ru/public/*/
-// @include        /^https?://drive.google.com/file/d/*/
-// @include        /^https?://docs.google.com/uc\?*/
+// @include        /^https?://(|www\.)howfile.com/file/\w/
+// @include        /^https?://(|www\.)uppit.com/\w/
+// @include        /^https?://(|www\.)imzupload.com/\w/
+// @include        /^https?://(|www\.)jumbofiles.com/\w/
+// @include        /^https?://(|www\.)sendmyway.com/\w/
+// @include        /^https?://(|www\.)tusfiles.net/\w/
+// @include        /^https?://(|www\.)dropbox.com/s/\w/
+// @include        /^https?://(|www\.)solidfiles.com/\w/
+// @include        /^https?://(|www\.)yadi.sk/\w/
+// @include        /^https?://(|www\.)datafilehost.com/d/\w/
+// @include        /^https?://(|www\.)userscloud.com/\w/
+// @include        /^https?://(|www\.)hulkload.com/\w/
+// @include        /^https?://app.box.com/s/\w/
+// @include        /^https?://(|www\.)dailyuploads.net/\w/
+// @include        /^https?://(|www\.)kumpulbagi.id/\w/
+// @include        /^https?://(|www\.)kbagi.com/\w/
+// @include        /^https?://(|www\.)kb.simple-aja.info/\w/
+// @include        /^https?://(|www\.)moesubs.com/url/\w/
+// @include        /^https?://kirino.ga/lak/\w/
+// @include        /^https?://(|www\.)kirino.sexy/\w/
+// @include        /^https?://(|www\.)seiba.ga/\w/
+// @include        /^https?://(|www\.)mylinkgen.com/\w/
+// @include        /^https?://(|www\.)openload.co/\w/
+// @include        /^https?://(|www\.)oload.tv/\w/
+// @include        /^https?://(|www\.)rgho.st/\w/
+// @include        /^https?://(|www\.)uploadrocket.net/\w/
+// @include        /^https?://(|www\.)(upload.so|uplod.ws)/\w/
+// @include        /^https?://(|www\.)upload.ee/files/\w/
+// @include        /^https?://(|www\.)uploads.to/\w/
+// @include        /^https?://(|www\.)uploadbank.com/\w/
+// @include        /^https?://(|www\.)drop.me/\w/
+// @include        /^https?://(|www\.)dropapk.com/\w/
+// @include        /^https?://(|www\.)suprafiles.org/\w/
+// @include        /^https?://(|www\.)file-upload.com/\w/
+// @include        /^https?://(|www\.)topddl.net/file/\w/
+// @include        /^https?://up.top4top.net/\w/
+// @include        /^https?://public.upera.co/\w/
+// @include        /^https?://cloud.mail.ru/public/\w/
+// @include        /^https?://drive.google.com/file/d/\w/
+// @include        /^https?://docs.google.com/uc\?\w/
 // @include        /^https?://bc.vc/([\w]+)(\#\w+?)?$/
 // @include        /^https?://sh.st/([\w]+)(\#\w+?)?$/
-// @include        /^https?://adf.ly/*/
-// @include        /^https?://adfoc.us/*/
-// @include        /^https?://my.pcloud.com/publink/*/
-// @include        /^https?://filescdn.com/*/
-// @include        /^https?://gen.lib.rus.ec/*/
-// @include        /^https?://libgen.io/*/
-// @include        /^https?://libgen.me/*/
-// @include        /^https?://golibgen.io/*/
-// @include        /^https?://bookzz.org/*/
-// @include        /^https?://(|\w+.)bookfi.net/*/
+// @include        /^https?://adf.ly/\w/
+// @include        /^https?://adfoc.us/\w/
+// @include        /^https?://my.pcloud.com/publink/\w/
+// @include        /^https?://filescdn.com/\w/
+// @include        /^https?://gen.lib.rus.ec/\w/
+// @include        /^https?://libgen.io/\w/
+// @include        /^https?://libgen.me/\w/
+// @include        /^https?://golibgen.io/\w/
+// @include        /^https?://bookzz.org/\w/
+// @include        /^https?://(|\w+.)bookfi.net/\w/
 // ==/UserScript==
 
 
@@ -1861,35 +1861,47 @@
     },
 
     uploadsows: {
-      rule: /(upload.so)|(uplod.ws)/,
+      rule: /(upload\.so)|(uplod\.ws)/,
       run: function(){
-        var that    = this,
-            blah    = null,
-            btnChk  = null,
-            btnDl   = null, href
+        var that   = this,
+            el     = null,
+            tform  = g('#myDownloadForm'),
+            btnDl  = g('.downloadbtn:not([name])'),
+            href   = ''
         ;
-        if( blah = g('a[href*="apploading.mobi"]') )
-          blah.parentNode.removeChild( blah );
+        if( tform || btnDl ){
 
-        if( btnChk = g('#chkIsAdd') )
-          btnChk.checked = false;
-        
-        if( btnDl = g('#downloadBtnClickOrignal') ){
+          if( el = g('a[href*="apploading.mobi"]') )
+            el.parentNode.removeChild( el );
+
+          if( el = g('#chkIsAdd') )
+            el.checked = false;
 
           SimulateMouse(btnDl, "click", true);
+
+          if( tform ){
+
+            tform.submit();
+          }
+          else{
+            
+            SimulateMouse(btnDl, "click", true);
+          }
         }
         else{
-          // stage-2 ?
-          if( btnDl = xp('//a[contains(.,"ownloa")]', g('.downloadbtn'), true) ){
-            href = btnDl.getAttribute('href');
-            if( href )
-              that.set_href( href );
-            else
-              SimulateMouse(btnDl, "click", true);
+          if( el = g('.fileInfo') ){
+            // # Stage 2
+            if( btnDl = g('.btn-download', el) ){
+              href = btnDl.getAttribute('href');
+              if( href )
+                that.set_href( href );
+              else
+                SimulateMouse(btnDl, "click", true);
+            }
           }
           else{
 
-            that.clog('uploadso: missing download button, page may changed');
+            that.clog('Not download page');
           }
         }
       }
