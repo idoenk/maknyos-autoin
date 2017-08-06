@@ -2382,55 +2382,62 @@
       rule: /dropapk\.com/,
       run: function(){
         var that  = this;
+
+        if( g('div[id*="ez-downloa"]') || g('div[class*="gez-downloa"]') ){
         
-        return that.waitforit(function(){
-          var sel = '#downloadbtn',
-              el  = null,
-              daform = null
-          ;
+          return that.waitforit(function(){
+            var sel = '#downloadbtn',
+                el  = null,
+                daform = null
+            ;
 
-          if( !g(sel) ){
-            if( g('img[src*="down_final.png"]') )
-              sel = 'img[src*="down_final.png"]';
-            else
-              sel = '[type="submit"][name="method_free"]';
-          }
-          that.clog('sel='+sel);
-          
-          if( sel )
-            return g(sel, null, true);
-        }, function(el){
-          var hid = null;
-
-          that.clog('da callback..');
-          that.clog(el.nodeName);
-          if( el ) {
-            if( el.nodeName == 'IMG' ){
-
-              SimulateMouse(el.parentNode, "click", true);
+            if( !g(sel) ){
+              if( g('img[src*="down_final.png"]') )
+                sel = 'img[src*="down_final.png"]';
+              else
+                sel = '[type="submit"][name="method_free"]';
             }
-            else{
+            that.clog('sel='+sel);
+            
+            if( sel )
+              return g(sel, null, true);
+          }, function(el){
+            var hid = null;
 
-              if( el.nodeName == 'INPUT' ){
-                hid = document.createElement('input')
-                hid.setAttribute('type', 'hidden');
-                hid.setAttribute('name', el.getAttribute('name'));
-                hid.setAttribute('value', el.getAttribute('value'));
-              }
+            that.clog('da callback..');
+            that.clog(el.nodeName);
+            if( el ) {
+              if( el.nodeName == 'IMG' ){
 
-              daform = that.closest(el, 'form');
-              if( daform ){
-                if( hid )
-                  daform.appendChild( hid );
-                daform.submit();
+                SimulateMouse(el.parentNode, "click", true);
               }
               else{
 
-                SimulateMouse(el, "click", true);
+                if( el.nodeName == 'INPUT' ){
+                  hid = document.createElement('input')
+                  hid.setAttribute('type', 'hidden');
+                  hid.setAttribute('name', el.getAttribute('name'));
+                  hid.setAttribute('value', el.getAttribute('value'));
+                }
+
+                daform = that.closest(el, 'form');
+                if( daform ){
+                  if( hid )
+                    daform.appendChild( hid );
+                  daform.submit();
+                }
+                else{
+
+                  SimulateMouse(el, "click", true);
+                }
               }
             }
-          }
-        }, 100);
+          }, 100);
+        }
+        else{
+
+          that.clog('Not download page');
+        }
       }
     },
 
