@@ -2333,7 +2333,7 @@
         }
         else{
 
-          that.clog('Missing download button');
+          that.clog('Not download page or missing download button');
         }
       }
     },
