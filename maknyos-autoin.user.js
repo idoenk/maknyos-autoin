@@ -2440,7 +2440,7 @@
         var that = this,
             btnDownload = g('[type="submit"][name="method_free"]',null,true),
             cont = null,
-            el = null
+            el   = null
         ;
 
         // # 1
@@ -2450,20 +2450,20 @@
         }
         else{
           // # 3
-          el = g('form[name="F1"]');
-          if( el ){
+          if( el = g('form[name="F1"]') ){
 
             el.submit();
           }
           else{
             // # 2
-            el   = null;
             cont = g('#container');
-            if( cont ){
+            if( cont && (el = g('a[href*="suprafiles.org"]', cont)) ){
+              
+              SimulateMouse(el, "click", true);
+            }
+            else{
 
-              el = g('a[href*="suprafiles.org"]', cont);
-              if( el )
-                SimulateMouse(el, "click", true);
+              that.clog('Not download page');
             }
           }
         }
