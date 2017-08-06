@@ -2611,6 +2611,11 @@
               else
                 SimulateMouse(btnDl, "click", true);
             }
+
+            if( !g('.page-wrap') ){
+
+              that.clog('Not download page');
+            }
           }
         }
       }
