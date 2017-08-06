@@ -927,30 +927,41 @@
     tusfiles: {
       rule: /tusfiles\.net/,
       run: function(){
-
-        // prevent page to load, submission
-        var maxTry = 3, iTry=0, sTryStop;
+        var that    = this,
+            maxTry  = 3,
+            iTry    = 0,
+            sTryStop = null,
+            btnDl    = null
+        ;
         var cb_pagestop = function(){
-          var el = g('[name=quick]');
-          if( el ){
+          var el = null;
+
+          if( el = g('[name=quick]') ){
             el.removeAttribute('checked');
             el.parentNode.removeChild(el);
           }
 
-          el = g('[name=F1]');
-          el && el.submit();
+          if( el = g('[name=F1]') )
+            el.submit();
         };
 
-        sTryStop = setInterval(function(){
-          window.stop();
-          iTry++;
+        if( btnDl = g('[name=F1]') ){
 
-          if( iTry > maxTry ){
-            sTryStop && clearInterval( sTryStop );
-            if("function" == typeof cb_pagestop)
-              cb_pagestop()
-          }
-        }, 10);
+          sTryStop = setInterval(function(){
+            window.stop();
+            iTry++;
+
+            if( iTry > maxTry ){
+              sTryStop && clearInterval( sTryStop );
+              if("function" == typeof cb_pagestop)
+                cb_pagestop()
+            }
+          }, 10);
+        }
+        else{
+
+          that.clog('Not download page or missing download button');
+        }
       }
     },
 
