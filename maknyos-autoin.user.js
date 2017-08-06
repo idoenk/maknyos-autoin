@@ -2257,13 +2257,29 @@
       rule: /filescdn\.com/,
       run: function(){
         var that  = this,
-            btnDl = null
+            btnDl = null,
+            tform = null
         ;
-        if( btnDl = g('#btn_download') )
-          SimulateMouse( btnDl, "click", true );
+        if( btnDl = g('#btn_download') ){
 
-        else if( btnDl = xp('//a[(contains(.,"ownloa") and contains(.,"irect")) or contains(.,"eady!")]', null, true) )
+          tform = that.closest(btnDl, 'form');
+          if( tform ){
+
+            tform.submit()
+          }
+          else{
+
+            SimulateMouse( btnDl, "click", true);
+          }
+        }
+        else if( btnDl = xp('//a[(contains(.,"ownloa") and contains(.,"irect")) or contains(.,"eady!")]', null, true) ){
+
           SimulateMouse( btnDl, "click", true );
+        }
+        else{
+
+          that.clog('Not download page')
+        }
       }
     },
 
