@@ -1961,7 +1961,7 @@
             tform     = null,
             btnDl     = g("#method_free")
         ;
-        if( recapcay ){
+        if( recapcay && g('#method_free') ){
           site_key = recapcay.getAttribute('data-sitekey')
 
           if('function' === typeof $ && site_key){
@@ -1969,21 +1969,22 @@
             $(recapcay)
               .replaceWith($('<div id="maknyos-recaptcha" data-bijikuda="1" data-sitekey="'+site_key+'"></div>'));
 
-            if( g('#maknyos-recaptcha') )
+            if( g('#maknyos-recaptcha') ){
               that.clog('g-recaptcha tampered');
-            else
-              that.clog('tampering g-recaptcha FAILED');
+              that.waitforit(function(){
 
-            that.waitforit(function(){
-
-              return ('undefined' == typeof grecaptcha ? !1 : grecaptcha);
-            }, function(gr){
-              
-              gr.render("maknyos-recaptcha", {
-                sitekey: site_key,
-                callback: function(){ $("#method_free").trigger("click") }
+                return ('undefined' == typeof grecaptcha ? !1 : grecaptcha);
+              }, function(gr){
+                
+                gr.render("maknyos-recaptcha", {
+                  sitekey: site_key,
+                  callback: function(){ $("#method_free").trigger("click") }
+                });
               });
-            });
+            }
+            else{
+              that.clog('tampering g-recaptcha FAILED');
+            }
           }
           else{
 
@@ -2015,7 +2016,7 @@
           }
           else{
 
-            that.clog('Missing download button [Stage-?], page may changed');
+            that.clog('Not download page or missing download button [Stage-?], page may changed');
           }
         }
       }
