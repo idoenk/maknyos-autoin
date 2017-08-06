@@ -2675,7 +2675,10 @@
         }
         else{
 
-          that.clog('Missing download button')
+          if( g('.directlinkpage') || g('.downloadfile1') )
+            that.clog('missing download button')
+          else
+            that.clog('Not download page')
         }
       }
     }
