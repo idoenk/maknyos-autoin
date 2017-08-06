@@ -11,9 +11,11 @@
 // @include        /^https?://(files|maknyos)\.indowebster\.com/\w/
 // @include        /^https?://(.+\.)2shared\.com/file/\w/
 // @include        /^https?://(.+\.)zippyshare\.com/v/\w/
+// @include        /^https?://(.+\.)dfpan\.com/((file|fs)/\w+|file/down/\w+)/
 // @include        /^https?://(|www\.)mediafire\.com/(download|view|file)/\w/
 // @include        /^https?://(|www\.)sendspace\.com/file/\w/
 // @include        /^https?://(|www\.)uptobox\.com/\w/
+// @include        /^https?://(|www\.)yimuhe\.com/((down|file)-|n_dd\.php\?)\w/
 // @include        /^https?://(|www\.)howfile\.com/file/\w/
 // @include        /^https?://(|www\.)uppit\.com/\w/
 // @include        /^https?://(|www\.)imzupload\.com/\w/
@@ -2738,6 +2740,201 @@
             that.clog('missing download button')
           else
             that.clog('Not download page')
+        }
+      }
+    },
+
+    dfpan: {
+      rule: /dfpan\.com/,
+      noBaseClean: true,
+      run: function(){
+        var that = this,
+            el        = null,
+            tform     = null,
+            wrap      = null,
+            vth       = null,
+            btnDl     = null,
+            waitFor   = !1,
+            unit      = '',
+            interval  = g('#interval_div')
+        ;
+        that.killframes();
+        that.killevents(null, 'mousedown');
+
+        if( btnDl = g('#inputDownWait>.slow_button') ){
+
+          if( !that.isVisible(interval) ){
+
+            that.clog(btnDl);
+            SimulateMouse( btnDl, "click", true );
+
+            setTimeout(function(){
+              vth = g('#vcode_th');
+              if( vth && that.isVisible(vth) ){
+                if( wrap = g('td>div', vth) ){
+                  el = document.createElement('p');
+                  el.style.color = '#d00';
+                  el.innerHTML = 'Press ENTER to continue<br/><small>You may need to wait 30 seconds before download started</small>';
+                  wrap.appendChild( el );
+                }
+
+                setTimeout(function(){
+                  g('[type=text]', vth).focus();
+                }, 0);
+                btnDl.style.backgroundColor = '#3b8ccc';
+              }
+              else{
+
+                that.clog('vcode is not visible');
+              }
+
+            }, 567);
+          }
+          else{
+            that.clog('Download interupted with interval');
+            btnDl.disabled = "disabled";
+
+            if( waitFor = g('#down_interval_tag') ){
+              unit = waitFor.parentNode.textContent.trim();
+              unit = unit.replace(/\s*/g,'');
+              unit = unit.replace(/\d+-/g,'');
+
+              waitFor = parseInt( waitFor.textContent );
+              if( /minut/.test(unit) )
+                waitFor = (waitFor * 60);
+              else if( /hour/.test(unit) )
+                waitFor = (waitFor * 60 * 60);
+
+              waitFor = (waitFor + 3);
+
+              this.waitforit(function(){
+                var int = g('#interval_div');
+                return that.isVisible(int) ? !1 : true;
+              }, function(){
+                
+                location.href = location.href;
+              }, waitFor * 1000);
+            }
+          }
+        }
+        else if( btnDl = g('#downbtn > a:first-child') ){
+
+          SimulateMouse( btnDl, "click", true );
+        }
+        else{
+
+          that.clog('Not download page or missing download button')
+        }
+      }
+    },
+
+    yimuhe: {
+      rule: /yimuhe\.com/,
+      noBaseClean: true,
+      run: function(){
+        var that  = this,
+            el    = null,
+            tform = null,
+            btnDl = null
+        ;
+        that.killframes();
+        that.killevents(null, 'mousedown');
+
+        if( g('.sharp .w630') ){
+          if( btnDl = g('a[href*=down-]', g('.sharp .w630')) ){
+
+            SimulateMouse( btnDl, "click", true );
+          }
+          else{
+
+            that.clog('Missing download button');
+          }
+        }
+        else if( g('.sharp .w632') ){
+          if( el = g('#download') )
+            el.style.backgroundColor = '#f0f0f0';
+
+          if( btnDl = gAll('.download>a') ){
+            btnDl = btnDl[0];
+
+            btnDl.style.backgroundColor = '#ccc';
+            btnDl.style.borderColor = '#999';
+            btnDl.style.verticalAlign = 'top';
+            btnDl.setAttribute('title', 'DOWNLOAD');
+          }
+
+
+          el = g('#loading');
+          if( el && that.isVisible(el) ){
+            var wrap_waitfor = function(btn){
+              that.clog('inside wrap_waitfor..');
+              that.waitforit(function(){
+                var dl = g('#download');
+                return (that.isVisible(dl) ? true : !1);
+              }, function(){
+                that.clog('inside callbak of wrap_waitfor');
+                that.clog(btn);
+
+                
+                SimulateMouse( btn, "click", true );
+              });
+            };
+
+            that.waitforit(function(){
+              var el_ = g('#loading');
+              return (el_ && that.isVisible(el_) ? !1 : g('.yzm #code'));
+            }, function(el__){
+
+              if( el__ ){
+                if('undefined' != typeof $){
+                  $(el__).on('keydown', function(e){
+                    that.clog('keydown='+$(this).val()+'; e.keyCode='+e.keyCode);
+                    if( e.keyCode === 13 && btnDl )
+                      wrap_waitfor(btnDl);
+                  });
+                }
+                setTimeout(function(){
+                  el__.focus();
+                }, 0);
+              }
+              else{
+                that.clog('Missing input code');
+                if( tform = g('form', g('.yzm')) )
+                  tform.submit();
+              }
+            }, 567);
+          }
+          else{
+
+            that.clog('throbber element not found, page may changed');
+          }
+        }
+        else if( /\/n_dd\.php/.test(location.pathname) ){
+          if( btnDl = g('#downs') ){
+
+            btnDl.innerHTML = 'DOWNLOAD';
+            if('function' === typeof $){
+
+              $('.kuan, .ggao').css('visibility', 'hidden');
+              btnDl.style.position = 'absolute';
+              btnDl.style.zIndex = '999999';
+              btnDl.style.display = 'block';
+              btnDl.style.fontSize = '2.5em';
+              btnDl.style.lineHeight = '2em';
+            }
+
+            setTimeout(function(){
+              SimulateMouse( btnDl, "click", true );
+            }, 123);
+          }
+          else{
+
+            that.clog('Missing download button');
+          }
+        }
+        else{
+
+          that.clog('Not download page');
         }
       }
     }
