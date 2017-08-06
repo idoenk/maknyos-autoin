@@ -291,7 +291,7 @@
       if( gvar.__DEBUG__ )
         body.insertBefore(iframe, body.firstChild);
       else
-      g('body').appendChild(iframe);
+        g('body').appendChild(iframe);
 
 
       if( gvar.__DEBUG__ ){
@@ -1140,26 +1140,40 @@
       run: function(){
         var that = this,
             btnDl = null,
+            tform = null,
             btn_selector = '//button[contains(@id, "ownlo") and not(contains(@disabled,"disabled"))]'
         ;
-
         that.clog('inside userscloud, '+that.get_href());
         setTimeout(function(){ that.killframes() }, 456);
 
-        if( btnDl = xp(btn_selector, null, true) ){
-          setTimeout(function(){
-            SimulateMouse(btnDl, "click", true);
-          }, 345);
+        if( g('.innerTB') ){
+          if( btnDl = xp(btn_selector, null, true) ){
+            setTimeout(function(){
+
+              tform = that.closest(btnDl, 'form');
+              if( tform ){
+
+                tform.submit()
+              }
+              else{
+
+                SimulateMouse( btnDl, "click", true);
+              }
+            }, 345);
+          }
+          else if( btnDl = g('#dl_link a') ){
+            // Final link
+
+            that.set_href(btnDl.getAttribute('href'));
+          }
+          else{
+
+            that.clog('Missing download button');
+          }
         }
         else{
-          btn_selector = '//*[contains(@href,"usercdn.com") and contains(@href,"/d/")]';
-          this.waitforit(function(){
 
-            return xp(btn_selector, null, true);
-          }, function(btn){
-
-            SimulateMouse(btn, "click", true);
-          }, 100);
+          that.clog('Not download page');
         }
       }
     },
