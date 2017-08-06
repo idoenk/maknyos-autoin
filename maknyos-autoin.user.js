@@ -1260,32 +1260,37 @@
     dailyuploads: {
       rule: /dailyuploads\.net/,
       run: function(){
-        var that = this, el, FORM, btnDownload;
+        var that  = this,
+            el    = null,
+            tform = null,
+            btnDl = null
+        ;
 
         // is there report file?
         if( xp('//a[contains(@href,"op=report")]', null, true) ){
-          if( FORM = xp('//form[@name="F1"]', null, true) ){
+          if( tform = xp('//form[@name="F1"]', null, true) ){
             // uncheck download-manager
-            el = g('[name="chkIsAdd"]');
-            if( el )
+            if( el = g('[name="chkIsAdd"]') )
               el.removeAttribute('checked');
 
-            setTimeout(function(){ FORM.submit() }, 345);
+            setTimeout(function(){ tform.submit() }, 345);
           }
         }
-        else{
-          btnDownload = xp('//a[contains(@href,"dailyuploads.net") and contains(@href,"/d/")]', g(".inner"), true);
-          if( btnDownload ){
-            // since loading this href to iframe is not gonna work,
-            // bypass load it in `top.location` instead.
-            btnDownload && SimulateMouse(btnDownload, "click", true, function(href){
-              href = encodeURI( href );
-              top.location.href = href;
+        else if( btnDl = xp('//a[contains(@href,"dailyuploads.net") and contains(@href,"/d/")]', g(".inner"), true) ){
+          
+          // since loading this href to iframe is not gonna work,
+          // bypass load it in `top.location` instead.
+          SimulateMouse(btnDl, "click", true, function(href){
+            href = encodeURI( href );
+            top.location.href = href;
 
-              // dont let simulate continue with click events
-              return true;
-            });
-          }
+            // dont let simulate continue with click events
+            return true;
+          });
+        }
+        else{
+
+          that.clog('Not download page or missing download button')
         }
       }
     },
