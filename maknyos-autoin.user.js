@@ -2,7 +2,7 @@
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
 // @icon           https://github.com/idoenk/maknyos-autoin/raw/master/assets/img/icon-60x60.png
-// @version        3.9.29
+// @version        3.9.30
 // @description    Auto click get link, iframe killer. Hosts: indowebster,2shared,zippyshare,mediafire,sendspace,uptobox,howfile,uppit,imzupload,jumbofiles,sendmyway,tusfiles,dropbox,dropapk,uploadbank,suprafiles,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,kumpulbagi,moesubs,uploadrocket,my.pcloud.com,kirino.ga,seiba.ga,mylinkgen,rgho.st,uploads.to,upload.ee,upload.so,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen.io,golibgen.io,bookzz.org,bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -47,6 +47,7 @@
 // @include        /^https?://(|www\.)uploads\.to/\w/
 // @include        /^https?://(|www\.)uploadbank\.com/\w/
 // @include        /^https?://(|www\.)drop\.me/\w/
+// @include        /^https?://(|www\.)jzrputtbut.net/\w/
 // @include        /^https?://(|www\.)dropapk\.com/\w/
 // @include        /^https?://(|www\.)suprafiles\.org/\w/
 // @include        /^https?://(|www\.)douploads\.com/\w/
@@ -2936,6 +2937,32 @@
 
           that.clog('Not download page');
         }
+      }
+    },
+
+    // alias for: linkbucks?
+    jzrputtbut: {
+      rule: /jzrputtbut\.net/,
+      noBaseClean: true,
+      run: function(){
+        var that  = this;
+        that.killevents(null, 'mousedown');
+
+        // iframe handler
+        var o = document.getElementsByTagName('iframe');
+        for(var i=o.length-1; i>=0; i--){
+          o[i].style.position = 'absolute';
+          o[i].style.left = '-999999px';
+          o[i].style.top = '-999999px';
+        }
+
+        that.waitforit(function(){
+          var timer = g('#timer');
+          return (that.isVisible(timer) ? !1 : g('#skiplink'));
+        }, function(el){
+          if( el )
+            SimulateMouse( el, "click", true );
+        }, 100);
       }
     }
   };
