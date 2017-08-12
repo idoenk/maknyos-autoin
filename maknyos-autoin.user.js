@@ -2,7 +2,7 @@
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
 // @icon           https://github.com/idoenk/maknyos-autoin/raw/master/assets/img/icon-60x60.png
-// @version        3.9.30
+// @version        3.9.31
 // @description    Auto click get link, iframe killer. Hosts: indowebster,2shared,zippyshare,mediafire,sendspace,uptobox,howfile,uppit,imzupload,jumbofiles,sendmyway,tusfiles,dropbox,dropapk,uploadbank,suprafiles,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,kumpulbagi,moesubs,uploadrocket,my.pcloud.com,kirino.ga,seiba.ga,mylinkgen,rgho.st,uploads.to,upload.ee,upload.so,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen.io,golibgen.io,bookzz.org,bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -53,6 +53,7 @@
 // @include        /^https?://(|www\.)douploads\.com/\w/
 // @include        /^https?://(|www\.)file-upload\.com/\w/
 // @include        /^https?://(|www\.)topddl\.net/file/\w/
+// @include        /^https?://(|www\.)up-4ever\.com/\w/
 // @include        /^https?://up\.top4top\.net/\w/
 // @include        /^https?://public\.upera\.co/\w/
 // @include        /^https?://cloud\.mail\.ru/public/\w/
@@ -391,6 +392,10 @@
     killframes: function(par){
       !par && (par = document);
       var o = par.getElementsByTagName('iframe');
+      for(var i=o.length-1;i>=0;i--)
+        o[i].parentNode.removeChild(o[i]);
+
+      o = gAll('.ad'+'sbygo'+'ogle');
       for(var i=o.length-1;i>=0;i--)
         o[i].parentNode.removeChild(o[i]);
 
@@ -2963,6 +2968,132 @@
           if( el )
             SimulateMouse( el, "click", true );
         }, 100);
+      }
+    },
+
+    up4ever: {
+      rule: /up-4ever\.com/,
+      noBaseClean: true,
+      run: function(){
+        var that     = this,
+            recapcay = g('.g-recaptcha'),
+            site_key = null,
+            btnDl    = null,
+            el       = null,
+            hs       = null,
+            countdown = null,
+            cb_countdown = function(){}
+        ;
+        setTimeout(function(){
+          $('#adblock_detected').val(0);
+          $("#hiddensection").show();
+        }, 1555);
+
+
+        el = g('#hiddensection2');
+        if( el )
+          el.parentNode.removeChild(el);
+
+        if( btnDl = g('[type="submit"][name="method_free"]', null, true) ){
+          // # Stage 1
+
+          SimulateMouse(btnDl, "click", true);
+        }
+        else if( btnDl = g('#btn_downloadLink') ){
+          // # Stage 3
+
+          that.killframes();
+          this.killevents(null, 'click');
+          SimulateMouse(btnDl, "click", true);
+        }
+        else{
+          // # Stage 2
+          hs = g('#hiddensection');
+          
+          cb_countdown = function(){
+            $(hs).show();
+            if( recapcay ){
+              
+              that.waitforit(function(){
+
+                return ('undefined' == typeof grecaptcha ? !1 : grecaptcha);
+              }, function(gr){
+
+
+                $('.alert-waiting').remove();
+                gr.render("maknyos-recaptcha", {
+                  sitekey: recapcay.getAttribute('data-sitekey'),
+                  callback: function(){ $("#downloadbtn").trigger("click") }
+                });
+
+                var btnDl_ = g('#downloadbtn');
+                if( btnDl_ && 'undefined' != typeof $)
+                  $(btnDl_).prev().remove();
+              });
+            }
+            else if( btnDl = g('#downloadbtn') ){
+
+              SimulateMouse( btnDl, "click", true );
+            }
+            else{
+
+              that.clog('Missing download button')
+            }
+          };
+
+
+          // is there recapcay, early tampered dom g-recaptcha
+          if( recapcay ){
+            site_key = recapcay.getAttribute('data-sitekey')
+
+            if( site_key ){
+
+              $(recapcay)
+                .replaceWith($('<div id="maknyos-recaptcha" data-bijikuda="1" data-sitekey="'+site_key+'"></div>'));
+              $(hs).prev().replaceWith($('<div class="alert alert-success alert-waiting"><h3 style="text-align:center;">Wait For it...</h3></div>'));
+
+              if( g('#maknyos-recaptcha') )
+                that.clog('g-recaptcha tampered');
+              else
+                that.clog('tampering g-recaptcha FAILED');
+            }
+          }
+
+          $(hs).show();
+          countdown = g('#countdown .seconds');
+          if( countdown && (countdown = (parseInt(countdown.textContent)-1) ) ){
+            countdown = Math.floor(countdown / 3);
+
+            that.waitforit(function(){
+
+              that.killframes();
+              $(hs).show();
+              var cnt = g('#countdown .seconds');
+              return ((parseInt(cnt.textContent)-1) > 0 ? !1 : true);
+            }, function(){
+
+              cb_countdown();
+            }, countdown * 1000);
+          }
+          else{
+            that.clog('countdown not found.');
+
+            // remove disabled
+            if( btnDl = g('#downloadbtn') ){
+              btnDl.disabled = false;
+
+              if( recapcay )
+                cb_countdown();
+              else
+                SimulateMouse(btnDl, "click", true);
+            }
+            else{
+
+              that.clog('Not download page');
+            }
+          }
+        }
+        // end: stage-2
       }
     }
   };
