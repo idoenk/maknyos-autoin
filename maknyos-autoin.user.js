@@ -2,7 +2,7 @@
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
 // @icon           https://github.com/idoenk/maknyos-autoin/raw/master/assets/img/icon-60x60.png
-// @version        3.9.31
+// @version        3.9.32
 // @description    Auto click get link, iframe killer. Hosts: indowebster,2shared,zippyshare,mediafire,sendspace,uptobox,howfile,uppit,imzupload,jumbofiles,sendmyway,tusfiles,dropbox,dropapk,uploadbank,suprafiles,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,kumpulbagi,moesubs,uploadrocket,my.pcloud.com,kirino.ga,seiba.ga,mylinkgen,rgho.st,uploads.to,upload.ee,upload.so,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen.io,golibgen.io,bookzz.org,bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -54,6 +54,7 @@
 // @include        /^https?://(|www\.)file-upload\.com/\w/
 // @include        /^https?://(|www\.)topddl\.net/file/\w/
 // @include        /^https?://(|www\.)up-4ever\.com/\w/
+// @include        /^https?://(|www\.)3rbup\.com/\w/
 // @include        /^https?://up\.top4top\.net/\w/
 // @include        /^https?://public\.upera\.co/\w/
 // @include        /^https?://cloud\.mail\.ru/public/\w/
@@ -3095,7 +3096,57 @@
         }
         // end: stage-2
       }
-    }
+    },
+
+    '3rbup': {
+      rule: /\b3rbup\.com/,
+      run: function(){
+        var that      = this,
+            btnDl     = null,
+            countdown = null,
+            cdown_sel = '.download-timer-seconds',
+            dltimer   = g('.download-timer')
+        ;
+        that.clog(dltimer);
+
+        if( dltimer ){
+          if( countdown = g(cdown_sel) ){
+            that.waitforit(function(){
+              var eltimer = g(cdown_sel);
+
+              return (eltimer ? !1 : g('.btn', dltimer));
+            }, function(link){
+
+              if( link.getAttribute('href') ){
+
+                that.set_href( link.getAttribute('href') );
+              }
+              else{
+
+                SimulateMouse(btn, "click", true);
+              }
+            });
+          }
+          else if( btnDl = g('.btn', dltimer) ){
+
+            SimulateMouse(btnDl, "click", true);
+          }
+          else{
+
+            that.clog('Not download page');
+          }
+        }
+        else if( btnDl = g('a[href*="download_token"]') ){
+
+          SimulateMouse(btnDl, "click", true);
+        }
+        else{
+
+          that.clog('Missing download link');
+        }
+
+      }
+    },
   };
   // end of patterns
 
