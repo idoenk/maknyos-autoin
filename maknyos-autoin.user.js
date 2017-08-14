@@ -1334,7 +1334,9 @@
           }
           else{
 
-            cb_countdown()
+            setTimeout(function(){
+              cb_countdown()
+            }, 3 * 1000);
           }
         }else if( (par = g('.inner')) &&  xp('//h2[contains(text(),"Link Generated")]', par, true) ){
 
