@@ -2,7 +2,7 @@
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
 // @icon           https://github.com/idoenk/maknyos-autoin/raw/master/assets/img/icon-60x60.png
-// @version        3.9.33
+// @version        3.9.34
 // @description    Auto click get link, iframe killer. Hosts: indowebster,2shared,zippyshare,mediafire,sendspace,uptobox,howfile,uppit,imzupload,jumbofiles,sendmyway,tusfiles,dropbox,dropapk,uploadbank,suprafiles,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,kumpulbagi,moesubs,uploadrocket,my.pcloud.com,kirino.ga,seiba.ga,mylinkgen,rgho.st,uploads.to,upload.ee,upload.so,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen.io,golibgen.io,bookzz.org,bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -55,6 +55,7 @@
 // @include        /^https?://(|www\.)topddl\.net/file/\w/
 // @include        /^https?://(|www\.)up-4ever\.com/\w/
 // @include        /^https?://(|www\.)3rbup\.com/\w/
+// @include        /^https?://(|www\.)megadrive\.co/\w/
 // @include        /^https?://up\.top4top\.net/\w/
 // @include        /^https?://public\.upera\.co/\w/
 // @include        /^https?://cloud\.mail\.ru/public/\w/
@@ -170,6 +171,43 @@
           this.clog("parsing fail on href, missing param `fl=`");
       }
       return href;
+    },
+
+    /**
+     * Try find form to submit of given button element
+     * If it fail, just click that button anyway
+     */
+    trySumbit: function(button, cb_before){
+      var tform = this.closest(button, 'form'),
+          el    = null
+      ;
+
+      if( 'function' === typeof cb_before )
+        cb_before(tform);
+
+      if( tform ){
+        if( el = g('[name="referer"]', tform) )
+          el.value = '';
+
+        if( button.getAttribute('name') ){
+          el = document.createElement('input');
+          el.setAttribute('type', 'hidden');
+          el.setAttribute('name', button.getAttribute('name'));
+          if( button.value )
+            el.value = button.value;
+          else if(button.textContent)
+            el.value = button.textContent;
+
+          tform.appendChild(el);
+        }
+
+        tform.submit();
+      }
+      else{
+        this.clog('Inside trySumbit: form not found. Clicking button..');
+        
+        SimulateMouse(button, "click", true);
+      }
     },
 
     // do waitwhat -> thenwhat
@@ -2539,7 +2577,7 @@
         // # 1
         if( btnDownload ){
 
-          SimulateMouse(btnDownload, "click", true);
+          that.trySumbit( btnDownload );
         }
         else{
           // # 3
@@ -2613,7 +2651,7 @@
         if( btnDl = g('[type="submit"][name="method_free"]', null, true) ){
           // # Stage 1
 
-          SimulateMouse(btnDl, "click", true);
+          that.trySumbit( btnDl );
         }
         else if( btnDl = g('#download-btn') ){
           // # Stage 3
@@ -3042,7 +3080,7 @@
         if( btnDl = g('[type="submit"][name="method_free"]', null, true) ){
           // # Stage 1
 
-          SimulateMouse(btnDl, "click", true);
+          that.trySumbit( btnDl );
         }
         else if( btnDl = g('#btn_downloadLink') ){
           // # Stage 3
@@ -3151,7 +3189,6 @@
             cdown_sel = '.download-timer-seconds',
             dltimer   = g('.download-timer')
         ;
-        that.clog(dltimer);
 
         if( dltimer ){
           if( countdown = g(cdown_sel) ){
@@ -3188,9 +3225,31 @@
 
           that.clog('Missing download link');
         }
-
       }
     },
+
+    megadrive: {
+      rule: /megadrive\.co/,
+      run: function(){
+        var that  = this,
+            btnDl = g('[type="submit"][name="method_free"]', null, true)
+        ;
+
+        // # 1
+        if( btnDl ){
+
+          that.trySumbit( btnDl );
+        }
+        else if( btnDl = g('#downloadbtn') ){
+
+          that.trySumbit( btnDl );
+        }
+        else{
+
+          that.clog('Not download page or missing download button');
+        }
+      }
+    }
   };
   // end of patterns
 
