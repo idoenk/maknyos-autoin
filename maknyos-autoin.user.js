@@ -1282,35 +1282,77 @@
       run: function(){
         var that  = this,
             el    = null,
+            par   = null,
             tform = null,
-            btnDl = null
+            btnDl = null,
+            brokenCT = null,
+            countdown = null,
+            waitStr = ''
         ;
+        // flag to not wait countdown
+        brokenCT = true;
 
-        // is there report file?
-        if( xp('//a[contains(@href,"op=report")]', null, true) ){
-          if( tform = xp('//form[@name="F1"]', null, true) ){
-            // uncheck download-manager
-            if( el = g('[name="chkIsAdd"]') )
-              el.removeAttribute('checked');
 
-            setTimeout(function(){ tform.submit() }, 345);
+        if( btnDl = g('[name="fs_download_file"]') ){
+
+          if( el = g('[name="chkIsAdd"]') )
+            el.removeAttribute('checked');
+
+          cb_countdown = function(){
+            tform = that.closest(btnDl, 'form');
+            if( tform ){
+
+              if( el = g('[name=referer]', tform, true) )
+                el.parentNode.removeChild( el );
+
+              el = document.createElement('input');
+              el.setAttribute('name', 'fs_download_file');
+              el.setAttribute('type', 'hidden');
+              tform.appendChild( el );
+
+              tform.submit()
+            }
+            else{
+
+              SimulateMouse( btnDl, "click", true);
+            }
+          };
+
+
+          countdown = g('#countdown_str span');
+          if( !brokenCT && countdown && (countdown = (parseInt(countdown.textContent)-1) ) ){
+            countdown = Math.floor(countdown / 3);
+
+            that.waitforit(function(){
+
+              var cnt = g('#countdown_str span');
+              return ((parseInt(cnt.textContent)-1) > 0 ? !1 : true);
+            }, function(){
+              
+              cb_countdown();
+            }, countdown * 1000);
           }
-        }
-        else if( btnDl = xp('//a[contains(@href,"dailyuploads.net") and contains(@href,"/d/")]', g(".inner"), true) ){
-          
-          // since loading this href to iframe is not gonna work,
-          // bypass load it in `top.location` instead.
-          SimulateMouse(btnDl, "click", true, function(href){
-            href = encodeURI( href );
-            top.location.href = href;
+          else{
 
-            // dont let simulate continue with click events
-            return true;
-          });
+            cb_countdown()
+          }
+        }else if( (par = g('.inner')) &&  xp('//h2[contains(text(),"Link Generated")]', par, true) ){
+
+          that.clog('Download link generated..');
+          btnDl = g('a[href*=".dailyuploads.net"]', par);
+          that.clog(btnDl);
+          if( btnDl ){
+
+            SimulateMouse(btnDl, "click", true);
+          }
+          else{
+
+            that.clog('Missing download button');
+          }
         }
         else{
 
-          that.clog('Not download page or missing download button')
+          that.clog('Not a download page');
         }
       }
     },
