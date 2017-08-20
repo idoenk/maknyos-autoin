@@ -57,6 +57,7 @@
 // @include        /^https?://(|www\.)3rbup\.com/\w/
 // @include        /^https?://(|www\.)megadrive\.co/\w/
 // @include        /^https?://(|www\.)samaup\.com/\w/
+// @include        /^https?://(|www\.)akoam\.com/download/[^\/]+/\w/
 // @include        /^https?://up\.top4top\.net/\w/
 // @include        /^https?://public\.upera\.co/\w/
 // @include        /^https?://cloud\.mail\.ru/public/\w/
@@ -3302,6 +3303,65 @@
         else{
 
           that.clog('Not download page OR missing download button')
+        }
+      }
+    },
+
+    akoamcom: {
+      rule: /akoam\.com/,
+      run: function(){
+        var that  = this,
+            url   = that.get_href(),
+            pdata = {},
+            parDT = null,
+            dlGotIt = null
+        ;
+
+        if( parDT = g('.download_timer') ){
+
+          // which-ever done earlier, try xhr first
+          $.post(url, pdata, function(ret){
+            if( ret ){
+              try{
+
+                ret = JSON.parse(ret);
+              }catch(e){
+                that.clog('Fail parsing JSON');
+              }
+            }
+
+            if( ret && ret.direct_link ){
+              dlGotIt = true;
+              var $el = $('<a '+(ret.hash_data ? 'hash-data="'+ret.hash_data+'"':'')+' class="download_buttonX" style="color: #ff0000; border: 5px solid #ff0000;" href="'+ret.direct_link+'">DOWNLOAD</a>');
+
+              $('<div id="wrapfdl" style="position:absolute; top: 0; left:0; color: #ddd; background-color:rgba(34, 34, 34, 0.89); padding: 10px 0; text-align: center; width: 100%;"></div>')
+                .appendTo( $(parDT) );
+              $('#wrapfdl').html( $el );
+
+              $el = $('#wrapfdl').find('.download_buttonX');
+              if( $el.length )
+                SimulateMouse($el.get(0) , "click", true );
+            }
+            else{
+              that.clog('XHR Failed.')
+              that.clog(ret);
+            }
+          });
+
+          // inline we keep on waiting..
+          that.waitforit(function(){
+
+            var btn = g('#timerHolder .download_button');
+            return btn ? btn : null;
+          }, function(el){
+            
+            if( !dlGotIt )
+              SimulateMouse( el, "click", true );
+          }, 1000);
+        }
+        else{
+
+          that.clog('Not download page, or missing element: .download_timer');
         }
       }
     }
