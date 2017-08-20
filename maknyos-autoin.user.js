@@ -2,7 +2,7 @@
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
 // @icon           https://github.com/idoenk/maknyos-autoin/raw/master/assets/img/icon-60x60.png
-// @version        3.9.34
+// @version        3.9.35
 // @description    Auto click get link, iframe killer. Hosts: indowebster,2shared,zippyshare,mediafire,sendspace,uptobox,howfile,uppit,imzupload,jumbofiles,sendmyway,tusfiles,dropbox,dropapk,uploadbank,suprafiles,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,kumpulbagi,moesubs,uploadrocket,my.pcloud.com,kirino.ga,seiba.ga,mylinkgen,rgho.st,uploads.to,upload.ee,upload.so,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen.io,golibgen.io,bookzz.org,bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -56,6 +56,7 @@
 // @include        /^https?://(|www\.)up-4ever\.com/\w/
 // @include        /^https?://(|www\.)3rbup\.com/\w/
 // @include        /^https?://(|www\.)megadrive\.co/\w/
+// @include        /^https?://(|www\.)samaup\.com/\w/
 // @include        /^https?://up\.top4top\.net/\w/
 // @include        /^https?://public\.upera\.co/\w/
 // @include        /^https?://cloud\.mail\.ru/public/\w/
@@ -3247,6 +3248,60 @@
         else{
 
           that.clog('Not download page or missing download button');
+        }
+      }
+    },
+
+    samaupcom: {
+      rule: /samaup\.com/,
+      run: function(){
+        var that  = this,
+            btnCheck  = null,
+            btnDl     = null,
+            countdown = g('#countdown'),
+            cb_countdown = function(){}
+        ;
+        if( btnDl = g('#downloadbtn') ){
+          if( btnCheck = g('#chkIsAdd') )
+            btnCheck.checked = false;
+
+          cb_countdown = function(){
+            tform = that.closest(btnDl, 'form');
+            if( tform ){
+
+              tform.submit()
+            }
+            else{
+
+              SimulateMouse( btnDl, "click", true);
+            }
+          };
+
+          countdown = g('#countdown .seconds');
+          if( countdown && (countdown = (parseInt(countdown.textContent)-1) ) ){
+            countdown = Math.floor(countdown / 3);
+
+            that.waitforit(function(){
+
+              var cnt = g('#countdown .seconds');
+              return ((parseInt(cnt.textContent)-1) > 0 ? !1 : true);
+            }, function(){
+              
+              cb_countdown();
+            }, countdown * 1000);
+          }
+          else{
+
+            cb_countdown()
+          }
+        }
+        else if( btnDl = g('.downloadbtn a[href*="samaup.com"]') ){
+
+          SimulateMouse( btnDl, "click", true );
+        }
+        else{
+
+          that.clog('Not download page OR missing download button')
         }
       }
     }
