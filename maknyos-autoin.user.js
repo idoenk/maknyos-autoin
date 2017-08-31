@@ -2,7 +2,7 @@
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
 // @icon           https://github.com/idoenk/maknyos-autoin/raw/master/assets/img/icon-60x60.png
-// @version        3.9.35
+// @version        3.9.36
 // @description    Auto click get link, iframe killer. Hosts: indowebster,2shared,zippyshare,mediafire,sendspace,uptobox,howfile,uppit,imzupload,jumbofiles,sendmyway,tusfiles,dropbox,dropapk,uploadbank,suprafiles,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,kumpulbagi,moesubs,uploadrocket,my.pcloud.com,kirino.ga,seiba.ga,mylinkgen,rgho.st,uploads.to,upload.ee,upload.so,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen.io,golibgen.io,bookzz.org,bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -50,6 +50,7 @@
 // @include        /^https?://(|www\.)jzrputtbut.net/\w/
 // @include        /^https?://(|www\.)dropapk\.com/\w/
 // @include        /^https?://(|www\.)suprafiles\.org/\w/
+// @include        /^https?://(|www\.)cloudyfiles\.org/\w/
 // @include        /^https?://(|www\.)douploads\.com/\w/
 // @include        /^https?://(|www\.)file-upload\.com/\w/
 // @include        /^https?://(|www\.)topddl\.net/file/\w/
@@ -2567,8 +2568,11 @@
       }
     },
 
+    /**
+     * Applied for: [cloudyfiles.org, suprafiles.org]
+     */
     suprafiles:{
-      rule: /suprafiles\.org/,
+      rule: /suprafiles\.org|cloudyfiles\.org/,
       run: function(){
         var that = this,
             btnDownload = g('[type="submit"][name="method_free"]',null,true),
@@ -2590,7 +2594,7 @@
           else{
             // # 2
             cont = g('#container');
-            if( cont && (el = g('a[href*="suprafiles.org"]', cont)) ){
+            if( cont && (el = g('a[href*="'+location.hostname+'"]', cont)) ){
               
               SimulateMouse(el, "click", true);
             }
