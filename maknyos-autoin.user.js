@@ -59,7 +59,8 @@
 // @include        /^https?://(|www\.)megadrive\.co/\w/
 // @include        /^https?://(|www\.)samaup\.com/\w/
 // @include        /^https?://(|www\.)akoam\.com/download/[^\/]+/\w/
-// @include        /^https?://(|www\.)rapidgator.net/(file|download)/\w/
+// @include        /^https?://(|www\.)rapidgator\.net/(file|download)/\w/
+// @include        /^https?://(|www\.)filefactory\.com/file/[^\/]+/\w/
 // @include        /^https?://up\.top4top\.net/\w/
 // @include        /^https?://public\.upera\.co/\w/
 // @include        /^https?://cloud\.mail\.ru/public/\w/
@@ -3388,6 +3389,47 @@
         }
         else{
 
+          that.clog('Missing download button');
+        }
+      }
+    },
+
+    filefactory: {
+      rule: /filefactory\.com/,
+      run: function(){
+        var that  = this,
+            el    = null,
+            delay = 0,
+            dlBtn = null
+        ;
+        if( el = g('#file-download-free-action-slow') ){
+          delay = parseInt( g('#countdown_clock').getAttribute('data-delay') );
+          SimulateMouse( el, "click", true );
+          if( delay ){
+            setTimeout(function(){
+              // inline we keep on waiting..
+              that.waitforit(function(){
+
+                var btn = g('#file-download-free-action-start');
+                return btn ? btn : null;
+              }, function(el){
+                
+                SimulateMouse( el, "click", true );
+              }, 1000);
+
+            }, delay * 1000);
+          }
+          else if( dlBtn = g('#file-download-free-action-start') ){
+
+            SimulateMouse( dlBtn, "click", true );
+          }
+          else{
+
+            that.clog('Missing download button');
+          }
+        }
+        else{
+          // #file-download-free-action-start
           that.clog('Missing download button');
         }
       }
