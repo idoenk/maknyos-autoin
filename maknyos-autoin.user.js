@@ -2,7 +2,7 @@
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
 // @icon           https://github.com/idoenk/maknyos-autoin/raw/master/assets/img/icon-60x60.png
-// @version        3.9.36
+// @version        3.9.37
 // @description    Auto click get link, iframe killer. Hosts: indowebster,2shared,zippyshare,mediafire,sendspace,uptobox,howfile,uppit,imzupload,jumbofiles,sendmyway,tusfiles,dropbox,dropapk,uploadbank,suprafiles,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,kumpulbagi,moesubs,uploadrocket,my.pcloud.com,kirino.ga,seiba.ga,mylinkgen,rgho.st,uploads.to,upload.ee,upload.so,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen.io,golibgen.io,bookzz.org,bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -59,6 +59,7 @@
 // @include        /^https?://(|www\.)megadrive\.co/\w/
 // @include        /^https?://(|www\.)samaup\.com/\w/
 // @include        /^https?://(|www\.)akoam\.com/download/[^\/]+/\w/
+// @include        /^https?://(|www\.)rapidgator.net/(file|download)/\w/
 // @include        /^https?://up\.top4top\.net/\w/
 // @include        /^https?://public\.upera\.co/\w/
 // @include        /^https?://cloud\.mail\.ru/public/\w/
@@ -3366,6 +3367,28 @@
         else{
 
           that.clog('Not download page, or missing element: .download_timer');
+        }
+      }
+    },
+
+    rapidgator: {
+      rule: /rapidgator\.net/,
+      run: function(){
+        var that  = this,
+            el    = null,
+            dlBtn = null
+        ;
+        if( el = g('.btn-free.link') ){
+
+          SimulateMouse( el, "click", true );
+        }
+        else if( dlBtn = g('.btn-download') ){
+
+          SimulateMouse( dlBtn, "click", true );
+        }
+        else{
+
+          that.clog('Missing download button');
         }
       }
     }
