@@ -2,7 +2,7 @@
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
 // @icon           https://github.com/idoenk/maknyos-autoin/raw/master/assets/img/icon-60x60.png
-// @version        3.9.37
+// @version        3.9.38
 // @description    Auto click get link, iframe killer. Hosts: indowebster,2shared,zippyshare,mediafire,sendspace,uptobox,howfile,uppit,imzupload,jumbofiles,sendmyway,tusfiles,dropbox,dropapk,uploadbank,suprafiles,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,kumpulbagi,moesubs,uploadrocket,my.pcloud.com,kirino.ga,seiba.ga,mylinkgen,rgho.st,uploads.to,upload.ee,upload.so,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen.io,golibgen.io,bookzz.org,bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -12,6 +12,7 @@
 // @include        /^https?://(.+\.)2shared\.com/file/\w/
 // @include        /^https?://(.+\.)zippyshare\.com/v/\w/
 // @include        /^https?://(.+\.)dfpan\.com/((file|fs)/\w+|file/down/\w+)/
+// @include        /^https?://(|www\.)4shared\.com/\w+\/\w+/\w/
 // @include        /^https?://(|www\.)mediafire\.com/(download|view|file)/\w/
 // @include        /^https?://(|www\.)sendspace\.com/file/\w/
 // @include        /^https?://(|www\.)uptobox\.com/\w/
@@ -56,11 +57,17 @@
 // @include        /^https?://(|www\.)topddl\.net/file/\w/
 // @include        /^https?://(|www\.)up-4ever\.com/\w/
 // @include        /^https?://(|www\.)3rbup\.com/\w/
+// @include        /^https?://(|www\.)9xupload\.me/\w/
 // @include        /^https?://(|www\.)megadrive\.co/\w/
 // @include        /^https?://(|www\.)samaup\.com/\w/
+// @include        /^https?://(|www\.)hdupload\.net/\w/
+// @include        /^https?://(|www\.)bdupload\.info/\w/
+// @include        /^https?://(|www\.)uptocafe\.com/\w/
+// @include        /^https?://(|www\.)indishare\.me/\w/
 // @include        /^https?://(|www\.)akoam\.com/download/[^\/]+/\w/
 // @include        /^https?://(|www\.)rapidgator\.net/(file|download)/\w/
 // @include        /^https?://(|www\.)filefactory\.com/file/[^\/]+/\w/
+// @include        /^https?://dl\.free\.fr/getfile\.pl\?file=.+/
 // @include        /^https?://up\.top4top\.net/\w/
 // @include        /^https?://public\.upera\.co/\w/
 // @include        /^https?://cloud\.mail\.ru/public/\w/
@@ -465,6 +472,13 @@
       window.onbeforeunload = null;
       window.onunload = null;
       unsafeWindow.onbeforeunload = null;
+    },
+
+    hidefixed: function(){
+      var style = document.createElement("style"),
+          css = 'body>*[style*="fixed"]{display: none!important;}';
+      style.textContent = css;
+      document.body.insertBefore(style, document.body.firstChild);
     },
 
     isVisible: function (ele) {
@@ -3431,6 +3445,235 @@
         else{
           // #file-download-free-action-start
           that.clog('Missing download button');
+        }
+      }
+    },
+
+    dlfree: {
+      rule: /dl\.free\.fr/,
+      run: function(){
+        var that  = this,
+            el    = g('.form-button')
+        ;
+        if( el ){
+
+          that.trySumbit( el );
+        }
+        else{
+
+          that.clog('Missing download button');
+        }
+      }
+    },
+
+    '4shared':{
+      rule: /4shared\.com/,
+      run: function(){
+        var that  = this,
+            el    = null,
+            rgx   = /^\/(\w+)\//,
+            cucok = rgx.exec(location.pathname),
+            url   = that.get_href()
+        ;
+        if( !(cucok && cucok.length > 1) )
+          return !1;
+
+        if( cucok[1] == 'folder' ){
+          that.clog('Do nothing on folder page');
+          return !1;
+        }
+
+        if( cucok[1] != 'get' ){
+          rgx = new RegExp("^/"+cucok[1]+"/");
+          url = location.pathname.replace(rgx, "/get/");
+          url = location.protocol+'//'+location.hostname+url;
+          that.set_href( url );
+          return !1;
+        }
+
+        // Good-togo
+        if( el = g('.freeDownloadButton') ){
+
+          that.trySumbit( el );
+          setTimeout(function(){
+            if( g('.p_window') && document.hidden )
+              alert('Please login to continue download');
+          }, 456);
+        }
+        else{
+
+          that.clog('Not a download page or missing download button');
+        }
+      }
+    },
+
+    bdupload: {
+      rule: /bdupload\.info/,
+      run: function(){
+        var that  = this,
+            btnDl     = null,
+            countdown = g('#countdown'),
+            cb_countdown = function(){}
+        ;
+        that.hidefixed();
+
+
+        if( btnDl = g('#downloadbtn') ){
+
+          cb_countdown = function(){
+            that.trySumbit( btnDl );
+          };
+
+          countdown = g('#countdown .seconds');
+          if( countdown && (countdown = (parseInt(countdown.textContent)-1) ) ){
+            countdown = Math.floor(countdown / 3);
+
+            that.waitforit(function(){
+
+              var cnt = g('#countdown .seconds');
+              return ((parseInt(cnt.textContent)-1) > 0 ? !1 : true);
+            }, function(){
+              
+              cb_countdown();
+            }, countdown * 1000);
+          }
+          else{
+
+            cb_countdown()
+          }
+        }
+        else if( btnDl = g('img[alt*="o Download"]') ){
+          
+          SimulateMouse( btnDl.parentNode, "click", true );
+        }
+        else{
+
+          that.clog('Not download page OR missing download button')
+        }
+      }
+    },
+
+    // [uptocafe, hdupload]
+    hdupload: {
+      rule: /hdupload\.net|uptocafe\.com/,
+      run: function(){
+        var that  = this,
+            btnDl = null,
+            host  = location.hostname,
+            pSel  = g(host == 'uptocafe.com' ? '#content' : '#page'),
+            wrapper = (host == 'uptocafe.com' ? 'b':'h2')
+        ;
+        that.hidefixed();
+
+        if( btnDl = g('[type="submit"][name="method_free"]',null,true) ){
+
+          that.trySumbit( btnDl );
+        }
+        else if( btnDl = g('#btn_download,#downloadbtn') ){
+
+          that.trySumbit( btnDl );
+        }
+        else if( xp('//'+wrapper+'[contains(text(),"Link Generated")]', pSel, true) ){
+
+          if( host == 'uptocafe.com' )
+            btnDl = g('a[href*=".'+host+'"]', pSel)
+          else
+            btnDl = g('#direct_link>a');
+
+          if( btnDl ){
+
+            that.trySumbit( btnDl );
+          }
+          else{
+
+            that.clog('Missing download button');
+          }
+        }
+        else{
+          
+          that.clog('Not download page or missing download button');
+        }
+      }
+    },
+
+    '9xupload': {
+      rule: /9xupload\.me/,
+      run: function(){
+        var that  = this,
+            btnDl = null,
+            par = g('#container>table')
+        ;
+        if( btnDl = g('#downloadbtn') ){
+
+          that.trySumbit( btnDl );
+        }
+        else if( xp('//*[contains(text(),"d Link Generated")]', g('table', par), true) ){
+          if( btnDl = g('a[href*=".'+location.hostname+'"]', par) ){
+
+            that.trySumbit( btnDl );
+          }
+          else{
+            that.clog('Missing download button');
+          }
+        }
+        else{
+          
+          that.clog('Not download page or Missing download button');
+        }
+      }
+    },
+
+    indishare: {
+      rule: /indishare\.me/,
+      run: function(){
+        var that  = this,
+            btnDl = null,
+            elxp  = null,
+            countdown = 0,
+            par = g('.content_mdl'),
+            cb_countdown = function(){}
+        ;
+        that.hidefixed();
+
+        if( btnDl = g('#btn_download') ){
+          cb_countdown = function(){
+
+            that.trySumbit( btnDl );
+          };
+
+          countdown = g('#countdown_str span');
+          if( countdown && (countdown = (parseInt(countdown.textContent)-1) ) ){
+            countdown = Math.floor(countdown / 3);
+
+            that.waitforit(function(){
+
+              var cnt = g('#countdown_str span');
+              return ((parseInt(cnt.textContent)-1) > 0 ? !1 : true);
+            }, function(){
+              
+              cb_countdown();
+            }, countdown * 1000);
+          }
+          else{
+
+            setTimeout(function(){
+              cb_countdown()
+            }, 5 * 1000);
+          }
+        }
+        else if( par && (elxp = xp('//h1[contains(text(),"Link Generated")]', par, true)) ){
+          if( btnDl = g('a>img[src*="'+location.hostname+'"]', elxp.parentNode) ){
+
+            btnDl = btnDl.parentNode;
+            that.trySumbit( btnDl );
+          }
+          else{
+            that.clog('Missing download button');
+          }
+        }
+        else{
+          
+          that.clog('Not download page or Missing download button');
         }
       }
     }
