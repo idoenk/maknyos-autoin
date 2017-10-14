@@ -39,6 +39,7 @@
 // @include        /^https?://(|www\.)kirino\.sexy/\w/
 // @include        /^https?://(|www\.)seiba\.ga/\w/
 // @include        /^https?://(|www\.)mylinkgen\.com/\w/
+// @include        /^https?://(|www\.)linkgen\.st/\w/
 // @include        /^https?://(|www\.)openload\.co/\w/
 // @include        /^https?://(|www\.)oload\.tv/\w/
 // @include        /^https?://(|www\.)rgho\.st/\w/
@@ -475,9 +476,12 @@
       unsafeWindow.onbeforeunload = null;
     },
 
-    hidefixed: function(){
+    hidefixed: function(orAbsolute){
       var style = document.createElement("style"),
-          css = 'body>*[style*="fixed"]{display: none!important;}';
+          css = ''
+            +'body>*[style*="fixed"]'
+            +(orAbsolute ? ',body>*[style*="absolute"]' : '')
+            +'{display: none!important;}';
       style.textContent = css;
       document.body.insertBefore(style, document.body.firstChild);
     },
@@ -1485,13 +1489,17 @@
       }
     },
 
+    // [mylinkgen, linkgen]
     mylinkgen: {
-      rule: /mylinkgen\.com/,
+      rule: /mylinkgen\.com|linkgen\.st/,
       run: function(){
-        var wrapBox = g('#main-content'),
+        var that = this,
+            wrapBox = g('#main-content'),
             btnContinue = null,
             href, cucok, el
         ;
+        that.hidefixed( true );
+
         if( wrapBox ){
           btnContinue = g('.btn', wrapBox);
           if( btnContinue ){
