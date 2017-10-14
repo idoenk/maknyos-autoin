@@ -2,7 +2,7 @@
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
 // @icon           https://github.com/idoenk/maknyos-autoin/raw/master/assets/img/icon-60x60.png
-// @version        3.9.38
+// @version        3.9.39
 // @description    Auto click get link, iframe killer. Hosts: indowebster,2shared,zippyshare,mediafire,sendspace,uptobox,howfile,uppit,imzupload,jumbofiles,sendmyway,tusfiles,dropbox,dropapk,uploadbank,suprafiles,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,kumpulbagi,moesubs,uploadrocket,my.pcloud.com,kirino.ga,seiba.ga,mylinkgen,rgho.st,uploads.to,upload.ee,upload.so,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen.io,golibgen.io,bookzz.org,bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -64,6 +64,7 @@
 // @include        /^https?://(|www\.)bdupload\.info/\w/
 // @include        /^https?://(|www\.)uptocafe\.com/\w/
 // @include        /^https?://(|www\.)indishare\.me/\w/
+// @include        /^https?://(|www\.)minhateca\.com\.br/\w/
 // @include        /^https?://(|www\.)akoam\.com/download/[^\/]+/\w/
 // @include        /^https?://(|www\.)rapidgator\.net/(file|download)/\w/
 // @include        /^https?://(|www\.)filefactory\.com/file/[^\/]+/\w/
@@ -3674,6 +3675,64 @@
         else{
           
           that.clog('Not download page or Missing download button');
+        }
+      }
+    },
+
+    // minhateca\.com\.br
+    minhatecacom: {
+      rule: /minhateca\.com\.br/,
+      run: function(){
+        var that  = this,
+            btnDl = null,
+            wrapper  = g('#fileDetails')
+        ;
+        if( !wrapper ){
+          that.clog('Not download page');
+          return !1;
+        }
+
+        // Good togo
+        if( (btnDl = g('.greenActionButton', wrapper)) ){
+
+          // doin xhr
+          var pdata = {},
+              el  = null,
+              url = location.protocol+'//'+location.hostname+'/action/License/Download',
+              tokenfield = '__RequestVerificationToken',
+              defaultAct = function(button){
+
+                SimulateMouse(button, "click", true); 
+              }
+          ;
+          if( el = g('[name="'+tokenfield+'"]') ) {
+
+            pdata[tokenfield] = el.value;
+            if( el = g('#FileId') )
+              pdata.fileId = el.value;
+
+            $.post(url, pdata, function(ret){
+              that.clog(ret);
+
+              if( ret && ret.redirectUrl ){
+
+                that.frameload( ret.redirectUrl );
+              }
+              else{
+
+                that.clog('Bad response of XHR, failing over...');
+                defaultAct(btnDl);
+              }
+            });
+          }
+          else{
+            that.clog('Mehh, failover. just do click button');
+            defaultAct(btnDl);
+          }
+        }
+        else{
+
+          that.clog('Missing download button');
         }
       }
     }
