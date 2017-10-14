@@ -2,7 +2,7 @@
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
 // @icon           https://github.com/idoenk/maknyos-autoin/raw/master/assets/img/icon-60x60.png
-// @version        3.9.39
+// @version        3.9.40
 // @description    Auto click get link, iframe killer. Hosts: indowebster,2shared,zippyshare,mediafire,sendspace,uptobox,howfile,uppit,imzupload,jumbofiles,sendmyway,tusfiles,dropbox,dropapk,uploadbank,suprafiles,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,kumpulbagi,moesubs,uploadrocket,my.pcloud.com,kirino.ga,seiba.ga,mylinkgen,rgho.st,uploads.to,upload.ee,upload.so,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen.io,golibgen.io,bookzz.org,bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
 // @author         Idx
@@ -20,6 +20,7 @@
 // @include        /^https?://(|www\.)howfile\.com/file/\w/
 // @include        /^https?://(|www\.)uppit\.com/\w/
 // @include        /^https?://(|www\.)imzupload\.com/\w/
+// @include        /^https?://(|www\.)clicknupload\.org/\w/
 // @include        /^https?://(|www\.)jumbofiles\.com/\w/
 // @include        /^https?://(|www\.)sendmyway\.com/\w/
 // @include        /^https?://(|www\.)tusfiles\.net/\w/
@@ -3687,7 +3688,6 @@
       }
     },
 
-    // minhateca\.com\.br
     minhatecacom: {
       rule: /minhateca\.com\.br/,
       run: function(){
@@ -3741,6 +3741,51 @@
         else{
 
           that.clog('Missing download button');
+        }
+      }
+    },
+
+    clicknuploadorg: {
+      rule: /clicknupload\.org/,
+      noBaseClean: true,
+      run: function(){
+        var that  = this,
+            btnDl = g('[type="submit"][name="method_free"]',null,true),
+            parent = null,
+            cucok = null
+        ;
+
+        if( btnDl ){
+
+          that.trySumbit( btnDl );
+        }
+        else if( btnDl = g('#downloadbtn') ){
+
+          parent = btnDl.parentNode;
+          if( parent.nodeName == 'FORM' ){
+
+            that.trySumbit( btnDl );
+          }
+          else{
+            if( !/https?\:/.test(btnDl.getAttribute('href')) && btnDl.getAttribute('onClick') ){
+              if( cucok = /(https?\:[^\'\"]+)/.exec(btnDl.getAttribute('onClick')) ){
+                
+                that.set_href( cucok[1] );
+              }
+              else{
+
+                that.clog('Something went wrong while getting download link');
+              }
+            }
+            else{
+
+              SimulateMouse( btnDl, "click", true );
+            }
+          }
+        }
+        else{
+
+          that.clog('Not downlaod page');
         }
       }
     }
