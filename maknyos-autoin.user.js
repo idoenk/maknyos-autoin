@@ -2,99 +2,20 @@
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
 // @icon           https://github.com/idoenk/maknyos-autoin/raw/master/assets/img/icon-60x60.png
-// @version        3.9.40
+// @version        3.9.41
 // @description    Auto click get link, iframe killer. Hosts: indowebster,2shared,zippyshare,mediafire,sendspace,uptobox,howfile,uppit,imzupload,jumbofiles,sendmyway,tusfiles,dropbox,dropapk,uploadbank,suprafiles,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,kumpulbagi,moesubs,uploadrocket,my.pcloud.com,kirino.ga,seiba.ga,mylinkgen,rgho.st,uploads.to,upload.ee,upload.so,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen.io,golibgen.io,bookzz.org,bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
+// @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js
 // @author         Idx
 // @grant          GM_log
-// @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js
-// @include        /^https?://(files|maknyos)\.indowebster\.com/\w/
-// @include        /^https?://(.+\.)2shared\.com/file/\w/
-// @include        /^https?://(.+\.)zippyshare\.com/v/\w/
-// @include        /^https?://(.+\.)dfpan\.com/((file|fs)/\w+|file/down/\w+)/
-// @include        /^https?://(|www\.)4shared\.com/\w+\/\w+/\w/
-// @include        /^https?://(|www\.)mediafire\.com/(download|view|file)/\w/
-// @include        /^https?://(|www\.)sendspace\.com/file/\w/
-// @include        /^https?://(|www\.)uptobox\.com/\w/
-// @include        /^https?://(|www\.)yimuhe\.com/((down|file)-|n_dd\.php\?)\w/
-// @include        /^https?://(|www\.)howfile\.com/file/\w/
-// @include        /^https?://(|www\.)uppit\.com/\w/
-// @include        /^https?://(|www\.)imzupload\.com/\w/
-// @include        /^https?://(|www\.)clicknupload\.org/\w/
-// @include        /^https?://(|www\.)jumbofiles\.com/\w/
-// @include        /^https?://(|www\.)sendmyway\.com/\w/
-// @include        /^https?://(|www\.)tusfiles\.net/\w/
-// @include        /^https?://(|www\.)dropbox\.com/s/\w/
-// @include        /^https?://(|www\.)solidfiles\.com/\w/
-// @include        /^https?://(|www\.)yadi\.sk/\w/
-// @include        /^https?://(|www\.)datafilehost\.com/d/\w/
-// @include        /^https?://(|www\.)userscloud\.com/\w/
-// @include        /^https?://(|www\.)hulkload\.com/\w/
-// @include        /^https?://app\.box\.com/s/\w/
-// @include        /^https?://(|www\.)dailyuploads\.net/\w/
-// @include        /^https?://(|www\.)kumpulbagi\.id/\w/
-// @include        /^https?://(|www\.)kbagi\.com/\w/
-// @include        /^https?://(|www\.)kb.simple-aja\.info/\w/
-// @include        /^https?://(|www\.)moesubs\.com/url/\w/
-// @include        /^https?://kirino\.ga/lak/\w/
-// @include        /^https?://(|www\.)kirino\.sexy/\w/
-// @include        /^https?://(|www\.)seiba\.ga/\w/
-// @include        /^https?://(|www\.)mylinkgen\.com/\w/
-// @include        /^https?://(|www\.)linkgen\.st/\w/
-// @include        /^https?://(|www\.)openload\.co/\w/
-// @include        /^https?://(|www\.)oload\.tv/\w/
-// @include        /^https?://(|www\.)rgho\.st/\w/
-// @include        /^https?://(|www\.)uploadrocket\.net/\w/
-// @include        /^https?://(|www\.)(upload\.so|uplod\.ws)/\w/
-// @include        /^https?://(|www\.)upload\.ee/files/\w/
-// @include        /^https?://(|www\.)uploads\.to/\w/
-// @include        /^https?://(|www\.)uploadbank\.com/\w/
-// @include        /^https?://(|www\.)drop\.me/\w/
-// @include        /^https?://(|www\.)jzrputtbut.net/\w/
-// @include        /^https?://(|www\.)dropapk\.com/\w/
-// @include        /^https?://(|www\.)suprafiles\.org/\w/
-// @include        /^https?://(|www\.)cloudyfiles\.org/\w/
-// @include        /^https?://(|www\.)douploads\.com/\w/
-// @include        /^https?://(|www\.)file-upload\.com/\w/
-// @include        /^https?://(|www\.)topddl\.net/file/\w/
-// @include        /^https?://(|www\.)up-4ever\.com/\w/
-// @include        /^https?://(|www\.)3rbup\.com/\w/
-// @include        /^https?://(|www\.)9xupload\.me/\w/
-// @include        /^https?://(|www\.)megadrive\.co/\w/
-// @include        /^https?://(|www\.)samaup\.com/\w/
-// @include        /^https?://(|www\.)hdupload\.net/\w/
-// @include        /^https?://(|www\.)bdupload\.info/\w/
-// @include        /^https?://(|www\.)uptocafe\.com/\w/
-// @include        /^https?://(|www\.)indishare\.me/\w/
-// @include        /^https?://(|www\.)minhateca\.com\.br/\w/
-// @include        /^https?://(|www\.)akoam\.com/download/[^\/]+/\w/
-// @include        /^https?://(|www\.)rapidgator\.net/(file|download)/\w/
-// @include        /^https?://(|www\.)filefactory\.com/file/[^\/]+/\w/
-// @include        /^https?://dl\.free\.fr/getfile\.pl\?file=.+/
-// @include        /^https?://up\.top4top\.net/\w/
-// @include        /^https?://public\.upera\.co/\w/
-// @include        /^https?://cloud\.mail\.ru/public/\w/
-// @include        /^https?://drive\.google\.com/file/d\/\w/
-// @include        /^https?://docs\.google\.com/uc\?\w/
-// @include        /^https?://bc\.vc/([\w]+)(\#\w+?)?$/
-// @include        /^https?://sh\.st/([\w]+)(\#\w+?)?$/
-// @include        /^https?://adf\.ly/\w/
-// @include        /^https?://adfoc\.us/\w/
-// @include        /^https?://my\.pcloud\.com/publink/\w/
-// @include        /^https?://filescdn\.com/\w/
-// @include        /^https?://gen\.lib\.rus\.ec/\w/
-// @include        /^https?://libgen\.io/\w/
-// @include        /^https?://libgen\.me/\w/
-// @include        /^https?://golibgen\.io/\w/
-// @include        /^https?://bookzz\.org/\w/
-// @include        /^https?://(|\w+.)bookfi\.net/\w/
+// @include        http*://*.zippyshare.com/v/*/*
 // ==/UserScript==
 
 
 
 (function() {
-  var gvar=function(){};
-  gvar.__DEBUG__ = !1;
+  var gvar = function(){};
+  gvar.__DEBUG__ = 1;
 
   function MaknyosHelper(baseURI){
     this.baseURI = baseURI;
@@ -689,7 +610,7 @@
       rule: /zippyshare\.com/,
       run: function(){
         this.clog('inside zippyshare');
-        var btn = btn = g("[id=dlbutton]");
+        var btn = g("#dlbutton");
 
         // failover, just incase
         if( !btn ) {
@@ -697,7 +618,7 @@
           if( btn )
             btn = btn.parentNode;
           else
-            btn = g("[class=download]");
+            btn = g(".download");
 
           if( btn )
             btn = btn.parentNode;
