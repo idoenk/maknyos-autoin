@@ -3,12 +3,30 @@
 // @namespace      http://userscripts.org/scripts/show/91629
 // @icon           https://github.com/idoenk/maknyos-autoin/raw/master/assets/img/icon-60x60.png
 // @version        3.9.41
-// @description    Auto click get link, iframe killer. Hosts: indowebster,2shared,zippyshare,mediafire,sendspace,uptobox,howfile,uppit,imzupload,jumbofiles,sendmyway,tusfiles,dropbox,dropapk,uploadbank,suprafiles,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,kumpulbagi,moesubs,uploadrocket,my.pcloud.com,kirino.ga,seiba.ga,mylinkgen,rgho.st,uploads.to,upload.ee,upload.so,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen.io,golibgen.io,bookzz.org,bookfi.net
+// @description    Auto click get link, iframe killer. Hosts: indowebster,2shared,zippyshare,mediafire,sendspace,uptobox,howfile,uppit,sendmyway,tusfiles,dropbox,dropapk,uploadbank,suprafiles,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,kumpulbagi,moesubs,uploadrocket,my.pcloud.com,kirino.ga,seiba.ga,mylinkgen,rgho.st,uploads.to,upload.ee,upload.so,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen.io,golibgen.io,bookzz.org,bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js
 // @author         Idx
 // @grant          GM_log
 // @include        http*://*.zippyshare.com/v/*/*
+// @include        http*://*.dfpan.com/fs/*
+// @include        http*://*.dfpan.com/file/down/*
+// @include        http*://*.4shared.com/*/*/*
+// @include        http*://*.mediafire.com/*/*/*
+// @include        http*://*.sendspace.com/file/*
+// @include        http*://*uptobox.com/*
+// @include        http*://*.yimuhe.com/file-*
+// @include        http*://*.yimuhe.com/down-*
+// @include        http*://*howfile.com/file/*
+// @include        http*://*uppit.com/*/*
+// @include        http*://*clicknupload.org/*
+// @include        http*://*sendmyway.com/*
+// @include        http*://*tusfiles.net/*
+// @include        http*://*.dropbox.com/s/*
+// @include        http*://*.solidfiles.com/v/*
+// @include        http*://*yadi.sk/i/*
+// @include        http*://*yadi.sk/d/*
+
 // ==/UserScript==
 
 
@@ -708,43 +726,6 @@
       }
     },
 
-    '2shared': {
-      rule: /\b2shared\.com/,
-      run: function(){
-        this.clog('inside 2shared;');
-
-        var gotit = false, dlBtn=null, btns, that;
-
-        that = this;
-        setTimeout(function(){
-          btns = xp('//*[contains(@id,"dlBtn") and not(contains(@style,"display:"))]', null);
-
-          if( btns.snapshotLength ){
-            if( btns.snapshotLength == 1 ){
-              gotit = true;
-              dlBtn = btns.snapshotItem(0);
-            }
-            else
-              for(var i=0, iL=btns.snapshotLength; i<iL; i++){
-                dlBtn = btns.snapshotItem(i);
-                that.clog(dlBtn);
-                if( that.isVisible(dlBtn) ){
-                  gotit = true;
-                  break;
-                }
-              }
-          }
-
-          if( gotit && dlBtn ){
-            // this.frameload(dlBtn.getAttribute('href'));
-            that.set_href(dlBtn.getAttribute('href'));
-          }
-          else
-            that.clog("unable finding download-button");
-        }, 345);
-      }
-    },
-
     uptobox: {
       rule: /uptobox\.com/,
       run: function(){
@@ -888,35 +869,6 @@
       }
     },
 
-    imzupload: {
-      rule: /imzupload\.com/,
-      run: function(){
-        this.clog('inside imzupload');
-
-        var main, btnDownload = g('[type="submit"][name="method_free"]',null,true);
-        if( btnDownload ){
-          SimulateMouse(btnDownload, "click", true);
-        }
-        else{
-          g('.tbl1') &&
-            g('.tbl1').setAttribute('style','display:none;');
-          var imgcapcay, tbcacay = g('.captcha');
-          if( tbcacay )
-            imgcapcay = g('img', tbcacay);
-
-          if( imgcapcay ){
-            this.rezCapcay(imgcapcay, [null, 100]);
-            g('[type=text]',tbcacay).focus();
-          }
-          else{
-            main = g('[role=main]');
-            btnDownload = xp('//a[contains(@href,"imzupload.com/files")]',main,true);
-            btnDownload && this.frameload(btnDownload.getAttribute('href'))
-          }
-        }
-      }
-    },
-
     tusfiles: {
       rule: /tusfiles\.net/,
       run: function(){
@@ -955,13 +907,6 @@
 
           that.clog('Not download page or missing download button');
         }
-      }
-    },
-
-    jumbofiles: {
-      rule: /jumbofiles\.com/,
-      run: function(){
-        this.clog('inside jumbofiles, method not found');
       }
     },
 
@@ -1006,13 +951,21 @@
     dropbox: {
       rule: /dropbox\.com/,
       run: function(){
-        var btnDownload;
-        if( btnDownload = g('*[id*=download_button]') )
-            setTimeout(function(){
-              SimulateMouse(btnDownload, "click", true);
-            }, 123);
-        else
-          this.clog('dropbox: missing download button, page may changed');
+        var that = this;
+
+        this.waitforit(function(){
+          var parent = g('.react-title-bar');
+
+          return xp('.//button[contains(.,"Download")]', parent, true);
+        }, function(btn){
+          if (btn){
+            btn && SimulateMouse(btn, "click", true);
+          }
+          else{
+            
+            this.clog('dropbox: missing download button, page may changed');
+          }
+        }, 234);
       }
     },
 
@@ -1045,19 +998,21 @@
     yadi: {
       rule: /yadi\.sk/,
       run: function(){
-        var that = this;
-        that.clog('inside yadi, '+that.get_href());
+        var that = this,
+            api_url = location.protocol+'//'+location.hostname+'/public-api-desktop/download-url';
 
+        that.clog('inside yadi, '+that.get_href());
         this.waitforit(function(){
 
           return el = xp('//button[contains(@class,"button2") and contains(.,"ownloa")]', null, true);
         }, function(btnDownload){
+          that.clog(btnDownload);
 
           if( btnDownload ){
 
             // models-client json
-            var json = g('#models-client').innerHTML,
-                pdata = {};
+            var json = g('#store-prefetch').innerHTML,
+                pdata = {"hash": "", "sk": ""};
 
             if( json ){
               try{
@@ -1066,42 +1021,67 @@
             }
 
             if( json ){
-              var data, url;
+              var fields = ['environment', 'resources'],
+                  firstKey = null,
+                  item = null;
 
-              for(var i=0, iL=json.length; i<iL; i++){
-                if( isUndefined(json[i]['data']) )
+              for(var key in json){
+
+                if(fields.indexOf(key) === -1)
                   continue;
-                data = json[i]['data'];
 
-                if(json[i].model == 'resource'){
-                  if( isDefined(data['id']) )
-                    pdata['id.0'] = data['id'];
-                }
-                else if(json[i].model == 'config'){
-                  if( isDefined(data['sk']) )
-                    pdata['sk'] = data['sk'];
+                item = json[key];
+                switch(key){
+                  case "environment":
+                    if('undefined' != typeof item['sk']){
+                      pdata['sk'] = item['sk'];
+                      continue;
+                    }
+                  break
+
+                  case "resources":
+                    firstKey = Object.keys(item)[0];
+                    if(firstKey && 'undefined' != typeof item[firstKey]['hash']){
+                      pdata['hash'] = item[firstKey]['hash'];
+                      continue;
+                    }
+                  break
                 }
               }
-              pdata['_model.0'] = 'do-get-resource-url';
+              // end: for json
 
-              // xhr
-              url = location.protocol+'//'+location.host+'/models/?_m=do-get-resource-url';
-              $.post(url, pdata, function(ret){
-                that.clog(ret);
-                if(ret && ret.models && ret.models.length){
-                  var md = ret.models[0];
-                  if( md.data ){
-                    if( md.data.file )
-                      that.frameload( md.data.file );
-                    else if( md.data.folder )
-                      that.frameload( md.data.folder );
+              setTimeout(function(){
+                that.clog('Prepping XHR...');
+
+                // xhr
+                $.ajax({
+                  type: 'POST',
+                  url: api_url,
+                  contentType: 'text/plain',
+                  dataType: 'json',
+                  data: JSON.stringify(pdata)
+                })
+                .done(function(ret){
+                  that.clog('on DONE');
+                  
+                  that.clog(ret)
+                  if (ret && ret.data && ret.data.url){
+
+                    that.frameload( ret.data.url );
                   }
                   else{
 
-                    that.clog('yadi: missing xhr data models');
+                    that.clog('yadi: missing download data.url');
                   }
-                }
-              });
+                })
+                .fail(function(r){
+                  that.clog('on FAIL');
+                })
+                .always(function(r){
+                  that.clog('on ALWAYS');
+                  that.clog(r);
+                });
+              }, 1200);
             }
             else{
 
@@ -1109,9 +1089,9 @@
             }
           }
           else{
+
             that.clog('yadi: missing download button, page may changed');
           }
-            
         }, 100);
       }
     },
@@ -2876,6 +2856,7 @@
       run: function(){
         var that  = this,
             el    = null,
+            el_ch = null,
             tform = null,
             btnDl = null
         ;
@@ -2902,9 +2883,21 @@
             btnDl.style.backgroundColor = '#ccc';
             btnDl.style.borderColor = '#999';
             btnDl.style.verticalAlign = 'top';
+            btnDl.style.position = 'relative';
+            btnDl.style.display = 'inline-block';
             btnDl.setAttribute('title', 'DOWNLOAD');
-          }
 
+            el_ch = document.createElement('abbr');
+            el_ch.style.position = 'absolute';
+            el_ch.style.left = '0';
+            el_ch.style.bottom = '0';
+            el_ch.style.width = '100%';
+            el_ch.style.backgroundColor = 'rgba(60, 132, 137, 0.98)';
+            el_ch.style.color = '#fff';
+            el_ch.style.lineHeight = '1.2';
+            el_ch.innerText = 'DOWNLOAD';
+            btnDl.appendChild(el_ch);
+          }
 
           el = g('#loading');
           if( el && that.isVisible(el) ){
@@ -2954,7 +2947,7 @@
         else if( /\/n_dd\.php/.test(location.pathname) ){
           if( btnDl = g('#downs') ){
 
-            btnDl.innerHTML = 'DOWNLOAD';
+            btnDl.innerText = 'DOWNLOAD';
             if('function' === typeof $){
 
               $('.kuan, .ggao').css('visibility', 'hidden');
