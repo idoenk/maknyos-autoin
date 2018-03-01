@@ -26,6 +26,10 @@
 // @include        http*://*.solidfiles.com/v/*
 // @include        http*://*yadi.sk/i/*
 // @include        http*://*yadi.sk/d/*
+// @include        http*://*.datafilehost.com/d/*
+// @include        http*://*userscloud.com/*
+// @include        http*://*hulkload.com/*
+// @include        http*://*up2me.net/*
 
 // ==/UserScript==
 
@@ -1163,80 +1167,34 @@
     },
 
     hulkload: {
-      rule: /hulkload\.com/,
+      rule: /hulkload\.com|up2me\.net/,
       run: function(){
-        var that = this, FORM, el, adcopy;
+        var that = this,
+            btnDl = null;
 
         that.clog('inside hulkload, '+that.get_href());
+
+        if (!$('.filepanelag').length){
+          that.clog('Now download page');
+          return !1;
+        }
+
+        // cleanup page 
         setTimeout(function(){ 
           that.killframes();
 
-          var el_, els = xp('//*[contains(@id,"onsor")]', null);
-          that.clog("els="+els.snapshotLength);
-          if( els.snapshotLength ){
-            for(var i=0, iL=els.snapshotLength; i<iL; i++){
-              el_ = els.snapshotItem(i);
-              el_.parentNode.removeChild(el_);
-            }
-          }
+          $('[class*="adscent"]').remove();
+        }, 1100);
 
-          var selector = '//a[contains(@href, "data:text/html;")]';
-          that.waitforit(function(){
-            return xp(selector, null, true);
-          }, function(){
-            var layer = xp(selector, null, true);
+        btnDl = $('#direct_link');
+        if (btnDl.length){
 
-            layer.parentNode.removeChild( layer );
-          });
-
-        }, 123);
-
-        if( adcopy = g("[name=adcopy_response]") ){
-
-          adcopy.focus();
+          btnDl = btnDl.get(0);
+          SimulateMouse( btnDl, "click", true);
         }
         else{
-          this.waitforit(function(){
-            return xp('//*[contains(@id, "ownlo") and not(contains(@disabled,"disabled"))]', null, true);
-          }, function(){
-            if( FORM = xp('//form[@name="F1"]', null, true) ){
-              if( el = xp('//input[@name="code"]', null, FORM) ){
-
-                that.scrap_simplecapcay( el );
-                el.focus();
-
-                var counter, count, btn_download;
-
-                btn_download = g('#btn_download');
-                if( counter = g('[id*="ountdow"]') ){
-                  if( !that.isVisible(counter) ){
-
-                    SimulateMouse(btn_download, "click", true);
-                  }
-                  else{
-                    if( count = g('*', counter) )
-                    if( waitFor = parseInt( $(count).text() ) ){
-                      that.clog("waiting for "+waitFor+' seconds');
-                      that.waitforit(function(){
-
-                        return !that.isVisible( counter );
-                      }, function(){
-                        SimulateMouse(btn_download, "click", true);
-                      }, waitFor * 1000);
-                    }
-                  }
-                }
-
-              }
-              else
-                setTimeout(function(){ FORM.submit() }, 345);
-            }else
-            if( el = xp('//a[contains(@href,"kloa'+'d.co'+'m/fi'+'les/")]', null, true) ){
-              setTimeout(function(){
-                SimulateMouse(el, "click", true)
-              }, 125);
-            }
-          }, 100);
+          // count down with captcha..
+          that.clog('Please wait then insert captcha');
         }
       }
     },
