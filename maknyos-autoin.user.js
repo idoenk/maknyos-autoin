@@ -31,6 +31,7 @@
 // @include        http*://*hulkload.com/*
 // @include        http*://*up2me.net/*
 // @include        http*://app.box.com/*
+// @include        http*://*dailyuploads.net/*
 
 // ==/UserScript==
 
@@ -1212,71 +1213,53 @@
       rule: /dailyuploads\.net/,
       run: function(){
         var that  = this,
-            el    = null,
-            par   = null,
-            tform = null,
+            recapcay  = g('.g-recaptcha'),
+            site_key = null,
             btnDl = null,
-            brokenCT = null,
-            countdown = null,
-            waitStr = ''
+            par = null
         ;
-        // flag to not wait countdown
-        brokenCT = true;
+        
+        if ($('#chkIsAdd').is(':checked'))
+          $('#chkIsAdd').trigger('click');
 
+        if (recapcay){
+          site_key = recapcay.getAttribute('data-sitekey');
+          if('function' === typeof $ && site_key){
+            $(recapcay)
+              .replaceWith($('<div id="maknyos-recaptcha" data-bijikuda="2" data-sitekey="'+site_key+'"></div>'));
 
-        if( btnDl = g('[name="fs_download_file"]') ){
+            if( g('#maknyos-recaptcha') ){
+              that.clog('g-recaptcha tampered');
+              that.waitforit(function(){
 
-          if( el = g('[name="chkIsAdd"]') )
-            el.removeAttribute('checked');
+                return ('undefined' == typeof grecaptcha ? !1 : grecaptcha);
+              }, function(gr){
+                
+                gr.render("maknyos-recaptcha", {
+                  sitekey: site_key,
+                  callback: function(){ 
+                    var $par = null;
+                    if ($('#chkIsAdd').is(':checked'))
+                      $('#chkIsAdd').trigger('click');
 
-          cb_countdown = function(){
-            tform = that.closest(btnDl, 'form');
-            if( tform ){
-
-              if( el = g('[name=referer]', tform, true) )
-                el.parentNode.removeChild( el );
-
-              el = document.createElement('input');
-              el.setAttribute('name', 'fs_download_file');
-              el.setAttribute('type', 'hidden');
-              tform.appendChild( el );
-
-              tform.submit()
+                    $par = $('#chkIsAdd').closest('div');
+                    $par.find('button:visible').trigger("click")
+                  }
+                });
+              });
             }
             else{
-
-              SimulateMouse( btnDl, "click", true);
+              that.clog('tampering g-recaptcha FAILED');
             }
-          };
-
-
-          countdown = g('#countdown_str span');
-          if( !brokenCT && countdown && (countdown = (parseInt(countdown.textContent)-1) ) ){
-            countdown = Math.floor(countdown / 3);
-
-            that.waitforit(function(){
-
-              var cnt = g('#countdown_str span');
-              return ((parseInt(cnt.textContent)-1) > 0 ? !1 : true);
-            }, function(){
-              
-              cb_countdown();
-            }, countdown * 1000);
           }
-          else{
-
-            setTimeout(function(){
-              cb_countdown()
-            }, 3 * 1000);
-          }
-        }else if( (par = g('.inner')) &&  xp('//h2[contains(text(),"Link Generated")]', par, true) ){
-
-          that.clog('Download link generated..');
+        }
+        else if((par = g('.inner')) &&  xp('//h2[contains(text(),"Link Generated")]', par, true)){
           btnDl = g('a[href*=".dailyuploads.net"]', par);
-          that.clog(btnDl);
           if( btnDl ){
 
-            SimulateMouse(btnDl, "click", true);
+            setTimeout(function(){
+              SimulateMouse(btnDl, "click", true);
+            }, 1235)
           }
           else{
 
