@@ -1273,19 +1273,6 @@
       }
     },
 
-
-    "simple-aja": {
-      rule: /simple-aja\.info/,
-      run: function(){
-        var newbaseURI = document.baseURI
-          .replace('kb.simple-aja.info','kumpulbagi.com')
-          .replace('https:','http:')
-        ;
-        MNy = new MaknyosHelper(newbaseURI);
-        MNy.matchDomain().matchAction().invokeAction();
-      }
-    },
-
     moesubs: {
       rule: /(?:www\.)?moesubs\.com/,
       run: function(){
