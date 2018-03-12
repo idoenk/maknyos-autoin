@@ -1218,7 +1218,7 @@
             btnDl = null,
             par = null
         ;
-        
+
         if ($('#chkIsAdd').is(':checked'))
           $('#chkIsAdd').trigger('click');
 
@@ -1272,25 +1272,7 @@
         }
       }
     },
-  
-    kumpulbagi: {
-      rule: /kumpulbagi\.id|kbagi\.com/,
-      run: function(){
-        var that = this, el, FORM, parent;
-        if( !g('#fileDetails') ){
-          that.clog('wrong page broh, GTFO..');
-          return;
-        }
 
-        if( FORM = xp('//form[contains(@action,"DownloadFile")]', null, true) ){
-          
-          el = g('.download', FORM);
-          setTimeout(function(){ 
-            SimulateMouse(el, "click", true)
-          }, 345);
-        }
-      }
-    },
 
     "simple-aja": {
       rule: /simple-aja\.info/,
