@@ -30,6 +30,7 @@
 // @include        http*://*userscloud.com/*
 // @include        http*://*hulkload.com/*
 // @include        http*://*up2me.net/*
+// @include        http*://app.box.com/*
 
 // ==/UserScript==
 
@@ -942,12 +943,20 @@
     box: {
       rule: /app\.box\.com/,
       run: function(){
-        var btnDownload, that = this;
+        var that = this;
+
         this.waitforit(function(){
-          return xp('//button[contains(@data-type, "download-btn")]', null, true);
-        }, function(){
-          btnDownload = xp('//button[contains(@data-type, "download-btn")]', null, true);
-          btnDownload && SimulateMouse(btnDownload, "click", true);
+          var $pcw = $('.preview-content-wrapper'),
+              $phr = $('.preview-header-right'),
+              $btn1 = xp('.//button[contains(@data-type, "download-btn")]', $phr.get(0), true),
+              $btn2 = xp('.//button[contains(.,"Download")]', $pcw.get(0), true);
+
+          return ($btn1 && $btn2 ? $btn1 : null);
+        }, function(btnDl){
+
+          setTimeout(function(){
+            btnDl && SimulateMouse(btnDl, "click", true);
+          }, 3456);
         }, 100);
       }
     },
