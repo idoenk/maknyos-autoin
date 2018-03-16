@@ -65,6 +65,7 @@
 // @include        http*://adf.ly/*
 // @include        http*://adfoc.us/*
 // @include        http*://my.pcloud.com/publink/*
+// @include        http*://filescdn.com/*
 
 // ==/UserScript==
 
