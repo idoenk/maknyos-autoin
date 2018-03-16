@@ -55,6 +55,7 @@
 // @include        http*://ako.am/*
 // @include        http*://rapidgator.net/file/*
 // @include        http*://*filefactory.com/file/*
+// @include        http*://dl.free.fr/getfile.pl?file=*
 
 // ==/UserScript==
 
