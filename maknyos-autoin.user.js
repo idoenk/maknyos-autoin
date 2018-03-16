@@ -53,6 +53,7 @@
 // @include        http*://*bdnupload.com/*
 // @include        http*://*indishare.me/*
 // @include        http*://ako.am/*
+// @include        http*://rapidgator.net/file/*
 
 // ==/UserScript==
 
