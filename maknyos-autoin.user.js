@@ -60,6 +60,8 @@
 // @include        http*://cloud.mail.ru/public/*
 // @include        http*://drive.google.com/file/*
 // @include        http*://docs.google.com/uc*
+// @include        http*://bc.vc/*
+// @include        http*://sh.st/*
 
 // ==/UserScript==
 
