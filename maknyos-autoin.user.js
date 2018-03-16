@@ -42,6 +42,7 @@
 // @include        http*://dropapk.com/*
 // @include        http*://*suprafiles.org/*
 // @include        http*://*cloudyfiles.org/*
+// @include        http*://*megadrive.co/*
 // @include        http*://*douploads.com/*
 // @include        http*://*file-upload.com/*
 // @include        http*://*topddl.net/file/*
@@ -2290,10 +2291,13 @@
     },
 
     /**
-     * Applied for: [cloudyfiles.org, suprafiles.org]
+     * Applied for these hosts:
+     *  cloudyfiles.org
+     *  suprafiles.org
+     *  megadrive.co
      */
     suprafiles:{
-      rule: /suprafiles\.org|cloudyfiles\.org/,
+      rule: /suprafiles\.org|cloudyfiles\.org|megadrive\.co/,
       run: function(){
         var that = this,
             btnDownload = g('[type="submit"][name="method_free"]',null,true),
