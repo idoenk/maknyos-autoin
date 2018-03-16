@@ -63,6 +63,7 @@
 // @include        http*://bc.vc/*
 // @include        http*://sh.st/*
 // @include        http*://adf.ly/*
+// @include        http*://adfoc.us/*
 
 // ==/UserScript==
 
