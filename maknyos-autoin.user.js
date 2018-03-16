@@ -41,6 +41,7 @@
 // @include        http*://*jzrputtbut.net/*
 // @include        http*://dropapk.com/*
 // @include        http*://*suprafiles.org/*
+// @include        http*://*cloudyfiles.org/*
 
 // ==/UserScript==
 
