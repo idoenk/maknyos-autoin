@@ -49,6 +49,7 @@
 // @include        http*://*.up-4ever.com/*
 // @include        http*://*3rbup.com/*
 // @include        http*://*9xupload.me/*
+// @include        http*://*samaup.com/*
 
 // ==/UserScript==
 
