@@ -56,6 +56,7 @@
 // @include        http*://rapidgator.net/file/*
 // @include        http*://*filefactory.com/file/*
 // @include        http*://dl.free.fr/getfile.pl?file=*
+// @include        http*://up.top4top.net/*
 
 // ==/UserScript==
 
