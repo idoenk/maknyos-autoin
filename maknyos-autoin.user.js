@@ -3,7 +3,7 @@
 // @namespace      http://userscripts.org/scripts/show/91629
 // @icon           https://github.com/idoenk/maknyos-autoin/raw/master/assets/img/icon-60x60.png
 // @version        3.9.41
-// @description    Auto click get link, iframe killer. Hosts: indowebster,2shared,zippyshare,mediafire,sendspace,uptobox,howfile,uppit,sendmyway,tusfiles,dropbox,dropapk,uploadbank,suprafiles,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,kumpulbagi,moesubs,uploadrocket,my.pcloud.com,kirino.ga,seiba.ga,mylinkgen,rgho.st,uploads.to,upload.ee,upload.so,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen.io,golibgen.io,bookzz.org,bookfi.net
+// @description    Auto click get link, iframe killer. Hosts: zippyshare,mediafire,sendspace,uptobox,howfile,uppit,sendmyway,tusfiles,dropbox,dropapk,uploadbank,suprafiles,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,my.pcloud.com,rgho.st,uploads.to,upload.ee,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen,bookfi.net
 // @homepageURL    https://greasyfork.org/scripts/97
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js
 // @author         Idx
@@ -77,7 +77,7 @@
 
 (function() {
   var gvar = function(){};
-  gvar.__DEBUG__ = 1;
+  gvar.__DEBUG__ = !1;
 
   function MaknyosHelper(baseURI){
     this.baseURI = baseURI;
@@ -544,129 +544,6 @@
     }
   };
   Actions.prototype.patterns = {
-    indowebster: {
-      rule: /(files|maknyos)\.indowebster\.com/,
-      run: function(){
-
-        var that = this,
-            dlBtn = g('#downloadBtn'),
-            delayTime = 0,
-            btn_free, scripts, innerScript,
-            cucok, cokcok, fnName,
-            el, mainWrap, aabp
-        ;
-        // anti-(antiabp) :: injectBodyStyle-ish
-        aabp = function(){
-          var style = document.createElement("style"),
-              css = ''
-                +'*[id*="idb"] ~ #bodyAndFooter{display: initial!important;}'
-                +'*[id*="idb"]{display:none!important;}'
-              ;
-
-          style.textContent = css;
-          document.body.insertBefore(style, document.body.firstChild);
-          that.clog('injecting anti-(antiabp)..');
-        };
-        aabp();
-
-        if( dlBtn ){
-
-          scripts = document.getElementsByTagName( 'script' );
-          for( var i = 0; i < scripts.length; ++i ) {
-            innerScript = scripts[i].innerHTML;
-            innerScript = innerScript.trim();
-            
-            if( innerScript ){
-              if( cucok = /(\$\.post\b.+)/m.exec(innerScript)) {
-
-                if( cokcok = /var\s+s\s+=\s(\d+)/.exec(innerScript) )
-                  delayTime = parseInt(cokcok[1]);
-
-                innerScript = cucok[1];
-
-                // getting fn-name
-                if( cucok = /function\([^\)]+.\s*\{\s*(\w+)/.exec(innerScript) )
-                  fnName = cucok[1];
-
-                // required: [fnName, delayTime]
-                var scriptHandler = function(){
-                  return (function(win, $){
-                    var gvar = gvar||{};
-                    gvar.__DEBUG__ = !1;
-
-                    win["__dlhit__"] = null;
-                    win["___function___"] = function(ret){
-                      console.log('AHOYY, .......')
-                      console.log(ret);
-
-                      var $tgt = $("#filename");
-                      $tgt.prepend('<div>DOWNLOAD</div>');
-                      $("#filename").wrap("<a href='"+ret+"' class='button color_blue'></a>");
-                      $tgt.parent().css('display', 'block');
-
-                      setTimeout(function(){
-                        win["iframe_preloader"](ret)
-                      }, 100);
-                      $('#downloadBtn').remove();
-                      win["__dlhit__"] = true;
-                    };
-
-                    win["iframe_preloader"] = __iframe_preloader__;
-                    win["g"] = __function_g__;
-
-                    setTimeout(function(){
-                      if( win["__dlhit__"] === null ){
-                        
-                        console.log('requesting XHR die to __dlhit__='+win["__dlhit__"]);
-                        ___innerScript___;
-                      }
-                    }, (___delaytime___+1)*1000);
-                  })(window, jQuery);
-                };
-                scriptHandler = scriptHandler.toString();
-                scriptHandler = scriptHandler.replace(/___function___/i, fnName);
-                scriptHandler = scriptHandler.replace(/___innerScript___/i, innerScript);
-                scriptHandler = scriptHandler.replace(/___delaytime___/i, delayTime);
-                scriptHandler = scriptHandler.replace(/__iframe_preloader__/i, this.frameload.toString());
-                scriptHandler = scriptHandler.replace(/__function_g__/i, g.toString());
-
-                this.injectBodyScript(scriptHandler);
-
-                // end-it
-                break;
-              }
-            }
-          }
-          // end:for
-
-          // remove css idb: #idb
-          scripts = document.getElementsByTagName( 'style' );
-          for( var i = 0; i < scripts.length; ++i ){
-            innerScript = scripts[i].innerHTML;
-            if( innerScript ){
-              if( cucok = /\#idb/.exec(innerScript)) {
-
-                scripts[i].parentNode.removeChild(scripts[i]);
-                break;
-              }
-            }
-          }
-          // end:for
-        }
-        else if( btn_free = g('.block.al_c a.downloadBtn') ){
-          btn_free.setAttribute('data-target', btn_free.getAttribute('href'));
-          btn_free.setAttribute('href', 'javascript:;');
-          btn_free.setAttribute('_target', 'self');
-          btn_free.onclick = function(e){
-            var href = this.getAttribute('data-target');;
-            this.setAttribute('href', href);
-            location.href = href;
-            return true;
-          }
-          SimulateMouse(btn_free, "click", true);
-        }
-      }
-    },
 
     sendspace: {
       rule: /sendspace\.com/,
