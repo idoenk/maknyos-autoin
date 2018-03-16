@@ -37,6 +37,7 @@
 // @include        http*://*.upload.ee/files/*
 // @include        http*://*uploads.to/*
 // @include        http*://*uploadbank.com/*
+// @include        http*://*drop.me/*
 
 // ==/UserScript==
 
@@ -2208,6 +2209,7 @@
         var that  = this;
 
         return this.waitforit(function(){
+
           return g('form[name="myFile"]');
         }, function(el){
           if( el )
