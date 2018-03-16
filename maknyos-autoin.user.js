@@ -33,6 +33,7 @@
 // @include        http*://app.box.com/*
 // @include        http*://*dailyuploads.net/*
 // @include        http*://rgho.st/*
+// @include        http*://*uplod.org/*
 
 // ==/UserScript==
 
@@ -1683,32 +1684,67 @@
       }
     },
 
-    uploadsows: {
-      rule: /(upload\.so)|(uplod\.ws)/,
+    uplodorg: {
+      rule: /(uplod\.org)/,
       run: function(){
         var that   = this,
             el     = null,
             tform  = g('#myDownloadForm'),
             btnDl  = g('.downloadbtn:not([name])'),
+            recapcay = g('.g-recaptcha', tform),
+            site_key = null,
             href   = ''
         ;
         if( tform || btnDl ){
-
           if( el = g('a[href*="apploading.mobi"]') )
             el.parentNode.removeChild( el );
 
           if( el = g('#chkIsAdd') )
             el.checked = false;
 
-          SimulateMouse(btnDl, "click", true);
+          if (recapcay){
+            site_key = recapcay.getAttribute('data-sitekey');
 
-          if( tform ){
+            $(recapcay)
+              .replaceWith($('<div id="maknyos-recaptcha" data-bijikuda="1" data-sitekey="'+site_key+'"></div>'));
 
-            tform.submit();
+            if( g('#maknyos-recaptcha') ){
+              that.clog('g-recaptcha tampered');
+              that.waitforit(function(){
+
+                return ('undefined' == typeof grecaptcha ? !1 : grecaptcha);
+              }, function(gr){
+                
+                gr.render("maknyos-recaptcha", {
+                  sitekey: site_key,
+                  callback: function(){
+                    if( tform ){
+
+                      tform.submit();
+                    }
+                    else{
+
+                      $(btnDl).trigger('click');
+                    }
+                  }
+                });
+              });
+            }
+            else{
+
+              that.clog('tampering g-recaptcha FAILED');
+            }
           }
           else{
-            
-            SimulateMouse(btnDl, "click", true);
+
+            if( tform ){
+
+              tform.submit();
+            }
+            else{
+              
+              SimulateMouse(btnDl, "click", true);
+            }
           }
         }
         else{
