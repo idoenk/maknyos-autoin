@@ -58,6 +58,8 @@
 // @include        http*://dl.free.fr/getfile.pl?file=*
 // @include        http*://up.top4top.net/*
 // @include        http*://cloud.mail.ru/public/*
+// @include        http*://drive.google.com/file/*
+// @include        http*://docs.google.com/uc*
 
 // ==/UserScript==
 
