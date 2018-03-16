@@ -40,6 +40,7 @@
 // @include        http*://*drop.me/*
 // @include        http*://*jzrputtbut.net/*
 // @include        http*://dropapk.com/*
+// @include        http*://*suprafiles.org/*
 
 // ==/UserScript==
 
@@ -2290,24 +2291,30 @@
         var that = this,
             btnDownload = g('[type="submit"][name="method_free"]',null,true),
             cont = null,
+            lite_hostname = null,
             el   = null
         ;
 
         // # 1
         if( btnDownload ){
+          that.clog('#1');
 
           that.trySumbit( btnDownload );
         }
         else{
           // # 3
           if( el = g('form[name="F1"]') ){
+            that.clog('#3');
 
             el.submit();
           }
           else{
+            that.clog('#2');
             // # 2
             cont = g('#container');
-            if( cont && (el = g('a[href*="'+location.hostname+'"]', cont)) ){
+            lite_hostname = (location.hostname+'').replace(/^w{3}\./,'');
+
+            if( cont && (el = g('a[href*="'+lite_hostname+'"]', cont)) ){
               
               SimulateMouse(el, "click", true);
             }
