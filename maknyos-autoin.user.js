@@ -50,6 +50,7 @@
 // @include        http*://*3rbup.com/*
 // @include        http*://*9xupload.me/*
 // @include        http*://*samaup.com/*
+// @include        http*://*bdnupload.com/*
 
 // ==/UserScript==
 
@@ -3257,49 +3258,81 @@
       }
     },
 
-    bdupload: {
-      rule: /bdupload\.info/,
+    bdnupload: {
+      rule: /bdnupload\.com/,
       run: function(){
         var that  = this,
-            btnDl     = null,
-            countdown = g('#countdown'),
-            cb_countdown = function(){}
+            btnDl = null,
+            pSel = g('#pSel'),
+            host = location.hostname,
+            wrapper = 'b'
         ;
+
         that.hidefixed();
 
+        if( btnDl = g('[type="submit"][name="method_free"]',null,true) ){
 
-        if( btnDl = g('#downloadbtn') ){
+          that.trySumbit( btnDl );
+        }
+        else if( xp('//'+wrapper+'[contains(text(),"Link Generated")]', pSel, true) ){
 
-          cb_countdown = function(){
+          host = host.replace(/^w{3}\./, '');
+          btnDl = g('a[href*=".'+host+'"]')
+
+          if (!btnDl)
+            btnDl = g('#direct_link>a');
+
+          if( btnDl ){
+
             that.trySumbit( btnDl );
-          };
-
-          countdown = g('#countdown .seconds');
-          if( countdown && (countdown = (parseInt(countdown.textContent)-1) ) ){
-            countdown = Math.floor(countdown / 3);
-
-            that.waitforit(function(){
-
-              var cnt = g('#countdown .seconds');
-              return ((parseInt(cnt.textContent)-1) > 0 ? !1 : true);
-            }, function(){
-              
-              cb_countdown();
-            }, countdown * 1000);
           }
           else{
 
-            cb_countdown()
+            that.clog('Missing download button');
           }
         }
-        else if( btnDl = g('img[alt*="o Download"]') ){
-          
-          SimulateMouse( btnDl.parentNode, "click", true );
+        else if( btnDl = g('#btn_download,#downloadbtn') ){
+
+          that.trySumbit( btnDl );
         }
         else{
-
-          that.clog('Not download page OR missing download button')
+          
+          that.clog('Not download page or missing download button');
         }
+
+
+        // if( btnDl = g('#downloadbtn') ){
+
+        //   cb_countdown = function(){
+        //     that.trySumbit( btnDl );
+        //   };
+
+        //   countdown = g('#countdown .seconds');
+        //   if( countdown && (countdown = (parseInt(countdown.textContent)-1) ) ){
+        //     countdown = Math.floor(countdown / 3);
+
+        //     that.waitforit(function(){
+
+        //       var cnt = g('#countdown .seconds');
+        //       return ((parseInt(cnt.textContent)-1) > 0 ? !1 : true);
+        //     }, function(){
+              
+        //       cb_countdown();
+        //     }, countdown * 1000);
+        //   }
+        //   else{
+
+        //     cb_countdown()
+        //   }
+        // }
+        // else if( btnDl = g('img[alt*="o Download"]') ){
+          
+        //   SimulateMouse( btnDl.parentNode, "click", true );
+        // }
+        // else{
+
+        //   that.clog('Not download page OR missing download button')
+        // }
       }
     },
 
