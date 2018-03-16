@@ -44,6 +44,7 @@
 // @include        http*://*cloudyfiles.org/*
 // @include        http*://*douploads.com/*
 // @include        http*://*file-upload.com/*
+// @include        http*://*topddl.net/file/*
 
 // ==/UserScript==
 
