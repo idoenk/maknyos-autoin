@@ -66,6 +66,10 @@
 // @include        http*://adfoc.us/*
 // @include        http*://my.pcloud.com/publink/*
 // @include        http*://filescdn.com/*
+// @include        http*://gen.lib.rus.ec/*
+// @include        http*://libgen.io/*
+// @include        http*://libgen.me/*
+// @include        http*://b-ok.org/*
 
 // ==/UserScript==
 
@@ -474,6 +478,14 @@
         ele.offsetParent !== null &&
         ele.style.opacity !== 0 &&
         ele.style.visibility !== 'hidden';
+    },
+
+    isInIframe: function () {
+      try {
+        return window.self !== window.top;
+      } catch (e) {
+        return true;
+      }
     },
 
     hasClass: function(cName, ele){
@@ -1984,14 +1996,19 @@
     },
 
     "e-book:genlib": {
-      rule: /gen\.lib\.rus\.ec|libgen\.me|libgen\.io|golibgen\.io|bookzz\.org|(|\w+\.)bookfi\.net/,
+      rule: /gen\.lib\.rus\.ec|libgen\.io|(|\w+\.)bookfi\.net|b-ok\.org/,
       run: function(){
         var that      = this,
             pathname  = location.pathname,
+            host      = location.hostname,
             matchLoc  = ['foreignfiction','search.php','book'],
-            imgdl, btnDl, form, rows, healLinks
+            imgdl, btnDl, form, rows, healLinks, href
         ;
-        that.clog('location.hostname='+location.hostname);
+        if (that.isInIframe()){
+
+          that.clog('Exiting script, soz it loaded in iframe..');
+        }
+
 
         healLinks = function(){
           var $parent = $('table.c');
@@ -2029,6 +2046,8 @@
                 });
               }
             });
+
+            that.clog('Links healed');
           }, 10);
         };
         var cssString = ''
@@ -2039,7 +2058,11 @@
           +'a#mlink:visited>strong,a#mlink.opened>strong{font-weight:bold;}'
         ;
 
-        switch(location.hostname){
+        host = host.replace(/^w{3}\./, '');
+        that.clog('host: '+host);
+        that.clog('pathname: '+pathname);
+
+        switch(host){
           case "libgen.io":
             that.clog('pathname='+pathname);
             if( /\/ads\.php/.test(pathname) ){
@@ -2056,34 +2079,46 @@
             }
           break;
 
-          case "bookzz.org":
+          case "b-ok.org":
           case "en.bookfi.net":
+
             rows = gAll('.resItemBox');
+            form = g('#searchForm');
+
+            that.clog('Row count='+(rows && rows.length ? rows.length : 0));
+            that.clog(rows);
+
             if( rows && rows.length == 1 ){
 
-              if( btnDl = g('.ddownload', rows[0]) )
-                SimulateMouse(btnDl, "click", true);
+              if( btnDl = g('.ddownload', rows[0]) ){
+                try{
+
+                  if (href = btnDl.getAttribute('href'))
+                    that.set_href(href);
+                }catch(e){
+                  
+                  SimulateMouse(btnDl, "click", true);
+                }
+              }
               else
                 that.clog('Missing download button');
             }
             else if(/\/book\/\w+/i.test(pathname) ){
-              if( btnDl = xp('//a[contains(.,"ownloa") and contains(@href,"/dl/")]', null, true) )
-                SimulateMouse(btnDl, "click", true);
+              if( btnDl = xp('//a[contains(.,"ownloa") and contains(@href,"/dl/")]', null, true) ){
+                try{
+
+                  if (href = btnDl.getAttribute('href'))
+                    that.set_href(href);
+                }catch(e){
+                  
+                  SimulateMouse(btnDl, "click", true);
+                }
+              }
               else
                 that.clog('Missing download button');
             }
           break;
 
-          case "golibgen.io":
-          case "libgen.me":
-            if( form = g('form[action*="noleech1.php"]') ){
-
-              if( btnDl = g('[type=submit]', form) )
-                SimulateMouse(btnDl, "click", true);
-              else
-                that.clog('Missing download button')
-            }
-          break;
 
           // gen.lib.rus.ec
           default:
