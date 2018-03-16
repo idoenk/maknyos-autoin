@@ -35,6 +35,7 @@
 // @include        http*://rgho.st/*
 // @include        http*://*uplod.org/*
 // @include        http*://*.upload.ee/files/*
+// @include        http*://*uploads.to/*
 
 // ==/UserScript==
 
@@ -1704,36 +1705,38 @@
             el.checked = false;
 
           if (recapcay){
-            site_key = recapcay.getAttribute('data-sitekey');
 
-            $(recapcay)
-              .replaceWith($('<div id="maknyos-recaptcha" data-bijikuda="1" data-sitekey="'+site_key+'"></div>'));
+            if (site_key = recapcay.getAttribute('data-sitekey')){
 
-            if( g('#maknyos-recaptcha') ){
-              that.clog('g-recaptcha tampered');
-              that.waitforit(function(){
+              $(recapcay)
+                .replaceWith($('<div id="maknyos-recaptcha" data-bijikuda="1" data-sitekey="'+site_key+'"></div>'));
 
-                return ('undefined' == typeof grecaptcha ? !1 : grecaptcha);
-              }, function(gr){
-                
-                gr.render("maknyos-recaptcha", {
-                  sitekey: site_key,
-                  callback: function(){
-                    if( tform ){
+              if( g('#maknyos-recaptcha') ){
+                that.clog('g-recaptcha tampered');
+                that.waitforit(function(){
 
-                      tform.submit();
+                  return ('undefined' == typeof grecaptcha ? !1 : grecaptcha);
+                }, function(gr){
+                  
+                  gr.render("maknyos-recaptcha", {
+                    sitekey: site_key,
+                    callback: function(){
+                      if( tform ){
+
+                        tform.submit();
+                      }
+                      else{
+
+                        $(btnDl).trigger('click');
+                      }
                     }
-                    else{
-
-                      $(btnDl).trigger('click');
-                    }
-                  }
+                  });
                 });
-              });
-            }
-            else{
+              }
+              else{
 
-              that.clog('tampering g-recaptcha FAILED');
+                that.clog('tampering g-recaptcha FAILED');
+              }
             }
           }
           else{
