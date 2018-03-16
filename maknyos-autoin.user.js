@@ -54,6 +54,7 @@
 // @include        http*://*indishare.me/*
 // @include        http*://ako.am/*
 // @include        http*://rapidgator.net/file/*
+// @include        http*://*filefactory.com/file/*
 
 // ==/UserScript==
 
