@@ -51,6 +51,7 @@
 // @include        http*://*9xupload.me/*
 // @include        http*://*samaup.com/*
 // @include        http*://*bdnupload.com/*
+// @include        http*://*indishare.me/*
 
 // ==/UserScript==
 
@@ -3333,49 +3334,6 @@
 
         //   that.clog('Not download page OR missing download button')
         // }
-      }
-    },
-
-    // [uptocafe, hdupload]
-    hdupload: {
-      rule: /hdupload\.net|uptocafe\.com/,
-      run: function(){
-        var that  = this,
-            btnDl = null,
-            host  = location.hostname,
-            pSel  = g(host == 'uptocafe.com' ? '#content' : '#page'),
-            wrapper = (host == 'uptocafe.com' ? 'b':'h2')
-        ;
-        that.hidefixed();
-
-        if( btnDl = g('[type="submit"][name="method_free"]',null,true) ){
-
-          that.trySumbit( btnDl );
-        }
-        else if( btnDl = g('#btn_download,#downloadbtn') ){
-
-          that.trySumbit( btnDl );
-        }
-        else if( xp('//'+wrapper+'[contains(text(),"Link Generated")]', pSel, true) ){
-
-          if( host == 'uptocafe.com' )
-            btnDl = g('a[href*=".'+host+'"]', pSel)
-          else
-            btnDl = g('#direct_link>a');
-
-          if( btnDl ){
-
-            that.trySumbit( btnDl );
-          }
-          else{
-
-            that.clog('Missing download button');
-          }
-        }
-        else{
-          
-          that.clog('Not download page or missing download button');
-        }
       }
     },
 
