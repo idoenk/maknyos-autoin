@@ -32,6 +32,7 @@
 // @include        http*://*up2me.net/*
 // @include        http*://app.box.com/*
 // @include        http*://*dailyuploads.net/*
+// @include        http*://rgho.st/*
 
 // ==/UserScript==
 
