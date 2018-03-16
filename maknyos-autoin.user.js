@@ -57,6 +57,7 @@
 // @include        http*://*filefactory.com/file/*
 // @include        http*://dl.free.fr/getfile.pl?file=*
 // @include        http*://up.top4top.net/*
+// @include        http*://cloud.mail.ru/public/*
 
 // ==/UserScript==
 
@@ -1869,8 +1870,10 @@
         var that    = this;
 
         that.waitforit(function(){
+          var toolbar = g('#toolbar');
 
-          return g('.btn_main');
+          // return g('.b-toolbar__btn_download');
+          return g('[data-name="download"]', toolbar);
         }, function(btn){
 
           var layers = g('.layers'),
