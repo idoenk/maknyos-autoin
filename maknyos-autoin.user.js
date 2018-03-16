@@ -64,6 +64,7 @@
 // @include        http*://sh.st/*
 // @include        http*://adf.ly/*
 // @include        http*://adfoc.us/*
+// @include        http*://my.pcloud.com/publink/*
 
 // ==/UserScript==
 
