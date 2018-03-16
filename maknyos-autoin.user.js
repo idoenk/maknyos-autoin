@@ -34,6 +34,7 @@
 // @include        http*://*dailyuploads.net/*
 // @include        http*://rgho.st/*
 // @include        http*://*uplod.org/*
+// @include        http*://*.upload.ee/files/*
 
 // ==/UserScript==
 
