@@ -43,6 +43,7 @@
 // @include        http*://*suprafiles.org/*
 // @include        http*://*cloudyfiles.org/*
 // @include        http*://*douploads.com/*
+// @include        http*://*file-upload.com/*
 
 // ==/UserScript==
 
@@ -2374,6 +2375,7 @@
             site_key  = null,
             countdown = null,
             btnDl     = null,
+            tform     = g('form[name=F1]'),
             cb_countdown = function(){}
         ;
         if( btnDl = g('[type="submit"][name="method_free"]', null, true) ){
@@ -2381,7 +2383,7 @@
 
           that.trySumbit( btnDl );
         }
-        else if( btnDl = g('#download-btn') ){
+        else if( btnDl = g('#download-btn', tform) ){
           // # Stage 3
 
           SimulateMouse(btnDl, "click", true);
@@ -2389,18 +2391,12 @@
         else{
           // # Stage 2
 
-          if( 'undefined' != typeof $ ){
-
-            $('.page-wrap>.text-center').each(function(){
-              var $me = $(this);
-              if( $me.find('ins').length )
-                $me.remove();
-            });
-            $('#downloadbtn')
-              .css('font-size', '2em');
-          }
+          $('#downloadbtn')
+            .css('font-size', '2em');
 
           cb_countdown = function(){
+            var btnDl_ = g('#downloadbtn', tform);
+
             if( recapcay ){
               
               that.waitforit(function(){
@@ -2408,19 +2404,25 @@
                 return ('undefined' == typeof grecaptcha ? !1 : grecaptcha);
               }, function(gr){
                 
-                gr.render("maknyos-recaptcha", {
-                  sitekey: recapcay.getAttribute('data-sitekey'),
-                  callback: function(){ $("#downloadbtn").trigger("click") }
-                });
+                if (!$('#maknyos-recaptcha').html()){
 
-                var btnDl_ = g('#downloadbtn');
-                if( btnDl_ && 'undefined' != typeof $)
-                  $(btnDl_).prev().remove();
+                  gr.render("maknyos-recaptcha", {
+                    sitekey: recapcay.getAttribute('data-sitekey'),
+                    callback: function(){
+
+                      return that.trySumbit( btnDl_ );
+                    }
+                  });
+                }
+                else{
+
+                  that.trySumbit( btnDl_ );
+                }
               });
             }
-            else if( btnDl = g('#downloadbtn') ){
+            else if( btnDl_ ){
 
-              SimulateMouse( btnDl, "click", true );
+              SimulateMouse( btnDl_, "click", true );
             }
             else{
 
@@ -2442,6 +2444,26 @@
                 that.clog('g-recaptcha tampered');
               else
                 that.clog('tampering g-recaptcha FAILED');
+
+              that.waitforit(function(){
+
+                return ('undefined' == typeof grecaptcha ? !1 : grecaptcha);
+              }, function(gr){
+                
+                gr.render("maknyos-recaptcha", {
+                  sitekey: site_key,
+                  callback: function(){
+                    $('#maknyos-recaptcha').attr('data-checked', !0);
+
+                    var countdown_ = g('#countdown .seconds');
+                    if (countdown_)
+                    if ((parseInt(countdown_.textContent)-1) <= 0){
+
+                      return cb_countdown();
+                    }
+                  }
+                });
+              });
             }
           }
 
@@ -2462,13 +2484,13 @@
           else{
 
             // remove disabled
-            if( btnDl = g('#downloadbtn') ){
+            if( btnDl = g('#downloadbtn', tform) ){
               btnDl.disabled = false;
 
               if( recapcay )
                 cb_countdown();
               else
-                SimulateMouse(btnDl, "click", true);
+                that.trySumbit( btnDl );
             }
 
             if( !g('.page-wrap') ){
