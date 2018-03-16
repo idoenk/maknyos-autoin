@@ -52,6 +52,7 @@
 // @include        http*://*samaup.com/*
 // @include        http*://*bdnupload.com/*
 // @include        http*://*indishare.me/*
+// @include        http*://ako.am/*
 
 // ==/UserScript==
 
@@ -3079,8 +3080,8 @@
       }
     },
 
-    akoamcom: {
-      rule: /akoam\.com/,
+    akoam: {
+      rule: /ako\.am/,
       run: function(){
         var that  = this,
             url   = that.get_href(),
