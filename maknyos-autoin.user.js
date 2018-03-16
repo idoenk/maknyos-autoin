@@ -42,6 +42,7 @@
 // @include        http*://dropapk.com/*
 // @include        http*://*suprafiles.org/*
 // @include        http*://*cloudyfiles.org/*
+// @include        http*://*douploads.com/*
 
 // ==/UserScript==
 
