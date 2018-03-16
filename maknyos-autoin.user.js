@@ -60,11 +60,12 @@
 // @include        http*://cloud.mail.ru/public/*
 // @include        http*://drive.google.com/file/*
 // @include        http*://docs.google.com/uc*
+// @include        http*://my.pcloud.com/publink/*
+// @include        http*://minhateca.com.br/*
 // @include        http*://bc.vc/*
 // @include        http*://sh.st/*
 // @include        http*://adf.ly/*
 // @include        http*://adfoc.us/*
-// @include        http*://my.pcloud.com/publink/*
 // @include        http*://filescdn.com/*
 // @include        http*://gen.lib.rus.ec/*
 // @include        http*://libgen.io/*
@@ -3375,7 +3376,7 @@
           if( el = g('[name="'+tokenfield+'"]') ) {
 
             pdata[tokenfield] = el.value;
-            if( el = g('#FileId') )
+            if( el = g('[name="FileId"]') )
               pdata.fileId = el.value;
 
             $.post(url, pdata, function(ret){
@@ -3383,7 +3384,10 @@
 
               if( ret && ret.redirectUrl ){
 
-                that.frameload( ret.redirectUrl );
+                setTimeout(function(){
+
+                  that.frameload( ret.redirectUrl );
+                }, 1324);
               }
               else{
 
