@@ -47,6 +47,7 @@
 // @include        http*://*topddl.net/file/*
 // @include        http*://*.up-4ever.com/*
 // @include        http*://*3rbup.com/*
+// @include        http*://*9xupload.me/*
 
 // ==/UserScript==
 
