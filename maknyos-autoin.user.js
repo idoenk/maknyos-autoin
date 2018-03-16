@@ -62,6 +62,7 @@
 // @include        http*://docs.google.com/uc*
 // @include        http*://bc.vc/*
 // @include        http*://sh.st/*
+// @include        http*://adf.ly/*
 
 // ==/UserScript==
 
