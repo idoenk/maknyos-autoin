@@ -36,6 +36,7 @@
 // @include        http*://*uplod.org/*
 // @include        http*://*.upload.ee/files/*
 // @include        http*://*uploads.to/*
+// @include        http*://*uploadbank.com/*
 
 // ==/UserScript==
 
