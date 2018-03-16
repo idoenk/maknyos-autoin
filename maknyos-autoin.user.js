@@ -38,6 +38,8 @@
 // @include        http*://*uploads.to/*
 // @include        http*://*uploadbank.com/*
 // @include        http*://*drop.me/*
+// @include        http*://*jzrputtbut.net/*
+// @include        http*://dropapk.com/*
 
 // ==/UserScript==
 
@@ -2244,8 +2246,6 @@
           }, function(el){
             var hid = null;
 
-            that.clog('da callback..');
-            that.clog(el.nodeName);
             if( el ) {
               if( el.nodeName == 'IMG' ){
 
