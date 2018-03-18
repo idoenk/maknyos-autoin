@@ -177,9 +177,14 @@
      * If it fail, just click that button anyway
      */
     trySumbit: function(button, cb_before){
-      var tform = this.closest(button, 'form'),
+      var tform = null,
           el    = null
       ;
+      if (!button)
+        return !1;
+
+      if (button.nodeName != 'FORM')
+        tform = this.closest(button, 'form');
 
       if( 'function' === typeof cb_before )
         cb_before(tform);
@@ -188,7 +193,7 @@
         if( el = g('[name="referer"]', tform) )
           el.value = '';
 
-        if( button.getAttribute('name') ){
+        if( button.nodeName != 'FORM' && button.getAttribute('name') ){
           el = document.createElement('input');
           el.setAttribute('type', 'hidden');
           el.setAttribute('name', button.getAttribute('name'));
@@ -1139,45 +1144,13 @@
         var that  = this,
             recapcay  = g('.g-recaptcha'),
             site_key = null,
+            form = null,
             btnDl = null,
             par = null
         ;
 
-        if ($('#chkIsAdd').is(':checked'))
-          $('#chkIsAdd').trigger('click');
-
-        if (recapcay){
-          site_key = recapcay.getAttribute('data-sitekey');
-          if('function' === typeof $ && site_key){
-            $(recapcay)
-              .replaceWith($('<div id="maknyos-recaptcha" data-bijikuda="2" data-sitekey="'+site_key+'"></div>'));
-
-            if( g('#maknyos-recaptcha') ){
-              that.clog('g-recaptcha tampered');
-              that.waitforit(function(){
-
-                return ('undefined' == typeof grecaptcha ? !1 : grecaptcha);
-              }, function(gr){
-                
-                gr.render("maknyos-recaptcha", {
-                  sitekey: site_key,
-                  callback: function(){ 
-                    var $par = null;
-                    if ($('#chkIsAdd').is(':checked'))
-                      $('#chkIsAdd').trigger('click');
-
-                    $par = $('#chkIsAdd').closest('div');
-                    $par.find('button:visible').trigger("click")
-                  }
-                });
-              });
-            }
-            else{
-              that.clog('tampering g-recaptcha FAILED');
-            }
-          }
-        }
-        else if((par = g('.inner')) &&  xp('//h2[contains(text(),"Link Generated")]', par, true)){
+        // Final-page
+        if ((par = g('.inner')) &&  xp('//h2[contains(text(),"Link Generated")]', par, true)){
           btnDl = g('a[href*=".dailyuploads.net"]', par);
           if( btnDl ){
 
@@ -1191,8 +1164,66 @@
           }
         }
         else{
+          // Init page
+          form = g('form[name=F1]');
+          btnDl = g('[name=fs_download_file]');
 
-          that.clog('Not a download page');
+          if ($('#chkIsAdd').is(':checked'))
+            $('#chkIsAdd').trigger('click');
+
+          if (recapcay){
+            site_key = recapcay.getAttribute('data-sitekey');
+            that.clog('Recapcay found, site_key: '+site_key);
+
+            $(recapcay)
+              .replaceWith($('<div id="maknyos-recaptcha" data-sitekey="'+site_key+'"></div>'));
+
+
+            // Incase of grecaptcha lib properly loaded
+            setTimeout(function(){
+
+              // recaptcha-rebuilder
+              var scriptHandler = function(_site_key){
+                return (function(win, $){
+
+                  if("undefined" !== typeof grecaptcha){
+                    grecaptcha.render("maknyos-recaptcha", {
+                      sitekey: "___SITEKEY___",
+                      callback: function(){
+                        var $par = null;
+                        if ($('#chkIsAdd').is(':checked'))
+                          $('#chkIsAdd').trigger('click');
+
+                        $par = $('#chkIsAdd').closest('div');
+                        $par.find('button:visible').trigger("click")
+                      }
+                    });
+                  }
+                  else{
+
+                    console.log('grecaptcha undefined');
+                  }
+                })(window, $);
+              };
+              scriptHandler = scriptHandler.toString();
+              scriptHandler = scriptHandler.replace(/___SITEKEY___/, site_key);
+              that.injectBodyScript(scriptHandler);
+            }, 567);
+          }
+          else if(form || btnDl){
+            that.clog('Recapcay not found, direct submitting..');
+
+            if (form)
+              that.trySumbit(form);
+            else if (btnDl)
+              that.trySumbit(btnDl);
+            else
+              that.clog('Missing download button');
+          }
+          else{
+
+            that.clog('Not a download page');
+          }
         }
       }
     },
