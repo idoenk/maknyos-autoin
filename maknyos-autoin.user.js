@@ -2234,10 +2234,13 @@
         var that = this,
             btnDownload = g('[type="submit"][name="method_free"]',null,true),
             recapcay  = g('.g-recaptcha'),
+            site_key = null,
+            form = null,
             cont = null,
             lite_hostname = null,
             el   = null
         ;
+        that.clog(recapcay);
 
         // # 1
         if( btnDownload ){
@@ -2246,15 +2249,54 @@
           that.trySumbit( btnDownload );
         }
         else{
-          // # 3
-          if( el = g('form[name="F1"]') ){
-            that.clog('#3');
+          if( form = g('form[name="F1"]') ){
+            // # 2
+            that.clog('#2');
 
-            el.submit();
+            if( recapcay ){
+              site_key = recapcay.getAttribute('data-sitekey');
+              that.clog('Recapcay found, site_key: '+site_key);
+
+              $(recapcay)
+                .replaceWith($('<div id="maknyos-recaptcha" data-sitekey="'+site_key+'"></div>'));
+
+              // Incase of grecaptcha lib properly loaded
+              setTimeout(function(){
+
+                // recaptcha-rebuilder
+                var scriptHandler = function(_site_key){
+                  return (function(win, $){
+
+                    if("undefined" !== typeof grecaptcha){
+                      grecaptcha.render("maknyos-recaptcha", {
+                        sitekey: "___SITEKEY___",
+                        callback: function(){
+                          var theform = document.querySelector('form[name=F1]');
+                          if (theform)
+                            theform.submit();
+                        }
+                      });
+                    }
+                    else{
+
+                      console.log('grecaptcha undefined');
+                    }
+                  })(window, $);
+                };
+                scriptHandler = scriptHandler.toString();
+                scriptHandler = scriptHandler.replace(/___SITEKEY___/, site_key);
+                that.injectBodyScript(scriptHandler);
+              }, 567);
+            }
+            else{
+              that.clog('Recapcay not found, directly submitting..');
+
+              form.submit();
+            }
           }
           else{
-            that.clog('#2');
-            // # 2
+            // # 3
+            that.clog('#3');
             cont = g('#container');
             lite_hostname = (location.hostname+'').replace(/^w{3}\./,'');
 
