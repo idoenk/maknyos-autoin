@@ -2,8 +2,8 @@
 // @name           Maknyos AutoIn
 // @namespace      http://userscripts.org/scripts/show/91629
 // @icon           https://github.com/idoenk/maknyos-autoin/raw/master/assets/img/icon-60x60.png
-// @version        3.9.41
-// @description    Auto click get link, iframe killer. Hosts: zippyshare,mediafire,sendspace,uptobox,howfile,uppit,sendmyway,tusfiles,dropbox,dropapk,uploadbank,suprafiles,yadi.sk,datafilehost,userscloud,hulkload,app.box.com,dailyuploads,my.pcloud.com,rgho.st,uploads.to,upload.ee,cloud.mail.ru,bc.vc,sh.st,adf.ly,adfoc.us,gen.lib.rus.ec,libgen,bookfi.net
+// @version        3.9.42
+// @description    Auto click to a link mostly for download purpose, iframe killer. Supported hosts: zippyshare, mediafire, sendspace, uptobox, cloud.mail.ru, adf.ly, and many more...
 // @homepageURL    https://greasyfork.org/scripts/97
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js
 // @author         Idx
@@ -2233,6 +2233,7 @@
       run: function(){
         var that = this,
             btnDownload = g('[type="submit"][name="method_free"]',null,true),
+            recapcay  = g('.g-recaptcha'),
             cont = null,
             lite_hostname = null,
             el   = null
